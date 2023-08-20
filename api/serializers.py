@@ -38,6 +38,12 @@ class OperatorSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'worker_number', 'working_machine', 'full_name')
 
 
+class ProductionInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductionInfo
+        fields = ('id', 'minute', 'item_count')
+
+
 class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap

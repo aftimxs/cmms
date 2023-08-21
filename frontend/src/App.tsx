@@ -1,7 +1,24 @@
-import ListGroup from "./components/ListGroup.tsx";
+import Button from "./components/Button.tsx";
 
 function App(){
-    return <div><ListGroup/></div>;
+
+    // let items = [
+    //     'Hola',
+    //     'caca',
+    //     'alice',
+    //     'fea',
+    // ];
+    // const handleSelectItem = (item:string) => {
+    //     console.log(item)
+    // }
+
+    return (<div>
+                <Button
+                    color="danger"
+                    onClick={() => console.log('Clicked')}>
+                    Hello
+                </Button>
+            </div>);
 }
 
 export default App;

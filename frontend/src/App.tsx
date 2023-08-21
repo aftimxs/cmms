@@ -1,4 +1,4 @@
-import Button from "./components/Button.tsx";
+import Header from "./components/Header.tsx";
 
 function App(){
 
@@ -13,11 +13,7 @@ function App(){
     // }
 
     return (<div>
-                <Button
-                    color="danger"
-                    onClick={() => console.log('Clicked')}>
-                    Hello
-                </Button>
+                <Header/>
             </div>);
 }
 

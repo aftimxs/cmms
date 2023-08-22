@@ -1,5 +1,4 @@
 import ProgressBar from "./ProgressBar.tsx";
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 
 interface Props {
     line: string;
@@ -19,78 +18,83 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
             <div className="container py-0">
             <div className="row">
                 <div className="col-4">
-                    logo
+                    <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                 </div>
-                <div className="col-6">
-                    <div className="row">
-                        <span className="titles">PRODUCTION LINE</span>
+                <div className="row col-7">
+                    <div className="col-2">
+                        <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
                     </div>
-                    <div className="row">
-                        <span>{line}</span>
+                    <div className=" col-10">
+                        <div className=" row">
+                            <span className=" titles">PRODUCTION LINE</span>
+                        </div>
+                        <div className=" row">
+                            <span>{line}</span>
+                        </div>
                     </div>
                 </div>
-                <div className="col-2">
+                <div className=" col-1">
 
                 </div>
             </div>
             </div>
 
-            <div className="container py-0">
-                <div className="row">
-                    <div className="col-8">
-                        <div className="row">
-                            <span className="titles">SHIFT QUANTITY</span>
+            <div className=" container py-0">
+                <div className=" row">
+                    <div className=" col-8">
+                        <div className=" row">
+                            <span className=" titles">SHIFT QUANTITY</span>
                         </div>
-                        <div className="row">
-                            <span className="fs-2">{pieces} pcs</span>
+                        <div className=" row">
+                            <span className=" fs-2">{pieces} pcs</span>
                         </div>
                     </div>
-                    <div className="col-4 text-center">
-                        <div className="row">
-                         <span className="titles">OEE</span>
+                    <div className=" col-4 text-center">
+                        <div className=" row">
+                         <span className=" titles">OEE</span>
                         </div>
-                        <div className="row">
-                            <span className="fs-2">65%</span>
+                        <div className=" row">
+                            <span className=" fs-2">65%</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="container py-0">
-                <div className="row">
-                    <span className="titles">CURRENT BATCH</span>
+            <div className=" container py-0">
+                <div className=" row">
+                    <span className=" titles">CURRENT BATCH</span>
                 </div>
-                <div className="row">
-                    <div className="col-4">
+                <div className=" row">
+                    <div className=" col-4">
                         <span>{current[0]}</span>
                     </div>
-                    <div className="col-8">
+                    <div className=" col-8">
                         <span>{current[1]}</span>
                     </div>
                 </div>
-                <div className="row pt-1">
-                    <div className="col-8 pt-1">
+                <div className=" row pt-1">
+                    <div className=" col-8 pt-1">
                         <ProgressBar progress={progress}/>
                     </div>
-                    <div className="col-4 text-end">
+                    <div className=" col-4 text-end">
                         <span>{pieces} ({scrap}) / {total} pcs</span>
                     </div>
                 </div>
             </div>
 
-            <div className="container py-0 pb-1">
-                <div className="row">
-                    <div className="col-3 border-bottom border-2 border-success rounded text-center">
-                        <span className="titles">PREVIOUS</span>
+            <div className=" container py-0 pb-1">
+                <div className=" row">
+                    <div className=" col-3 border-bottom border-2 border-success rounded text-center">
+                        <span className=" titles">PREVIOUS</span>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-4">
+                <div className=" row">
+                    <div className=" col-4">
                         <span>{previous[0]}</span>
                     </div>
-                    <div className="col-4">
+                    <div className=" col-4">
                         <span>{previous[1]}</span>
                     </div>
-                    <div className="col-4 text-end">
+                    <div className=" col-4 text-end">
                         <span>pcs</span>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 import Header from "./components/Header.tsx";
+import Timeline from "./components/Timeline.tsx";
 
 function App(){
 
@@ -12,8 +13,9 @@ function App(){
     //     console.log(item)
     // }
 
-    return (<div>
+    return (<div className="container-fluid bg-dark text-white">
                 <Header/>
+                <Timeline/>
             </div>);
 }
 

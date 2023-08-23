@@ -16,7 +16,7 @@ const Header = () => {
     ];
 
     return (
-        <div className="container-fluid bg-dark text-white pt-2">
+        <div className="container-fluid pt-2">
             <div className="row">
                 <HeaderLeft line="Weld1" pieces={250} scrap={50} total={500} current={current} previous={previous}/>
                 <HeaderCenter/>

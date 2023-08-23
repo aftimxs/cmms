@@ -1,39 +1,12 @@
+import TimelineBar from "./TimelineBar.tsx";
+import TimelineVerticalLines from "./TimelineVerticalLines.tsx";
 
 const TimelineCenter = () => {
     return(
         <div className="col-10 border-start border-end">
-            <div className="row bg-black h-100">
-                <div className="col-3 border-end border-white border-2">
-                    <div className="row h-100">
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                    </div>
-                </div>
-                <div className="col-3 border-end border-white border-2">
-                    <div className="row h-100">
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                    </div>
-                </div>
-                <div className="col-3 border-end border-white border-2">
-                    <div className="row h-100">
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                    </div>
-                </div>
-                <div className="col-3">
-                    <div className="row h-100">
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                        <div className="col-4 border-end border-secondary">
-                        </div>
-                    </div>
+            <div className="row bg-black h-100 align-items-center">
+                <div className="container px-0 h-75">
+                    <TimelineBar/>
                 </div>
             </div>
         </div>

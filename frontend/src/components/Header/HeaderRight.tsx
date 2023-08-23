@@ -9,18 +9,22 @@ const HeaderRight = () => {
                 <div className="col-8">
                     <div className="row">
                         <div className="col-4">
-                            <i className="bi bi-chevron-left" style={{fontSize: "1.5rem"}}></i>
+                            <button type="button" className="btn btn-dark"><i className="bi bi-chevron-left"
+                                                                              style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                         <div className="col-4">
-                            <i className="bi bi-chevron-right" style={{fontSize: "1.5rem"}}></i>
+                            <button type="button" className="btn btn-dark"><i className="bi bi-chevron-right"
+                                                                              style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                         <div className="col-4">
-                            <i className="bi bi-chevron-double-right" style={{fontSize: "1.5rem"}}></i>
+                            <button type="button" className="btn btn-dark"><i className="bi bi-chevron-double-right"
+                                                                              style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                     </div>
                 </div>
                 <div className="col-4 text-center">
-                    <i className="bi bi-gear-fill" style={{fontSize: "1.5rem"}}></i>
+                    <button type="button" className="btn btn-dark"><i className="bi bi-gear-fill"
+                                                                      style={{fontSize: "1.5rem"}}></i></button>
                 </div>
             </div>
             </div>

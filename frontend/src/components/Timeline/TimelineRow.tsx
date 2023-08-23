@@ -6,7 +6,7 @@ import TimelineCenter from "./TimelineCenter.tsx";
 const TimelineRow = () => {
 
 
-    return (<div className="row" style={{height:'100px'}}>
+    return (<div className="row" style={{height:'7vh'}}>
                 <TimelineLeft/>
                 <TimelineCenter/>
                 <TimelineRight/>

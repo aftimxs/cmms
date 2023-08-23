@@ -1,5 +1,5 @@
-import Header from "./components/Header.tsx";
-import Timeline from "./components/Timeline.tsx";
+import Header from "./components/Header/Header.tsx";
+import Timeline from "./components/Timeline/Timeline.tsx";
 
 function App(){
 

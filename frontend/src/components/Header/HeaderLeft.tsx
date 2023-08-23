@@ -16,27 +16,30 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
     return (
         <div className="col-5">
             <div className="container py-0">
-            <div className="row">
-                <div className="col-4">
-                    <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
-                </div>
-                <div className="row col-7">
-                    <div className="col-2">
-                        <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
+                <div className="row">
+                    <div className="col-4">
+                        <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                     </div>
-                    <div className=" col-10">
-                        <div className=" row">
-                            <span className=" titles">PRODUCTION LINE</span>
-                        </div>
-                        <div className=" row">
-                            <span>{line}</span>
-                        </div>
-                    </div>
-                </div>
-                <div className=" col-1">
 
+                    <button type="button" className="btn btn-dark col-7">
+                    <div className="row">
+                        <div className="col-2">
+                            <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
+                        </div>
+                        <div className=" col-10">
+                            <div className=" row">
+                                <span className=" titles">PRODUCTION LINE</span>
+                            </div>
+                            <div className=" row">
+                                <span>{line}</span>
+                            </div>
+                        </div>
+                    </div>
+                    </button>
+
+                    <div className=" col-1">
+                    </div>
                 </div>
-            </div>
             </div>
 
             <div className=" container py-0">
@@ -81,9 +84,9 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                 </div>
             </div>
 
-            <div className=" container py-0 pb-1">
+            <div className=" container py-1 pb-1">
                 <div className=" row">
-                    <div className=" col-3 border-bottom border-2 border-success rounded text-center">
+                    <div className=" col-3 border-bottom border-2 border-success text-center">
                         <span className=" titles">PREVIOUS</span>
                     </div>
                 </div>

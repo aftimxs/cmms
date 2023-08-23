@@ -1,7 +1,7 @@
 
 const TimelineCenter = () => {
     return(
-        <div className="col-10">
+        <div className="col-10 border-start border-end">
             <div className="row bg-black h-100">
                 <div className="col-3 border-end border-white border-2">
                     <div className="row h-100">

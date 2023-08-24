@@ -1,5 +1,4 @@
 import TimelineBar from "./TimelineBar.tsx";
-import TimelineVerticalLines from "./TimelineVerticalLines.tsx";
 
 const TimelineCenter = () => {
     return(

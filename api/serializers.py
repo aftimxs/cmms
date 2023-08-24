@@ -2,35 +2,15 @@ from rest_framework import serializers
 from .models import *
 
 
-class ShiftSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Shift
-        fields = '__all__'
-
-
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ('id', 'target_per_hour', 'quantity', 'line')
-
-
-class ProductionLineSerializer(serializers.ModelSerializer):
-    order = OrderSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ProductionLine
-        fields = ('id', 'area', 'cell', 'working_shift', 'making_product', 'order')
+        fields = '__all__'
 
 
 class MachineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Machine
-        fields = '__all__'
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
         fields = '__all__'
 
 
@@ -49,6 +29,32 @@ class ProductionInfoSerializer(serializers.ModelSerializer):
 class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap
+        fields = '__all__'
+
+
+class ProductionLineSerializer(serializers.ModelSerializer):
+    order = OrderSerializer(many=True, read_only=True)
+    machine = MachineSerializer(many=False, read_only=True)
+    operator = OperatorSerializer(many=True, read_only=True)
+    info = ProductionInfoSerializer(many=True, read_only=True)
+    scrap = ScrapSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProductionLine
+        fields = '__all__'
+
+
+class ShiftSerializer(serializers.ModelSerializer):
+    line = ProductionLineSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Shift
+        fields = '__all__'
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
         fields = '__all__'
 
 

@@ -1,5 +1,9 @@
+
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
 import CustomTooltip from "./CustomTooltip.tsx";
+import {useState} from "react";
+import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
+import dayjs from "dayjs";
 
 const HeaderCenter = () => {
 
@@ -34,10 +38,20 @@ const HeaderCenter = () => {
   },
 ];
 
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    let date = new Date()
+    const [value, setValue] = useState(dayjs(date));
+    const handleDate = () => setValue(newValue)
+    console.log(value)
+
     return(
         <div className="col-5">
+            <ShiftOptionMenu show={show} handleClose={handleClose} title="Select date and shift" value={value} handleDate={handleDate}/>
             <div className="container py-0">
-                <button type="button" className="btn btn-dark">
+                <button type="button" className="btn btn-dark" onClick={handleShow}>
                     <div className="row">
                         <div className="col-2 text-center">
                             <i className="bi bi-calendar" style={{fontSize: "1.5rem"}}></i>

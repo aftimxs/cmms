@@ -11,11 +11,11 @@ class ProductionLineAdmin(admin.ModelAdmin):
 
 
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'code', 'status', 'make', 'machine_model', 'serial', 'line')
+    list_display = ('id', 'code', 'status', 'make', 'machine_model', 'serial', 'line')
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'part_num', 'rate', 'total_quantity')
+    list_display = ('id', 'name', 'part_num', 'rate')
 
 
 class OrderAdmin(admin.ModelAdmin):

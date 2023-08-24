@@ -7,7 +7,7 @@ class ShiftAdmin(admin.ModelAdmin):
 
 
 class ProductionLineAdmin(admin.ModelAdmin):
-    list_display = ('id', 'area', 'cell', 'working_shift')
+    list_display = ('id', 'area', 'cell', 'working_shift', 'making_product')
 
 
 class MachineAdmin(admin.ModelAdmin):
@@ -23,7 +23,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class OperatorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'last_name', 'worker_number', 'working_machine', 'full_name')
+    list_display = ('id', 'first_name', 'last_name', 'worker_number', 'working_line', 'full_name')
 
 
 class ScrapAdmin(admin.ModelAdmin):
@@ -32,6 +32,10 @@ class ScrapAdmin(admin.ModelAdmin):
 
 class DowntimeAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'start', 'end', 'duration')
+
+
+class ProductionInfoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'minute', 'item_count', 'line')
 
 
 # Register your models here.
@@ -43,4 +47,5 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(Operator, OperatorAdmin)
 admin.site.register(Scrap, ScrapAdmin)
 admin.site.register(Downtime, DowntimeAdmin)
+admin.site.register(ProductionInfo, ProductionInfoAdmin)
 

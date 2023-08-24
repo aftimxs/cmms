@@ -12,10 +12,18 @@ class Shift(models.Model):
     end = models.TimeField()
 
 
+class Product(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    part_num = models.CharField(max_length=20, unique=True)
+    rate = models.IntegerField()
+    total_quantity = models.IntegerField()
+
+
 class ProductionLine(models.Model):
     area = models.CharField(max_length=15)
     cell = models.IntegerField()
     working_shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
+    making_product = models.ForeignKey(Product, default=0, on_delete=models.CASCADE)
 
 
 class Machine(models.Model):
@@ -28,25 +36,18 @@ class Machine(models.Model):
     line = models.OneToOneField(ProductionLine, on_delete=models.CASCADE)
 
 
-class Product(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    part_num = models.CharField(max_length=20, unique=True)
-    rate = models.IntegerField()
-    total_quantity = models.IntegerField()
-
-
 class Order(models.Model):
     target_per_hour = models.IntegerField()
     quantity = models.IntegerField()
     products = models.ManyToManyField(Product)
-    line = models.ForeignKey(ProductionLine, on_delete=models.CASCADE)
+    line = models.ForeignKey(ProductionLine, related_name='order', on_delete=models.CASCADE)
 
 
 class Operator(models.Model):
     first_name = models.CharField(max_length=30, null=False)
     last_name = models.CharField(max_length=30, null=False)
     worker_number = models.IntegerField(unique=True)
-    working_machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
+    working_line = models.ForeignKey(ProductionLine, default=0, on_delete=models.CASCADE)
 
     @property
     def full_name(self):
@@ -56,6 +57,7 @@ class Operator(models.Model):
 class ProductionInfo(models.Model):
     minute = models.TimeField()
     item_count = models.IntegerField()
+    line = models.ForeignKey(ProductionLine, default=0, on_delete=models.CASCADE)
 
 
 class Scrap(models.Model):

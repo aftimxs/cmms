@@ -5,52 +5,54 @@ from .models import *
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
-        fields = ('id', 'number', 'date', 'start', 'end')
-
-
-class ProductionLineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductionLine
-        fields = ('id', 'area', 'cell', 'working_shift')
-
-
-class MachineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Machine
-        fields = ('id', 'name', 'code', 'status', 'make', 'machine_model', 'serial', 'line')
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ('id', 'name', 'part_num', 'rate', 'total_quantity')
+        fields = '__all__'
 
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ('id', 'target_per_hour', 'quantity', 'products', 'line')
+        fields = ('id', 'target_per_hour', 'quantity', 'line')
+
+
+class ProductionLineSerializer(serializers.ModelSerializer):
+    order = OrderSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProductionLine
+        fields = ('id', 'area', 'cell', 'working_shift', 'making_product', 'order')
+
+
+class MachineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Machine
+        fields = '__all__'
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
 
 
 class OperatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operator
-        fields = ('id', 'first_name', 'last_name', 'worker_number', 'working_machine', 'full_name')
+        fields = '__all__'
 
 
 class ProductionInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductionInfo
-        fields = ('id', 'minute', 'item_count')
+        fields = '__all__'
 
 
 class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap
-        fields = ('id', 'title', 'pieces', 'comments', 'production')
+        fields = '__all__'
 
 
 class DowntimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Downtime
-        fields = ('id', 'title', 'start', 'end', 'duration')
+        fields = '__all__'

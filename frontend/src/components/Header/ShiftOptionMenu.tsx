@@ -1,26 +1,21 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import CalendarPicker from "./CalendarPicker.tsx";
-import dayjs from "dayjs";
 
-interface Props{
-    show: boolean;
-    handleClose: () => void;
-    title: string;
-    value: dayjs.Dayjs;
-    handleDate: () => void;
-}
 
-const ShiftOptionMenu = ({show, handleClose, title, value, handleDate}:Props) => {
+// @ts-ignore
+const ShiftOptionMenu = ({title, visibility, date, shiftSelector}) => {
     return(
          <>
-          <Modal show={show} onHide={handleClose}>
+          <Modal show={visibility.show} onHide={visibility.handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className="container-fluid text-center py-3">
-                    <CalendarPicker value={value} handleDate={handleDate}/>
+                    <CalendarPicker
+                        date = {date}
+                    />
                 </div>
                 <div className="container-fluid py-3">
                     <Form>
@@ -32,6 +27,8 @@ const ShiftOptionMenu = ({show, handleClose, title, value, handleDate}:Props) =>
                                     type='radio'
                                     name="shiftSelector"
                                     label={shift}
+                                    value={index}
+                                    onChange={value => shiftSelector.setShiftSelect(value)}
                                 />
                             </div>
                         ))}

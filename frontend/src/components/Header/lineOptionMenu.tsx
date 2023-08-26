@@ -1,6 +1,5 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-import CalendarPicker from "./CalendarPicker.tsx";
 
 
 // @ts-ignore
@@ -18,11 +17,6 @@ const ShiftOptionMenu = ({title, visibility, date, shiftSelector}) => {
               <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <div className="container-fluid text-center py-3">
-                    <CalendarPicker
-                        date = {date}
-                    />
-                </div>
                 <div className="container-fluid py-3">
                     <Form>
                         <div className="row text-center">

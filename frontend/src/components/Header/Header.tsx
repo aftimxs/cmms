@@ -1,8 +1,9 @@
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 
 import HeaderLeft from "./HeaderLeft.tsx";
 import HeaderCenter from "./HeaderCenter.tsx";
 import HeaderRight from "./HeaderRight.tsx";
+import * as dayjs from "dayjs";
 
 
 const Header = () => {
@@ -30,13 +31,77 @@ const Header = () => {
         setLine(data)
     }
 
+    // HEADER CENTER DATA
+    // SHOW SHIFT SELECTOR MENU
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    // DATE SELECTOR
+    const date = new Date()
+    const [value, setValue] = useState(dayjs(date));
+    const handleDate = (newValue:dayjs.Dayjs | null) => {
+        // @ts-ignore
+        setValue(newValue);
+    }
+
+    // SHIFT RADIO SELECTOR
+    const [shiftSelect, setShiftSelect] = useState('1');
+    const isRadioSelected = (value2:string): boolean => shiftSelect === value2;
+    const handleRadio = (e:React.ChangeEvent<HTMLInputElement>): void => setShiftSelect(e.currentTarget.value)
+
+
+    // SHIFT BUTTONS
+    const handleBackShift = () => {
+        if (shiftSelect === '1'){
+            setShiftSelect('2')
+            setValue(value.subtract(1, 'day'))
+        } else {
+            setShiftSelect('1')
+        }
+    }
+
+    const handleForwardShift = () => {
+        if (shiftSelect === '2'){
+            setShiftSelect('1')
+            setValue(value.add(1, 'day'))
+        } else {
+            setShiftSelect('2')
+        }
+    }
+
+    const handleTodayShift = () => {
+        const date = new Date()
+        setValue(dayjs(date))
+    }
 
     return (
         <div className="container-fluid pt-2">
             <div className="row">
                 <HeaderLeft line={`${line.area} ${line.cell}`} pieces={250} scrap={50} total={500} current={current} previous={previous}/>
-                <HeaderCenter/>
-                <HeaderRight/>
+                <HeaderCenter
+                    visibility={{
+                        show: show,
+                        handleShow: handleShow,
+                        handleClose: handleClose
+                    }}
+                    date={{
+                        value: value,
+                        handleDate: handleDate
+                    }}
+                    shiftSelector={{
+                        shiftSelect: shiftSelect,
+                        isRadioSelected: isRadioSelected,
+                        handleRadio: handleRadio,
+                    }}
+                />
+                <HeaderRight
+                    shiftButtons={{
+                        handleBackShift: handleBackShift,
+                        handleForwardShift: handleForwardShift,
+                        handleTodayShift: handleTodayShift,
+                    }}
+                />
             </div>
         </div>
     );

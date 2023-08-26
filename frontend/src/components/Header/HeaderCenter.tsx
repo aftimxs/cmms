@@ -1,11 +1,11 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
 import CustomTooltip from "./CustomTooltip.tsx";
-import {useState} from "react";
 import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
 
-const HeaderCenter = () => {
+// @ts-ignore
+const HeaderCenter = ({visibility, date, shiftSelector}) => {
 
     const data = [
   {
@@ -38,42 +38,19 @@ const HeaderCenter = () => {
   },
 ];
 
-    // SHOW SHIFT SELECTOR
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
 
-    // DATE SELECTOR
-    const date = new Date()
-    const [value, setValue] = useState(dayjs(date));
-    const handleDate = (newValue:dayjs.Dayjs | null) => {
-        // @ts-ignore
-        setValue(newValue);
-    }
-
-    const [shiftSelect, setShiftSelect] = useState()
-    console.log(shiftSelect)
     return(
         <>
             <ShiftOptionMenu
                 title={"Select date and shift"}
-                visibility={{
-                    show: show,
-                    handleClose: handleClose
-                }}
-                date={{
-                    value: value,
-                    handleDate: handleDate
-                }}
-                shiftSelector={{
-                    shiftSelect: shiftSelect,
-                    setShiftSelect: setShiftSelect
-                }}
+                visibility={visibility}
+                date={date}
+                shiftSelector={shiftSelector}
             />
 
             <div className="col-5">
                 <div className="container py-0">
-                    <button type="button" className="btn btn-dark" onClick={handleShow}>
+                    <button type="button" className="btn btn-dark w-100" onClick={visibility.handleShow}>
                         <div className="row">
                             <div className="col-2 text-center">
                                 <i className="bi bi-calendar" style={{fontSize: "1.5rem"}}></i>
@@ -83,7 +60,7 @@ const HeaderCenter = () => {
                                     <span className="titles">SHIFT</span>
                                 </div>
                                 <div className="row">
-                                    <span>{`${dayjs(value).format('dddd DD/MM/YYYY')} - ${shiftSelect} shift`}</span>
+                                    <span>{`${dayjs(date.value).format('dddd DD/MM/YYYY')} - Shift ${shiftSelector.shiftSelect}`}</span>
                                 </div>
                             </div>
                         </div>

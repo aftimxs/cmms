@@ -1,7 +1,8 @@
 import Hour from "./Hour.tsx";
 
 
-const HeaderRight = () => {
+// @ts-ignore
+const HeaderRight = ({shiftButtons}) => {
     return (
         <div className="col-2">
             <div className="container py-0">
@@ -9,16 +10,16 @@ const HeaderRight = () => {
                 <div className="col-8">
                     <div className="row">
                         <div className="col-4">
-                            <button type="button" className="btn btn-dark"><i className="bi bi-chevron-left"
-                                                                              style={{fontSize: "1.5rem"}}></i></button>
+                            <button type="button" className="btn btn-dark" onClick={shiftButtons.handleBackShift}>
+                                <i className="bi bi-chevron-left" style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                         <div className="col-4">
-                            <button type="button" className="btn btn-dark"><i className="bi bi-chevron-right"
-                                                                              style={{fontSize: "1.5rem"}}></i></button>
+                            <button type="button" className="btn btn-dark" onClick={shiftButtons.handleForwardShift}>
+                                <i className="bi bi-chevron-right" style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                         <div className="col-4">
-                            <button type="button" className="btn btn-dark"><i className="bi bi-chevron-double-right"
-                                                                              style={{fontSize: "1.5rem"}}></i></button>
+                            <button type="button" className="btn btn-dark" onClick={shiftButtons.handleTodayShift}>
+                                <i className="bi bi-chevron-double-right" style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                     </div>
                 </div>

@@ -1,19 +1,19 @@
 import ProgressBar from "./ProgressBar.tsx";
+import LineOptionMenu from "./LineOptionMenu.tsx";
 
-interface Props {
-    line: string;
-    pieces: number;
-    scrap: number;
-    total: number;
-    current: string[];
-    previous: string[];
-}
 
-const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => {
+// @ts-ignore
+const HeaderLeft = ({test, visibilityPL, lineSelector}) => {
 
-    let progress = [((pieces-scrap)/total)*100, (scrap/total)*100]
+    let progress = [((test.pieces-test.scrap)/test.total)*100, (test.scrap/test.total)*100]
 
     return (
+        <>
+            <LineOptionMenu
+                title={"Select station"}
+                visibilityPL={visibilityPL}
+                lineSelector={lineSelector}
+            />
         <div className="col-5">
             <div className="container py-0">
                 <div className="row">
@@ -21,7 +21,7 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                         <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                     </div>
 
-                    <button type="button" className="btn btn-dark col-7">
+                    <button type="button" className="btn btn-dark col-7" onClick={visibilityPL.handleShowPL}>
                     <div className="row">
                         <div className="col-2">
                             <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
@@ -31,7 +31,7 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                                 <span className=" titles">PRODUCTION LINE</span>
                             </div>
                             <div className=" row">
-                                <span>{line}</span>
+                                <span>{`${lineSelector.production[0].area} ${lineSelector.production[0].number}`}</span>
                             </div>
                         </div>
                     </div>
@@ -49,7 +49,7 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                             <span className=" titles">SHIFT QUANTITY</span>
                         </div>
                         <div className=" row">
-                            <span className=" fs-2">{pieces} pcs</span>
+                            <span className=" fs-2">{test.pieces} pcs</span>
                         </div>
                     </div>
                     <div className=" col-4 text-center">
@@ -68,10 +68,10 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                 </div>
                 <div className=" row">
                     <div className=" col-4">
-                        <span>{current[0]}</span>
+                        <span>{test.current[0]}</span>
                     </div>
                     <div className=" col-8">
-                        <span>{current[1]}</span>
+                        <span>{test.current[1]}</span>
                     </div>
                 </div>
                 <div className=" row pt-1">
@@ -79,7 +79,7 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                         <ProgressBar progress={progress}/>
                     </div>
                     <div className=" col-4 text-end">
-                        <span>{pieces} ({scrap}) / {total} pcs</span>
+                        <span>{test.pieces} ({test.scrap}) / {test.total} pcs</span>
                     </div>
                 </div>
             </div>
@@ -92,10 +92,10 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                 </div>
                 <div className=" row">
                     <div className=" col-4">
-                        <span>{previous[0]}</span>
+                        <span>{test.previous[0]}</span>
                     </div>
                     <div className=" col-4">
-                        <span>{previous[1]}</span>
+                        <span>{test.previous[1]}</span>
                     </div>
                     <div className=" col-4 text-end">
                         <span>pcs</span>
@@ -103,6 +103,7 @@ const HeaderLeft = ( {line, pieces, scrap, total, current, previous}:Props ) => 
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

@@ -75,10 +75,64 @@ const Header = () => {
         setValue(dayjs(date))
     }
 
+    // SHOW PRODUCTION LINE MENU
+    const [showPL, setShowPL] = useState(false);
+    const handleClosePL = () => setShowPL(false);
+    const handleShowPL = () => setShowPL(true);
+
+    //
+    const [production, setProduction] = useState([{id: '1', number: '1', area: 'Welding'}])
+    const isButtonSelected = (x:[]): boolean => production === x;
+    const handlePL = (e): void => {
+        const newProduction = production.map(production => {
+            let eSplit = e.currentTarget.value.split(",");
+            return {
+                ...production,
+                id: eSplit[0],
+                number: eSplit[1],
+                area: eSplit[2],
+            };
+        });
+        setProduction(newProduction)
+    }
+
+    const lines = [
+        {id:'1', number:'1', area:'Welding'},
+        {id:'2', number:'10', area:'Welding'},
+        {id:'3', number:'11', area:'Welding'},
+        {id:'4', number:'1', area:'Molding'},
+        {id:'5', number:'2', area:'Molding'},
+        {id:'6', number:'3', area:'Molding'},
+        {id:'7', number:'4', area:'Molding'},
+        {id:'8', number:'5', area:'Molding'},
+    ]
+
+
+
     return (
         <div className="container-fluid pt-2">
             <div className="row">
-                <HeaderLeft line={`${line.area} ${line.cell}`} pieces={250} scrap={50} total={500} current={current} previous={previous}/>
+                <HeaderLeft
+                    test = {{
+                        line: 1,
+                        pieces: 250,
+                        scrap: 50,
+                        total: 500,
+                        current: {current},
+                        previous: {previous},
+                    }}
+                    visibilityPL={{
+                        showPL: showPL,
+                        handleShowPL: handleShowPL,
+                        handleClosePL: handleClosePL
+                    }}
+                    lineSelector = {{
+                        production: production,
+                        isButtonSelected: isButtonSelected,
+                        handlePL: handlePL,
+                        lines: lines,
+                    }}
+                />
                 <HeaderCenter
                     visibility={{
                         show: show,

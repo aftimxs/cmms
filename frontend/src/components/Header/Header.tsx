@@ -5,6 +5,8 @@ import HeaderCenter from "./HeaderCenter.tsx";
 import HeaderRight from "./HeaderRight.tsx";
 import * as dayjs from "dayjs";
 
+import axios from 'axios';
+
 
 const Header = () => {
 
@@ -95,18 +97,52 @@ const Header = () => {
     ]
 
     //
-    let [line, setLine] = useState([])
+    let [shiftData, setShiftData] = useState([])
+    let [lineData, setLineData] = useState([])
+    let [orderData, setOrderData] = useState([])
+    let [infoData, setInfoData] = useState([])
 
     useEffect(() => {
         getLine(value, shiftSelect, production)
     }, [value, shiftSelect, production])
 
+    const instance = axios.create({
+      baseURL: 'http://127.0.0.1:8000/api',
+      timeout: 1000,
+    });
+
     let getLine = async (value, shiftSelect, production) => {
-        let response = await fetch(`http://127.0.0.1:8000/api/shift?shift_number=${shiftSelect}
-            &date=${dayjs(value).format('YYYY-MM-DD')}&area=${production[0].area.toLowerCase()}&cell=${production[0].number}`)
-        let data = await response.json()
-        console.log(data)
-        setLine(data)
+        try {
+            let response = await instance.get('/shift', {
+                params: {
+                    shift_number: shiftSelect,
+                    date: dayjs(value).format('YYYY-MM-DD'),
+                    area: production[0].area,
+                    cell: production[0].number,
+                }
+            })
+            let data = await response.data[0]
+            let data2 = await response.data[0].line[0]
+            let data3 = await response.data[0].line[0].order[0]
+            let data4 = await response.data[0].line[0].info
+
+            setShiftData(data)
+            setLineData(data2);
+            setOrderData(data3)
+            setInfoData(data4)
+        } catch (error) {
+            if (error.name === 'TypeError') {
+                let data = []
+                let data2 = []
+                let data3 = []
+                let data4 = []
+
+                setShiftData(data)
+                setLineData(data2);
+                setOrderData(data3)
+                setInfoData(data4)
+            }
+        }
     }
 
 
@@ -117,12 +153,17 @@ const Header = () => {
                     test = {{
                         line: 1,
                         pieces: 250,
-                        scrap: 50,
+                        scrap: 2,
                         total: 500,
                         current: {current},
                         previous: {previous},
                     }}
-                    data ={line}
+                    data = {{
+                        shiftData: shiftData,
+                        lineData: lineData,
+                        orderData: orderData,
+                        infoData: infoData,
+                    }}
                     visibilityPL={{
                         showPL: showPL,
                         handleShowPL: handleShowPL,

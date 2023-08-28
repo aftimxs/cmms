@@ -1,11 +1,21 @@
 import ProgressBar from "./ProgressBar.tsx";
 import LineOptionMenu from "./LineOptionMenu.tsx";
+import {useState} from "react";
 
 
 // @ts-ignore
 const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
 
-    let progress = [((test.pieces-test.scrap)/test.total)*100, (test.scrap/test.total)*100]
+    const infos = data.infoData
+    let [total, setTotal] = useState(0)
+
+    infos.map(info => {
+        total = total + info.item_count
+        console.log(total)
+    })
+
+
+    let progress = [((total-test.scrap)/data.orderData.quantity)*100, (test.scrap/data.orderData.quantity)*100]
 
     return (
         <>
@@ -49,7 +59,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                             <span className=" titles">SHIFT QUANTITY</span>
                         </div>
                         <div className=" row">
-                            <span className=" fs-2">{test.pieces} pcs</span>
+                            <span className=" fs-2">{total} pcs</span>
                         </div>
                     </div>
                     <div className=" col-4 text-center">
@@ -68,7 +78,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                 </div>
                 <div className=" row">
                     <div className=" col-4">
-                        <span>{test.current[0]}</span>
+                        {/*<span>{productData.part_num}</span>*/}
                     </div>
                     <div className=" col-8">
                         <span>{test.current[1]}</span>
@@ -79,7 +89,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                         <ProgressBar progress={progress}/>
                     </div>
                     <div className=" col-4 text-end">
-                        <span>{test.pieces} ({test.scrap}) / {test.total} pcs</span>
+                        <span>{total} ({test.scrap}) / {data.orderData.quantity} pcs</span>
                     </div>
                 </div>
             </div>

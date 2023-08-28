@@ -2,7 +2,15 @@ from rest_framework import serializers
 from .models import *
 
 
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
 class OrderSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+
     class Meta:
         model = Order
         fields = '__all__'
@@ -49,12 +57,6 @@ class ShiftSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shift
-        fields = '__all__'
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
         fields = '__all__'
 
 

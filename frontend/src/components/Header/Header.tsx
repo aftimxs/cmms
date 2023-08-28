@@ -18,19 +18,6 @@ const Header = () => {
         'aquel'
     ];
 
-    //
-    let [line, setLine] = useState([])
-
-    useEffect(() => {
-        getLine()
-    }, [])
-
-    let getLine = async () => {
-        let response = await fetch('http://127.0.0.1:8000/api/production-line/1/')
-        let data = await response.json()
-        setLine(data)
-    }
-
     // HEADER CENTER DATA
     // SHOW SHIFT SELECTOR MENU
     const [show, setShow] = useState(false);
@@ -107,6 +94,19 @@ const Header = () => {
         {id:'8', number:'5', area:'Molding'},
     ]
 
+    //
+    let [line, setLine] = useState([])
+
+    useEffect(() => {
+        getLine(value, shiftSelect, production)
+    }, [])
+
+    let getLine = async (value, shiftSelect, production) => {
+        let response = await fetch(`http://127.0.0.1:8000/api/shift?shift_number=${shiftSelect}&date=${dayjs(value).format('YYYY-MM-DD ')}`)
+        let data = await response.json()
+        console.log(data)
+        setLine(data)
+    }
 
 
     return (

@@ -6,8 +6,15 @@ from .serializers import *
 
 # Create your views here.
 class ShiftView(viewsets.ModelViewSet):
-    queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
+
+    def get_queryset(self):
+        queryset = Shift.objects.all()
+        shift_number = self.request.query_params.get('shift_number')
+        date = self.request.query_params.get('date')
+        if shift_number is not None and date is not None:
+            queryset = queryset.filter(shift_number=shift_number, date=date)
+        return queryset
 
 
 class ProductionLineView(viewsets.ModelViewSet):

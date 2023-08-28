@@ -99,10 +99,11 @@ const Header = () => {
 
     useEffect(() => {
         getLine(value, shiftSelect, production)
-    }, [])
+    }, [value, shiftSelect, production])
 
     let getLine = async (value, shiftSelect, production) => {
-        let response = await fetch(`http://127.0.0.1:8000/api/shift?shift_number=${shiftSelect}&date=${dayjs(value).format('YYYY-MM-DD ')}`)
+        let response = await fetch(`http://127.0.0.1:8000/api/shift?shift_number=${shiftSelect}
+            &date=${dayjs(value).format('YYYY-MM-DD')}&area=${production[0].area.toLowerCase()}&cell=${production[0].number}`)
         let data = await response.json()
         console.log(data)
         setLine(data)
@@ -121,6 +122,7 @@ const Header = () => {
                         current: {current},
                         previous: {previous},
                     }}
+                    data ={line}
                     visibilityPL={{
                         showPL: showPL,
                         handleShowPL: handleShowPL,

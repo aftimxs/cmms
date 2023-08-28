@@ -3,7 +3,7 @@ import LineOptionMenu from "./LineOptionMenu.tsx";
 
 
 // @ts-ignore
-const HeaderLeft = ({test, visibilityPL, lineSelector}) => {
+const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
 
     let progress = [((test.pieces-test.scrap)/test.total)*100, (test.scrap/test.total)*100]
 

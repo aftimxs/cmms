@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import *
 from .serializers import *
+from django.db.models import Prefetch
 
 
 # Create your views here.
@@ -12,19 +13,38 @@ class ShiftView(viewsets.ModelViewSet):
         queryset = Shift.objects.all()
         shift_number = self.request.query_params.get('shift_number')
         date = self.request.query_params.get('date')
+        area = self.request.query_params.get('area')
+        cell = self.request.query_params.get('cell')
+
         if shift_number is not None and date is not None:
-            queryset = queryset.filter(shift_number=shift_number, date=date)
+            queryset = (queryset.filter(shift_number=shift_number, date=date).
+                        prefetch_related(Prefetch('line', queryset=ProductionLine.objects.filter(area=area, cell=cell))))
         return queryset
 
 
 class ProductionLineView(viewsets.ModelViewSet):
-    queryset = ProductionLine.objects.all()
     serializer_class = ProductionLineSerializer
+
+    def get_queryset(self):
+        queryset = ProductionLine.objects.all()
+        area = self.request.query_params.get('area')
+        cell = self.request.query_params.get('cell')
+
+        if cell is not None:
+            queryset = queryset.filter(cell=cell)
+        return queryset
 
 
 class MachineView(viewsets.ModelViewSet):
-    queryset = Machine.objects.all()
     serializer_class = MachineSerializer
+
+    def get_queryset(self):
+        queryset = Machine.objects.all()
+        line = self.request.query_params.get('line')
+
+        if line is not None:
+            queryset = queryset.filter(line=line)
+        return queryset
 
 
 class ProductView(viewsets.ModelViewSet):

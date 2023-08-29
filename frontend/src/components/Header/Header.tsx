@@ -99,7 +99,8 @@ const Header = () => {
     //
     let [shiftData, setShiftData] = useState([])
     let [lineData, setLineData] = useState([])
-    let [orderData, setOrderData] = useState([])
+    let [orderData, setOrderData] = useState([{quantity:0}])
+    let [productData, setProductData] = useState([{part_num: 'Not Available', rate: 0}])
     let [infoData, setInfoData] = useState([])
 
     useEffect(() => {
@@ -117,30 +118,32 @@ const Header = () => {
                 params: {
                     shift_number: shiftSelect,
                     date: dayjs(value).format('YYYY-MM-DD'),
-                    area: production[0].area,
+                    area: production[0].area.toLowerCase(),
                     cell: production[0].number,
                 }
             })
             let data = await response.data[0]
             let data2 = await response.data[0].line[0]
             let data3 = await response.data[0].line[0].order[0]
-            let data4 = await response.data[0].line[0].info
+            let data4 = await response.data[0].line[0].order[0].products
+            let data5 = await response.data[0].line[0].info
 
             setShiftData(data)
-            setLineData(data2);
+            setLineData(data2)
             setOrderData(data3)
-            setInfoData(data4)
+            setProductData(data4)
+            setInfoData(data5)
         } catch (error) {
             if (error.name === 'TypeError') {
                 let data = []
-                let data2 = []
-                let data3 = []
-                let data4 = []
+                let data2 = [{quantity:0}]
+                let data3 = [{part_num: 'Not Available', rate: 0}]
 
                 setShiftData(data)
-                setLineData(data2);
-                setOrderData(data3)
-                setInfoData(data4)
+                setLineData(data);
+                setOrderData(data2)
+                setProductData(data3)
+                setInfoData(data)
             }
         }
     }
@@ -153,7 +156,7 @@ const Header = () => {
                     test = {{
                         line: 1,
                         pieces: 250,
-                        scrap: 2,
+                        scrap: 0,
                         total: 500,
                         current: {current},
                         previous: {previous},
@@ -162,6 +165,7 @@ const Header = () => {
                         shiftData: shiftData,
                         lineData: lineData,
                         orderData: orderData,
+                        productData: productData,
                         infoData: infoData,
                     }}
                     visibilityPL={{

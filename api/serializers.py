@@ -40,23 +40,23 @@ class ScrapSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductionLineSerializer(serializers.ModelSerializer):
+class ShiftSerializer(serializers.ModelSerializer):
     order = OrderSerializer(many=True, read_only=True)
-    machine = MachineSerializer(many=False, read_only=True)
     operator = OperatorSerializer(many=True, read_only=True)
     info = ProductionInfoSerializer(many=True, read_only=True)
-    scrap = ScrapSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ProductionLine
-        fields = '__all__'
-
-
-class ShiftSerializer(serializers.ModelSerializer):
-    line = ProductionLineSerializer(many=True, read_only=True)
 
     class Meta:
         model = Shift
+        fields = '__all__'
+
+
+class ProductionLineSerializer(serializers.ModelSerializer):
+    machine = MachineSerializer(many=False, read_only=True)
+    scrap = ScrapSerializer(many=True, read_only=True)
+    shift = ShiftSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProductionLine
         fields = '__all__'
 
 

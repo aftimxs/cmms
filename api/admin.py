@@ -3,27 +3,27 @@ from .models import *
 
 
 class ShiftAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'date', 'start', 'end')
+    list_display = ('id', 'shift_number', 'date', 'on_line')
 
 
 class ProductionLineAdmin(admin.ModelAdmin):
-    list_display = ('id', 'area', 'cell', 'working_shift', 'making_product')
+    list_display = ('id', 'area', 'cell')
 
 
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('id', 'code', 'status', 'make', 'machine_model', 'serial', 'line')
+    list_display = ('id', 'code', 'make', 'machine_model', 'serial', 'line')
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'part_num', 'rate')
+    list_display = ('id', 'part_num', 'rate')
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'target_per_hour', 'quantity', 'line')
+    list_display = ('id', 'quantity', 'line', 'shift')
 
 
 class OperatorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'last_name', 'worker_number', 'working_line', 'full_name')
+    list_display = ('id', 'first_name', 'last_name', 'worker_number', 'working_line', 'working_shift', 'full_name')
 
 
 class ScrapAdmin(admin.ModelAdmin):
@@ -35,7 +35,7 @@ class DowntimeAdmin(admin.ModelAdmin):
 
 
 class ProductionInfoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'minute', 'item_count', 'line')
+    list_display = ('id', 'minute', 'item_count', 'line', 'shift')
 
 
 # Register your models here.

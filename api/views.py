@@ -8,18 +8,7 @@ from django.db.models import Prefetch
 # Create your views here.
 class ShiftView(viewsets.ModelViewSet):
     serializer_class = ShiftSerializer
-
-    def get_queryset(self):
-        queryset = Shift.objects.all()
-        shift_number = self.request.query_params.get('shift_number')
-        date = self.request.query_params.get('date')
-        area = self.request.query_params.get('area')
-        cell = self.request.query_params.get('cell')
-
-        if shift_number is not None and date is not None:
-            queryset = (queryset.filter(shift_number=shift_number, date=date).
-                        prefetch_related(Prefetch('line', queryset=ProductionLine.objects.filter(area=area, cell=cell))))
-        return queryset
+    queryset = Shift.objects.all()
 
 
 class ProductionLineView(viewsets.ModelViewSet):
@@ -29,9 +18,12 @@ class ProductionLineView(viewsets.ModelViewSet):
         queryset = ProductionLine.objects.all()
         area = self.request.query_params.get('area')
         cell = self.request.query_params.get('cell')
+        date = self.request.query_params.get('date')
+        shift_number = self.request.query_params.get('shift_number')
 
-        if cell is not None:
-            queryset = queryset.filter(cell=cell)
+        if area is not None and cell is not None and date is not None and shift_number is not None:
+            queryset = (queryset.filter(area=area, cell=cell).
+                        prefetch_related(Prefetch('shift', queryset=Shift.objects.filter(shift_number=shift_number, date=date))))
         return queryset
 
 

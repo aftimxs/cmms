@@ -5,6 +5,16 @@ from datetime import timedelta
 
 
 # Create your models here.
+class ProductionLine(models.Model):
+    area = models.CharField(max_length=15)
+    cell = models.IntegerField()
+
+
+class Product(models.Model):
+    part_num = models.CharField(max_length=20, unique=True)
+    rate = models.IntegerField()
+
+
 class Shift(models.Model):
 
     number = [
@@ -14,26 +24,11 @@ class Shift(models.Model):
 
     shift_number = models.IntegerField(choices=number, default=1)
     date = models.DateField()
-    start = models.TimeField()
-    end = models.TimeField()
-
-
-class Product(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    part_num = models.CharField(max_length=20, unique=True)
-    rate = models.IntegerField()
-
-
-class ProductionLine(models.Model):
-    area = models.CharField(max_length=15)
-    cell = models.IntegerField()
-    working_shift = models.ForeignKey(Shift, related_name='line', on_delete=models.CASCADE)
-    making_product = models.ForeignKey(Product, default=0, on_delete=models.CASCADE)
+    on_line = models.ForeignKey(ProductionLine, related_name='shift',  default=0, on_delete=models.CASCADE)
 
 
 class Machine(models.Model):
     code = models.CharField(max_length=5, unique=True)
-    status = models.BooleanField(null=False, default=False)
     make = models.CharField(max_length=20)
     machine_model = models.CharField(max_length=20)
     serial = models.IntegerField(unique=True)
@@ -41,10 +36,10 @@ class Machine(models.Model):
 
 
 class Order(models.Model):
-    target_per_hour = models.IntegerField()
     quantity = models.IntegerField()
     products = models.ManyToManyField(Product)
-    line = models.ForeignKey(ProductionLine, related_name='order', on_delete=models.CASCADE)
+    line = models.ForeignKey(ProductionLine, related_name='orderL', on_delete=models.CASCADE)
+    shift = models.ForeignKey(Shift, related_name='order',  default=0, on_delete=models.CASCADE)
 
 
 class Operator(models.Model):
@@ -52,6 +47,7 @@ class Operator(models.Model):
     last_name = models.CharField(max_length=30, null=False)
     worker_number = models.IntegerField(unique=True)
     working_line = models.ForeignKey(ProductionLine, related_name='operator', default=0, on_delete=models.CASCADE)
+    working_shift = models.ForeignKey(Shift, related_name='operator',  default=0, on_delete=models.CASCADE)
 
     @property
     def full_name(self):
@@ -62,6 +58,7 @@ class ProductionInfo(models.Model):
     minute = models.TimeField()
     item_count = models.IntegerField()
     line = models.ForeignKey(ProductionLine, related_name='info', default=0, on_delete=models.CASCADE)
+    shift = models.ForeignKey(Shift, related_name='info',  default=0, on_delete=models.CASCADE)
 
 
 class Scrap(models.Model):

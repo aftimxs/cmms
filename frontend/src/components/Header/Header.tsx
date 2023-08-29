@@ -113,13 +113,13 @@ const Header = () => {
     });
 
     let getLine = async (value, shiftSelect, production) => {
-        try {
-            let response = await instance.get('/shift', {
+        // try {
+            let response = await instance.get('/production-line/', {
                 params: {
-                    shift_number: shiftSelect,
-                    date: dayjs(value).format('YYYY-MM-DD'),
-                    area: production[0].area.toLowerCase(),
+                    area: production[0].area,
                     cell: production[0].number,
+                    date: dayjs(value).format('YYYY-MM-DD'),
+                    shift_number: shiftSelect
                 }
             })
             let data = await response.data[0]
@@ -128,24 +128,28 @@ const Header = () => {
             let data4 = await response.data[0].line[0].order[0].products
             let data5 = await response.data[0].line[0].info
 
-            setShiftData(data)
-            setLineData(data2)
+            console.log(response)
+
+
+            setLineData(data)
+            setShiftData(data2)
             setOrderData(data3)
             setProductData(data4)
             setInfoData(data5)
-        } catch (error) {
-            if (error.name === 'TypeError') {
-                let data = []
-                let data2 = [{quantity:0}]
-                let data3 = [{part_num: 'Not Available', rate: 0}]
 
-                setShiftData(data)
-                setLineData(data);
-                setOrderData(data2)
-                setProductData(data3)
-                setInfoData(data)
-            }
-        }
+        // } catch (error) {
+        //     if (error.name === 'TypeError') {
+        //         let data = []
+        //         let data2 = [{quantity:0}]
+        //         let data3 = [{part_num: 'Not Available', rate: 0}]
+        //
+        //         setShiftData(data)
+        //         setLineData(data);
+        //         setOrderData(data2)
+        //         setProductData(data3)
+        //         setInfoData(data)
+        //     }
+        // }
     }
 
 

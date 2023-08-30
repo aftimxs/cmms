@@ -52,10 +52,11 @@ const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
                         <ResponsiveContainer width="100%" height={150}>
                         <LineChart
                           data={data.infoData}
+                          onMouseUp={(e) => console.log(e)}
                         >
                           <CartesianGrid vertical={false}/>
                           <XAxis dataKey="minute" />
-                          <YAxis width={25} axisLine={false} tickCount={6} interval={0}/>
+                          <YAxis width={25} axisLine={false} tickCount={6} interval={0} domain={[0, 'dataMax']}/>
                           <Tooltip offset={15} wrapperClassName={"recharts-tooltip-wrapper"}
                                    content={<CustomTooltip
                                        target={((data.productData[0].rate)/60).toFixed(2)}

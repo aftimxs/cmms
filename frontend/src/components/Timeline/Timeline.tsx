@@ -1,20 +1,37 @@
 import TimelineRow from "./TimelineRow.tsx";
 import TimelineHeader from "./TimelineHeader.tsx";
+import dayjs from "dayjs";
+import _ from 'lodash';
 
 const Timeline = ({ data }:any) => {
 
-    // let hours:any = []
-    // if (data.shiftData.shift_number === 1){
-    //     hours = ['6 am', '7 am', '8 am', '9 am', '10 am', '11 am', '12 pm', '1 pm', '2 pm']
-    // } else {
-    //     hours = ['3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm', '10 pm', '11 pm']
-    // }
+    let hours:any = []
+    if (data.shiftData.shift_number === 1){
+        hours = ['06:00:00', '07:00:00', '08:00:00', '09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00']
+    } else {
+        hours = ['3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm', '10 pm', '11 pm']
+    }
+
+    const byHour = _.groupBy(data.infoData, 'hour')
+    console.log(byHour['06:00:00'])
+
 
     return (<div className="container-fluid">
                 <TimelineHeader/>
-                <TimelineRow
-                    data = {data}
-                />
+                {hours.map((hour, index) =>
+                    <TimelineRow
+                        key = {index}
+                        hour = {hour}
+                        data = {{
+                            shiftData: data.shiftData,
+                            lineData: data.lineData,
+                            orderData: data.orderData,
+                            productData: data.productData,
+                            infoData: byHour[hour],
+                        }}
+                    />
+                )}
+
             </div>)
 };
 

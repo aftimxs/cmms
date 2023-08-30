@@ -35,7 +35,7 @@ class DowntimeAdmin(admin.ModelAdmin):
 
 
 class ProductionInfoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'minute', 'item_count', 'line', 'shift')
+    list_display = ('id', 'hour', 'minute', 'item_count', 'line', 'shift')
 
 
 # Register your models here.

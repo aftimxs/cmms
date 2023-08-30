@@ -55,6 +55,7 @@ class Operator(models.Model):
 
 
 class ProductionInfo(models.Model):
+    hour = models.TimeField(null=True)
     minute = models.TimeField()
     item_count = models.IntegerField()
     line = models.ForeignKey(ProductionLine, related_name='info', default=0, on_delete=models.CASCADE)

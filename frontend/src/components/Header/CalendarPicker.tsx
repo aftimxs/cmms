@@ -4,8 +4,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 
-// @ts-ignore
-export default function CalendarPicker({date}) {
+export default function CalendarPicker({date}:any) {
 
     return (
       <LocalizationProvider dateAdapter={AdapterDayjs}>

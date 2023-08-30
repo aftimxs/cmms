@@ -4,40 +4,7 @@ import CustomTooltip from "./CustomTooltip.tsx";
 import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
 
-// @ts-ignore
-const HeaderCenter = ({visibility, date, shiftSelector}) => {
-
-    const data = [
-  {
-    name: '6 am',
-    uv: 1,
-  },
-  {
-    name: '7 am',
-    uv: 1,
-  },
-  {
-    name: '8 am',
-    uv: 0,
-  },
-  {
-    name: '9 am',
-    uv: .75,
-  },
-  {
-    name: '10am',
-    uv: 1,
-  },
-  {
-    name: '11 am',
-    uv: 1,
-  },
-  {
-    name: '12 pm',
-    uv: .5,
-  },
-];
-
+const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
 
     return(
         <>
@@ -84,14 +51,18 @@ const HeaderCenter = ({visibility, date, shiftSelector}) => {
                     <div className="row">
                         <ResponsiveContainer width="100%" height={150}>
                         <LineChart
-                          data={data}
+                          data={data.infoData}
                         >
                           <CartesianGrid vertical={false}/>
-                          <XAxis dataKey="name" />
+                          <XAxis dataKey="minute" />
                           <YAxis width={25} axisLine={false} tickCount={6} interval={0}/>
                           <Tooltip offset={15} wrapperClassName={"recharts-tooltip-wrapper"}
-                                   content={<CustomTooltip time={'6am'} made={1} target={1} product={'HCF100'}/>} />
-                          <Line type="step" dataKey="uv" dot={false} stroke="white" strokeWidth={2} />
+                                   content={<CustomTooltip
+                                       target={((data.productData[0].rate)/60).toFixed(2)}
+                                       product={data.productData[0].part_num}
+                                   />}
+                          />
+                          <Line type="step" dataKey="item_count" dot={false} stroke="white" strokeWidth={2} />
                           <ReferenceLine y={1} stroke={"yellow"} strokeDasharray="3 3"/>
                         </LineChart>
                         </ResponsiveContainer>

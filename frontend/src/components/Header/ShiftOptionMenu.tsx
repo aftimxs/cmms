@@ -3,8 +3,7 @@ import Form from 'react-bootstrap/Form';
 import CalendarPicker from "./CalendarPicker.tsx";
 
 
-// @ts-ignore
-const ShiftOptionMenu = ({title, visibility, date, shiftSelector}) => {
+const ShiftOptionMenu = ({title, visibility, date, shiftSelector}:any) => {
 
     const radios = [
         {id:'1', title:'First Shift'},

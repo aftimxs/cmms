@@ -1,15 +1,15 @@
 import ProgressBar from "./ProgressBar.tsx";
 import LineOptionMenu from "./LineOptionMenu.tsx";
-import {useEffect, useState} from "react";
+import { useState } from "react";
 
 
 // @ts-ignore
 const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
 
     const infos = data.infoData
-    let [total, setTotal] = useState(0)
+    let [total] = useState(0)
 
-    infos.map(info => {
+    infos.map((info: { item_count: number; }) => {
         total = total + info.item_count;
     })
 
@@ -81,7 +81,6 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                         <span>{data.productData[0].part_num}</span>
                     </div>
                     <div className=" col-8">
-                        <span>{test.current[1]}</span>
                     </div>
                 </div>
                 <div className=" row pt-1">
@@ -102,10 +101,10 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                 </div>
                 <div className=" row">
                     <div className=" col-4">
-                        <span>{test.previous[0]}</span>
+                        {/*<span>{test.previous[0]}</span>*/}
                     </div>
                     <div className=" col-4">
-                        <span>{test.previous[1]}</span>
+                        {/*<span>{test.previous[1]}</span>*/}
                     </div>
                     <div className=" col-4 text-end">
                         <span>pcs</span>

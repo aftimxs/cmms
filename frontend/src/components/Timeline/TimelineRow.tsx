@@ -5,13 +5,14 @@ import TimelineCenter from "./TimelineCenter.tsx";
 
 const TimelineRow = ({ hour, data }:any) => {
 
-    console.log(data)
-
     return (<div className="row" style={{height:'7vh'}}>
                 <TimelineLeft
                     hour = {hour}
                 />
-                <TimelineCenter/>
+                <TimelineCenter
+                    hour = {hour}
+                    data = {data}
+                />
                 <TimelineRight
                     data = {data}
                 />

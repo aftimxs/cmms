@@ -52,7 +52,6 @@ const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
                         <ResponsiveContainer width="100%" height={150}>
                         <LineChart
                           data={data.infoData}
-                          onMouseUp={(e) => console.log(e)}
                         >
                           <CartesianGrid vertical={false}/>
                           <XAxis dataKey="minute" />

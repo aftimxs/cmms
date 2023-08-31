@@ -1,6 +1,5 @@
 import TimelineRow from "./TimelineRow.tsx";
 import TimelineHeader from "./TimelineHeader.tsx";
-import dayjs from "dayjs";
 import _ from 'lodash';
 
 const Timeline = ({ data }:any) => {
@@ -13,8 +12,14 @@ const Timeline = ({ data }:any) => {
     }
 
     const byHour = _.groupBy(data.infoData, 'hour')
-    console.log(byHour['06:00:00'])
 
+    const find = (hour:any) => {
+        if (byHour[(hour).toString()] !== undefined){
+            return byHour[(hour).toString()]
+        } else {
+            return []
+        }
+    }
 
     return (<div className="container-fluid">
                 <TimelineHeader/>
@@ -27,7 +32,7 @@ const Timeline = ({ data }:any) => {
                             lineData: data.lineData,
                             orderData: data.orderData,
                             productData: data.productData,
-                            infoData: byHour[hour],
+                            infoData: find(hour),
                         }}
                     />
                 )}

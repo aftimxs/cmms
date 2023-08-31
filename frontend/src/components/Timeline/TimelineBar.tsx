@@ -1,7 +1,7 @@
 
-const TimelineBar = () => {
+const TimelineBar = ({bg}:any) => {
     return(
-        <div className="d-inline-block h-100 bg-warning" style={{width:'1.667%'}}>
+        <div className={`d-inline-block h-100 ${bg}`} style={{width:'1.667%'}}>
         </div>
     )
 };

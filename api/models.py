@@ -61,6 +61,9 @@ class ProductionInfo(models.Model):
     line = models.ForeignKey(ProductionLine, related_name='info', default=0, on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, related_name='info',  default=0, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['minute']
+
 
 class Scrap(models.Model):
     title = models.CharField(max_length=50, null=True)

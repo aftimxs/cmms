@@ -5,7 +5,7 @@ import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
 
 const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
-
+    console.log(data.infoData)
     return(
         <>
             <ShiftOptionMenu

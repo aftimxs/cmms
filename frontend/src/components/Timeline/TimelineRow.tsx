@@ -4,6 +4,7 @@ import TimelineCenter from "./TimelineCenter.tsx";
 
 
 const TimelineRow = ({ hour, data }:any) => {
+    console.log(data.infoData)
 
     return (<div className="row" style={{height:'7vh'}}>
                 <TimelineLeft

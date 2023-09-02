@@ -60,13 +60,13 @@ function App(){
 
     // GET INFO EVERY MINUTE
     useEffect(() => {
-        let timer = setInterval(() => getLine({value, shiftSelect, production}), 1000)
+        //let timer = setInterval(() => getLine({value, shiftSelect, production}), 1000)
 
-        return function cleanup(){
-            clearInterval(timer)
-        }
+        //return function cleanup(){
+        //    clearInterval(timer)
+        //}
 
-        //getLine({value, shiftSelect, production})
+        getLine({value, shiftSelect, production})
 
     }, [value, shiftSelect, production])
 

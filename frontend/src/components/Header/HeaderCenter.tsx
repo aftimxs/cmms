@@ -5,7 +5,7 @@ import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
 
 const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
-    console.log(data.infoData)
+
     return(
         <>
             <ShiftOptionMenu
@@ -63,7 +63,7 @@ const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
                                    />}
                           />
                           <Line type="step" dataKey="item_count" dot={false} stroke="white" strokeWidth={2} />
-                          <ReferenceLine y={1} stroke={"yellow"} strokeDasharray="3 3"/>
+                          <ReferenceLine y={data.productData[0].rate/60} stroke={"yellow"} strokeDasharray="3 3"/>
                         </LineChart>
                         </ResponsiveContainer>
                     </div>

@@ -10,7 +10,10 @@ const TimelineCenter = ({hour, data}:any) => {
 
     let initialMinutes:any = [];
     for (let i= 0; i < 60; i++){
-        initialMinutes.push(dayjs(data.shiftData.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute'))
+        initialMinutes.push({
+            time: dayjs(data.shiftData.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute'),
+            used: false
+        })
     }
 
     let [minutes, setMinutes] = useState(initialMinutes);
@@ -21,7 +24,7 @@ const TimelineCenter = ({hour, data}:any) => {
     useEffect(() => {
         setBars([])
         background(now)
-    }, [data, hour]);
+    }, [data]);
 
     const handleBars = (id:number, color:string, minute:dayjs.Dayjs, counter:number) => {
         // @ts-ignore
@@ -31,7 +34,19 @@ const TimelineCenter = ({hour, data}:any) => {
         ]);
     }
 
-
+    function updateMinutes(m) {
+        const newMinutes = minutes.map(minute => {
+            if (minute.time == m.time) {
+                return {
+                    ...minute,
+                    used: true
+                }
+            } else {
+                return minute
+            }
+        })
+        setMinutes(newMinutes)
+    }
 
     const background = (now:dayjs.Dayjs) => {
         let counter = 1;
@@ -55,16 +70,21 @@ const TimelineCenter = ({hour, data}:any) => {
 
         data.infoData.forEach((info:any) => {
             for (let i = 0; i < minutes.length; i++) {
-                if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
-                    if (info.item_count >= (data.productData[0].rate / 60)) {
-                        checkColor('bg-success', minutes[i], false)
+                if (!minutes[i].used){
+                    if (dayjs(info.minute, 'H:mm').minute() === minutes[i].time.minute()) {
+                        if (info.item_count >= (data.productData[0].rate / 60)) {
+                            checkColor('bg-success', minutes[i].time, false)
+                            updateMinutes(minutes[i])
 
-                    } else if (info.item_count < (data.productData[0].rate / 60) && info.item_count > 0) {
-                        checkColor('bg-warning', minutes[i], false)
+                        } else if (info.item_count < (data.productData[0].rate / 60) && info.item_count > 0) {
+                            checkColor('bg-warning', minutes[i].time, false)
+                            updateMinutes(minutes[i])
 
-                    } else if (info.item_count == 0) {
-                        checkColor('bg-danger', minutes[i], false)
+                        } else if (info.item_count == 0) {
+                            checkColor('bg-danger', minutes[i].time, false)
+                            updateMinutes(minutes[i])
 
+                        }
                     }
                 }
             }
@@ -75,32 +95,37 @@ const TimelineCenter = ({hour, data}:any) => {
                 checkColor('bg-danger', min, true)
             }
         })
-        setUnusedMinutes(ms)
+
     }
 
-    let x = []
-    let byId = _.groupBy(bars, 'id')
-    for (let id in byId){
-        x.push(byId[id].slice(-1))
+    const sortBars = () => {
+        let x = []
+        let byId = _.groupBy(bars, 'id')
+        for (let id in byId){
+            x.push(byId[id].slice(-1))
+        }
+        x =  _.flatten(x)
+        return  _.sortBy(x, 'minute')
     }
 
-    x =  _.flatten(x)
-    let barsSorted = _.sortBy(x, 'minute')
+    if (hour == '06:00:00'){
+        console.log(minutes)
+    }
 
-    return(
+    return (
         <div className="col-10 border-start border-end">
             <div className="row bg-black h-100 align-items-center">
                 <div className="container px-0 h-75">
-                    {barsSorted.map((bar:any, index:number) =>
-                        <TimelineBar
-                            key = {index}
-                            bg = {bar}
+                    {sortBars().map((bar: any, index: number) => <TimelineBar
+                            key={index}
+                            bg={bar}
                         />
                     )}
                 </div>
             </div>
         </div>
     )
+
 }
 
 export default TimelineCenter;

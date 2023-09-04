@@ -2,7 +2,7 @@ import TimelineRow from "./TimelineRow.tsx";
 import TimelineHeader from "./TimelineHeader.tsx";
 import _ from 'lodash';
 
-const Timeline = ({ data }:any) => {
+const Timeline = ({ shiftSelect, data }:any) => {
 
     let hours:any = []
     if (data.shiftData.shift_number === 1){
@@ -20,8 +20,6 @@ const Timeline = ({ data }:any) => {
             return []
         }
     }
-    //{id: 1, hour: (hour), minute: (hour), item_count: 0, line: 1, shift: 1}
-    console.log(byHour['06:00:00'])
 
     return (<div className="container-fluid">
                 <TimelineHeader/>

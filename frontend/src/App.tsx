@@ -141,6 +141,7 @@ function App(){
                     }}
                 />
                 <Timeline
+                    shiftSelect ={shiftSelect}
                     data = {{
                         shiftData: shiftData,
                         lineData: lineData,

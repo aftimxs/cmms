@@ -15,7 +15,8 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
 
     console.log()
 
-    let progress = [((total-test.scrap)/data.orderData.quantity)*100, (test.scrap/data.orderData.quantity)*100]
+    let progress = [(((total-test.scrap)/data.orderData.quantity)*100).toPrecision(4),
+        ((test.scrap/data.orderData.quantity)*100).toFixed(2)]
 
     return (
         <>

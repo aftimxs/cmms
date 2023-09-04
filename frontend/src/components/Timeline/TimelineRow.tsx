@@ -1,8 +1,6 @@
 import TimelineLeft from "./TimelineLeft.tsx";
 import TimelineRight from "./TimelineRight.tsx";
 import TimelineCenter from "./TimelineCenter.tsx";
-import {useEffect} from "react";
-
 
 const TimelineRow = ({ hour, data }:any) => {
 

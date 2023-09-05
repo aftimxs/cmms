@@ -24,7 +24,7 @@ function App(){
 
     // SET PRODUCTION AREA AND CELL
     const [production, setProduction] = useState([{id: '1', number: '1', area: 'Welding'}])
-    const isButtonSelected = (x:[]): boolean => production === x;
+    const isButtonSelected = (x): boolean => production[0].id === x;
     const handlePL = (e:any): void => {
         const newProduction = production.map(production => {
             let eSplit = e.currentTarget.value.split(",");
@@ -37,7 +37,6 @@ function App(){
         });
         setProduction(newProduction)
     }
-
 
     const lines = [
         {id:'1', number:'1', area:'Welding'},
@@ -135,6 +134,7 @@ function App(){
                     }}
                     lineSelector = {{
                         production: production,
+                        setProduction: setProduction,
                         isButtonSelected: isButtonSelected,
                         handlePL: handlePL,
                         lines: lines,

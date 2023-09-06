@@ -3,6 +3,7 @@ import Timeline from "./components/Timeline/Timeline.tsx";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import dayjs from "dayjs";
+import Footer from "./components/Footer/Footer.tsx";
 
 
 function App(){
@@ -11,7 +12,6 @@ function App(){
     const date = new Date()
     const [value, setValue] = useState(dayjs(date));
     const handleDate = (newValue:dayjs.Dayjs | null) => {
-        // @ts-ignore
         setValue(newValue);
     }
 
@@ -24,10 +24,10 @@ function App(){
 
     // SET PRODUCTION AREA AND CELL
     const [production, setProduction] = useState([{id: '1', number: '1', area: 'Welding'}])
-    const isButtonSelected = (x): boolean => production[0].id === x;
-    const handlePL = (e:any): void => {
+    const isButtonSelected = (x: string): boolean => production[0].id === x;
+    const handlePL = (e: { currentTarget: { value: string; }; }): void => {
         const newProduction = production.map(production => {
-            let eSplit = e.currentTarget.value.split(",");
+            const eSplit = e.currentTarget.value.split(",");
             return {
                 ...production,
                 id: eSplit[0],
@@ -51,11 +51,11 @@ function App(){
 
 
     // BACKEND DATA RETRIEVE
-    let [shiftData, setShiftData] = useState([])
-    let [lineData, setLineData] = useState([])
-    let [orderData, setOrderData] = useState([{quantity:0}])
-    let [productData, setProductData] = useState([{part_num: 'Not Available', rate: 0}])
-    let [infoData, setInfoData] = useState([])
+    const [shiftData, setShiftData] = useState([])
+    const [lineData, setLineData] = useState([])
+    const [orderData, setOrderData] = useState([{quantity:0}])
+    const [productData, setProductData] = useState([{part_num: 'Not Available', rate: 0}])
+    const [infoData, setInfoData] = useState([])
 
     // GET INFO EVERY MINUTE
     useEffect(() => {
@@ -67,6 +67,7 @@ function App(){
 
         getLine({value, shiftSelect, production})
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value, shiftSelect, production])
 
     const instance = axios.create({
@@ -74,9 +75,9 @@ function App(){
       timeout: 1000,
     });
 
-    let getLine = async ({value, shiftSelect, production}:any) => {
+    const getLine = async ({value, shiftSelect, production}) => {
         try {
-            let response = await instance.get('/production-line/', {
+            const response = await instance.get('/production-line/', {
                 params: {
                     area: production[0].area,
                     cell: production[0].number,
@@ -84,11 +85,11 @@ function App(){
                     shift_number: shiftSelect
                 }
             })
-            let data = await response.data[0]
-            let data2 = await response.data[0].shift[0]
-            let data3 = await response.data[0].shift[0].order[0]
-            let data4 = await response.data[0].shift[0].order[0].products
-            let data5 = await response.data[0].shift[0].info
+            const data = await response.data[0]
+            const data2 = await response.data[0].shift[0]
+            const data3 = await response.data[0].shift[0].order[0]
+            const data4 = await response.data[0].shift[0].order[0].products
+            const data5 = await response.data[0].shift[0].info
 
             setLineData(data)
             setShiftData(data2)
@@ -97,11 +98,10 @@ function App(){
             setInfoData(data5)
 
         } catch (error) {
-            // @ts-ignore
             if (error.name === 'TypeError') {
-                let data:any = []
-                let data2 = [{quantity:0}]
-                let data3 = [{part_num: 'Not Available', rate: 0}]
+                const data: React.SetStateAction<never[]> = []
+                const data2 = [{quantity:0}]
+                const data3 = [{part_num: 'Not Available', rate: 0}]
 
                 setShiftData(data)
                 setLineData(data);
@@ -150,6 +150,7 @@ function App(){
                         infoData: infoData,
                     }}
                 />
+                <Footer/>
             </div>);
 }
 

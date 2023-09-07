@@ -149,7 +149,11 @@ function App(){
                         infoData: infoData,
                     }}
                 />
-                <Footer/>
+                <Footer
+                    data = {{
+                        shiftData: shiftData,
+                    }}
+                />
             </div>);
 }
 

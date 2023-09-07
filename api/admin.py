@@ -23,7 +23,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class OperatorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'last_name', 'worker_number', 'working_line', 'working_shift', 'full_name')
+    list_display = ('id', 'first_name', 'last_name', 'worker_number', 'full_name')
 
 
 class ScrapAdmin(admin.ModelAdmin):

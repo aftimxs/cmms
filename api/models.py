@@ -15,6 +15,16 @@ class Product(models.Model):
     rate = models.IntegerField()
 
 
+class Operator(models.Model):
+    first_name = models.CharField(max_length=30, null=False)
+    last_name = models.CharField(max_length=30, null=False)
+    worker_number = models.IntegerField(unique=True)
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+
 class Shift(models.Model):
 
     number = [
@@ -25,6 +35,7 @@ class Shift(models.Model):
     shift_number = models.IntegerField(choices=number, default=1)
     date = models.DateField()
     on_line = models.ForeignKey(ProductionLine, related_name='shift',  default=0, on_delete=models.CASCADE)
+    operators = models.ManyToManyField(Operator)
 
 
 class Machine(models.Model):
@@ -40,18 +51,6 @@ class Order(models.Model):
     products = models.ManyToManyField(Product)
     line = models.ForeignKey(ProductionLine, related_name='orderL', on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, related_name='order',  default=0, on_delete=models.CASCADE)
-
-
-class Operator(models.Model):
-    first_name = models.CharField(max_length=30, null=False)
-    last_name = models.CharField(max_length=30, null=False)
-    worker_number = models.IntegerField(unique=True)
-    working_line = models.ForeignKey(ProductionLine, related_name='operator', default=0, on_delete=models.CASCADE)
-    working_shift = models.ForeignKey(Shift, related_name='operator',  default=0, on_delete=models.CASCADE)
-
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.last_name}"
 
 
 class ProductionInfo(models.Model):

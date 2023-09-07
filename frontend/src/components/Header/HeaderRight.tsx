@@ -10,21 +10,21 @@ const HeaderRight = ({shiftButtons}) => {
                 <div className="col-8">
                     <div className="row">
                         <div className="col-4">
-                            <button type="button" className="btn btn-dark" onClick={shiftButtons.handleBackShift}>
+                            <button type="button" className="btn" onClick={shiftButtons.handleBackShift}>
                                 <i className="bi bi-chevron-left" style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                         <div className="col-4">
-                            <button type="button" className="btn btn-dark" onClick={shiftButtons.handleForwardShift}>
+                            <button type="button" className="btn" onClick={shiftButtons.handleForwardShift}>
                                 <i className="bi bi-chevron-right" style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                         <div className="col-4">
-                            <button type="button" className="btn btn-dark" onClick={shiftButtons.handleTodayShift}>
+                            <button type="button" className="btn" onClick={shiftButtons.handleTodayShift}>
                                 <i className="bi bi-chevron-double-right" style={{fontSize: "1.5rem"}}></i></button>
                         </div>
                     </div>
                 </div>
                 <div className="col-4 text-center">
-                    <button type="button" className="btn btn-dark"><i className="bi bi-gear-fill"
+                    <button type="button" className="btn"><i className="bi bi-gear-fill"
                                                                       style={{fontSize: "1.5rem"}}></i></button>
                 </div>
             </div>

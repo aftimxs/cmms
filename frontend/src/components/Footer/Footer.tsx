@@ -9,6 +9,7 @@ const Footer = () => {
     return (
     <div className="container-fluid pt-2">
         <BottomNavigation
+            sx ={{bgcolor: 'transparent'}}
             value = {value}
             onChange={(event, newValue) => {setValue(newValue)}}
         >

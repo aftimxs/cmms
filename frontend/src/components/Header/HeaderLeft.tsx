@@ -32,7 +32,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                         <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                     </div>
 
-                    <button type="button" className="btn btn-dark col-7" onClick={visibilityPL.handleShowPL}>
+                    <button type="button" className="btn col-7" onClick={visibilityPL.handleShowPL}>
                     <div className="row">
                         <div className="col-2">
                             <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>

@@ -17,7 +17,7 @@ const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
 
             <div className="col-5">
                 <div className="container py-0">
-                    <button type="button" className="btn btn-dark w-100" onClick={visibility.handleShow}>
+                    <button type="button" className="btn w-100" onClick={visibility.handleShow}>
                         <div className="row">
                             <div className="col-2 text-center">
                                 <i className="bi bi-calendar" style={{fontSize: "1.5rem"}}></i>
@@ -36,12 +36,12 @@ const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
 
                 <div className="container py-0">
                     <div className="row">
-                        <button type="button" className="btn btn-dark col-3">
+                        <button type="button" className="btn col-3">
                         <div className="border-bottom border-2 border-success text-center">
                             <span className=" titles">SPEED</span>
                         </div>
                         </button>
-                        <button type="button" className="btn btn-dark col-3">
+                        <button type="button" className="btn col-3">
                         <div className="border-bottom border-2 border-success text-center">
                             <span className=" titles">OEE</span>
                         </div>

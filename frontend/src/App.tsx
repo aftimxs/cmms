@@ -1,10 +1,9 @@
 import Header from "./components/Header/Header.tsx";
 import Timeline from "./components/Timeline/Timeline.tsx";
+import Footer from "./components/Footer/Footer.tsx";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import dayjs from "dayjs";
-import Footer from "./components/Footer/Footer.tsx";
-
 
 function App(){
 
@@ -112,7 +111,7 @@ function App(){
         }
     }
 
-    return (<div className="container-fluid bg-dark text-white">
+    return (<div className="container-fluid" >
                 <Header
                     dt = {{
                         value:value,

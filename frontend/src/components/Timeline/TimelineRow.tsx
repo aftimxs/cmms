@@ -4,7 +4,7 @@ import TimelineCenter from "./TimelineCenter.tsx";
 
 const TimelineRow = ({ hour, data }:any) => {
 
-    return (<div className="row" style={{height:'7vh'}}>
+    return (<div className="row" style={{height:'8vh'}}>
                 <TimelineLeft
                     hour = {hour}
                 />

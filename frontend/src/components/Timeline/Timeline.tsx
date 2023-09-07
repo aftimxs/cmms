@@ -21,22 +21,21 @@ const Timeline = ({ shiftSelect, data }:any) => {
         }
     }
 
-    return (<div className="container-fluid">
+    return (<div className="container-fluid" data-bs-theme="light">
                 <TimelineHeader/>
-                {hours.map((hour, index) =>
-                    <TimelineRow
-                        key = {index}
-                        hour = {hour}
-                        data = {{
-                            shiftData: data.shiftData,
-                            lineData: data.lineData,
-                            orderData: data.orderData,
-                            productData: data.productData,
-                            infoData: find(hour),
-                        }}
-                    />
-                )}
-
+                    {hours.map((hour, index) =>
+                        <TimelineRow
+                            key = {index}
+                            hour = {hour}
+                            data = {{
+                                shiftData: data.shiftData,
+                                lineData: data.lineData,
+                                orderData: data.orderData,
+                                productData: data.productData,
+                                infoData: find(hour),
+                            }}
+                        />
+                    )}
             </div>)
 };
 

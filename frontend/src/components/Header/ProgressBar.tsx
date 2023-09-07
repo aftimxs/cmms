@@ -4,7 +4,7 @@ interface Props {
 
 const ProgressBar = ({progress}:Props) => {
     return(
-        <div className="progress-stacked">
+        <div className="progress-stacked" style={{background:'#e3e3e3'}}>
             <div className="progress" role="progressbar" aria-label="good"
                  aria-valuenow={progress[0]} aria-valuemin={0} aria-valuemax={100} style={{width: progress[0] + "%"}}>
                 <div className="progress-bar bg-success progress-bar-striped progress-bar-animated">{progress[0]}%</div>

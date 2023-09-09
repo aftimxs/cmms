@@ -50,23 +50,20 @@ const OperatorModal = ({ open, setOpen, data }) => {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(data.shiftData.on_line)
-        const newOperatorData = operatorData.map((operator:any) => {
-            if (operator.id !== e.currentTarget.value) {
-                return operator;
-            } else {
-                return {
-                    ...operator,
-                    working_line: 1,
-                    working_shift: data.shiftData.shift_number,
-                };
-            }
+        console.log(data.shiftData.id)
+        axios.put(`http://127.0.0.1:8000/api/shift/${data.shiftData.id}/`, {
+            date: data.shiftData.date,
+            operators: [e.currentTarget.value],
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
         });
-        console.log(newOperatorData)
-        setoperatorData(newOperatorData)
+
     }
 
-    console.log(operatorData)
 
     return(
         <>

@@ -4,7 +4,7 @@ import Modal from '@mui/material/Modal';
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@mui/material";
-
+import _ from 'lodash';
 
 
 const style = {
@@ -24,6 +24,7 @@ const OperatorModal = ({ open, setOpen, data }) => {
 
     const handleClose = () => setOpen(false);
     const [operatorData, setoperatorData] = useState([])
+    let selected = [];
 
     // GET OPERATORS
     useEffect(() => {
@@ -50,10 +51,18 @@ const OperatorModal = ({ open, setOpen, data }) => {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(data.shiftData.id)
+        //console.log(data.shiftData.id)
+        if (!_.includes(selected, e.currentTarget.value)){
+            selected = _.concat(selected, e.currentTarget.value)
+        } else {
+            _.pull(selected, e.currentTarget.value)
+        }
+
+        console.log(selected)
+
         axios.put(`http://127.0.0.1:8000/api/shift/${data.shiftData.id}/`, {
             date: data.shiftData.date,
-            operators: [e.currentTarget.value],
+            operators: selected,
         })
         .then(function (response) {
           console.log(response);

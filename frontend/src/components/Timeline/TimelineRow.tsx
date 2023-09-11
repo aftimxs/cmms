@@ -4,18 +4,20 @@ import TimelineCenter from "./TimelineCenter.tsx";
 
 const TimelineRow = ({ hour, data }:any) => {
 
-    return (<div className="row" style={{height:'8vh'}}>
-                <TimelineLeft
-                    hour = {hour}
-                />
-                <TimelineCenter
-                    hour = {hour}
-                    data = {data}
-                />
-                <TimelineRight
-                    data = {data}
-                />
-            </div>)
+    return (
+        <div className="row" style={{height:'8vh'}}>
+            <TimelineLeft
+                hour = {hour}
+            />
+            <TimelineCenter
+                hour = {hour}
+                data = {data}
+            />
+            <TimelineRight
+                data = {data}
+            />
+        </div>
+    )
 };
 
 export default TimelineRow;

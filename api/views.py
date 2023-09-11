@@ -22,7 +22,7 @@ class ProductionLineView(viewsets.ModelViewSet):
         area = self.request.query_params.get('area')
         cell = self.request.query_params.get('cell')
         date = self.request.query_params.get('date')
-        shift_number = self.request.query_params.get('shift_number')
+        shift_number = self.request.query_params.get('number')
 
         if area is not None and cell is not None and date is not None and shift_number is not None:
             queryset = (queryset.filter(area=area, cell=cell).

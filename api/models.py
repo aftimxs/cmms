@@ -35,9 +35,9 @@ class Shift(models.Model):
         (2, 'Second')
     ]
 
-    shift_number = models.IntegerField(choices=number, default=1)
+    number = models.IntegerField(choices=number, default=1)
     date = models.DateField()
-    on_line = models.ForeignKey(ProductionLine, related_name='shift',  default=0, on_delete=models.CASCADE)
+    line = models.ForeignKey(ProductionLine, related_name='shift',  default=0, on_delete=models.CASCADE)
     operators = models.ManyToManyField(Operator, blank=True)
 
 

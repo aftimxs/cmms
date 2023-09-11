@@ -3,7 +3,7 @@ from .models import *
 
 
 class ShiftAdmin(admin.ModelAdmin):
-    list_display = ('id', 'shift_number', 'date', 'on_line')
+    list_display = ('id', 'number', 'date', 'line')
 
 
 class ProductionLineAdmin(admin.ModelAdmin):

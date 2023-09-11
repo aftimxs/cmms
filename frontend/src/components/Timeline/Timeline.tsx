@@ -5,9 +5,9 @@ import _ from 'lodash';
 const Timeline = ({ shiftSelect, data }:any) => {
 
     let hours:any = []
-    if (data.shiftData.shift_number === 1){
+    if (data.shiftData.number === 1){
         hours = ['06:00:00', '07:00:00', '08:00:00', '09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00']
-    } else if (data.shiftData.shift_number === 2){
+    } else if (data.shiftData.number === 2){
         hours = ['3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm', '10 pm', '11 pm']
     }
 

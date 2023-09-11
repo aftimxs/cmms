@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
+import CommentModal from "./CommentModal.tsx";
+import {useState} from "react";
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -62,22 +63,33 @@ const BarTooltip = ({ type, bg, data }:any) => {
 
 const TimelineBar = ({bg, data}:any) => {
     const w = bg.long * 1.6665
+
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
     
     return(
-        <ProductionTooltip
-            title={
-                <BarTooltip type={bg.bg} bg={bg} data={data}></BarTooltip>
-            }
-            enterDelay={200} leaveDelay={100}
-            arrow
-        >
-            <div className={`d-inline-block h-100 position-relative ${bg.bg}`} style={{width:`${w}%`}}>  
-                <span className={bg.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2
-                    border-light rounded-circle bg-dark p-1` : 'visually-hidden'}
-                      style={{zIndex:1}}><span className="visually-hidden">x</span></span>
+        <>
+            <CommentModal
+                open={open}
+                setOpen={setOpen}
+                data = {data}
+            />
 
-            </div>
-        </ProductionTooltip>
+            <ProductionTooltip
+                title={
+                    <BarTooltip type={bg.bg} bg={bg} data={data}></BarTooltip>
+                }
+                enterDelay={200} leaveDelay={100}
+                arrow
+            >
+                <div className={`d-inline-block h-100 position-relative ${bg.bg}`} style={{width:`${w}%`}} onClick={handleOpen}>
+                    <span className={bg.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2
+                        border-light rounded-circle bg-dark p-1` : 'visually-hidden'}
+                          style={{zIndex:1}}><span className="visually-hidden">x</span></span>
+
+                </div>
+            </ProductionTooltip>
+        </>
     )
 };
 

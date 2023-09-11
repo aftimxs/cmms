@@ -24,6 +24,9 @@ class Operator(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    class Meta:
+        ordering = ['last_name']
+
 
 class Shift(models.Model):
 

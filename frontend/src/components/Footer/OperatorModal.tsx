@@ -20,16 +20,17 @@ const style = {
     borderRadius: '4px',
 };
 
-const OperatorModal = ({ open, setOpen, data }) => {
+const OperatorModal = ({ open, setOpen, data }:any ) => {
 
     const handleClose = () => setOpen(false);
-    const [operatorData, setoperatorData] = useState([])
-    let selected = [];
+    const [operatorData, setOperatorData] = useState([])
+    const [selected, setSelected] = useState([0]);
 
     // GET OPERATORS
     useEffect(() => {
         getOperators()
-    }, [])
+        setSelected(data.shiftData.operators)
+    }, [data])
 
     const instance = axios.create({
       baseURL: 'http://127.0.0.1:8000/api',
@@ -40,35 +41,37 @@ const OperatorModal = ({ open, setOpen, data }) => {
         try {
             const response = await instance.get('/operator/')
             const data = await response.data
-            setoperatorData(data)
+            setOperatorData(data)
 
         } catch (error) {
+            // @ts-ignore
             if (error.name === 'TypeError') {
                 const data: React.SetStateAction<never[]> = []
-                setoperatorData(data)
+                setOperatorData(data)
             }
         }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        //console.log(data.shiftData.id)
-        if (!_.includes(selected, e.currentTarget.value)){
-            selected = _.concat(selected, e.currentTarget.value)
-        } else {
-            _.pull(selected, e.currentTarget.value)
-        }
+        let s = [...selected]
+        const id = Number(e.currentTarget.value)
 
-        console.log(selected)
+        if (!_.includes(s, id)){
+           s = _.concat(s, id)
+        } else {
+           _.pull(s, id)
+        }
+        setSelected(s)
 
         axios.put(`http://127.0.0.1:8000/api/shift/${data.shiftData.id}/`, {
             date: data.shiftData.date,
-            operators: selected,
+            operators: s,
         })
         .then(function (response) {
-          console.log(response);
+          //console.log(response);
         })
         .catch(function (error) {
-          console.log(error);
+          //console.log(error);
         });
 
     }
@@ -92,10 +95,15 @@ const OperatorModal = ({ open, setOpen, data }) => {
                                 {operatorData.map((operator:any) => (
                                     <FormControlLabel
                                         key={operator.id}
+                                        style={{color:'black'}}
                                         control={
-                                        <Checkbox onChange={handleChange} value={operator.id} />
+                                        <Checkbox
+                                            onChange={handleChange}
+                                            value={operator.id}
+                                            checked={_.includes(selected, operator.id)}
+                                        />
                                     }
-                                        label={`${operator.first_name} ${operator.last_name}`}
+                                        label={`#${operator.worker_number} | ${operator.last_name}, ${operator.first_name}`}
                                     />
                                 ))}
                             </FormGroup>

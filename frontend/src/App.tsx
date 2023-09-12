@@ -66,7 +66,6 @@ function App(){
 
         getLine({value, shiftSelect, production})
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value, shiftSelect, production])
 
     const instance = axios.create({
@@ -81,9 +80,12 @@ function App(){
                     area: production[0].area,
                     cell: production[0].number,
                     date: dayjs(value).format('YYYY-MM-DD'),
-                    shift_number: shiftSelect
+                    number: shiftSelect
                 }
             })
+
+            console.log(response.data[0])
+
             const data = await response.data[0]
             const data2 = await response.data[0].shift[0]
             const data3 = await response.data[0].shift[0].order[0]

@@ -75,10 +75,11 @@ class Scrap(models.Model):
 
 
 class Downtime(models.Model):
-    title = models.CharField(max_length=50, null=True)
-    start = models.DateTimeField(auto_now_add=True)
-    end = models.DateTimeField()
+    shift = models.ForeignKey(Shift, related_name='downtime', on_delete=models.CASCADE)
+    reason = models.CharField(max_length=50, null=True)
+    description = models.CharField(max_length=150, null=True)
+    start = models.TimeField()
+    end = models.TimeField()
 
-    @property
-    def duration(self):
-        return self.start - self.end
+    class Meta:
+        ordering = ['start']

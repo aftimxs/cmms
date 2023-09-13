@@ -31,7 +31,7 @@ class ScrapAdmin(admin.ModelAdmin):
 
 
 class DowntimeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'start', 'end', 'duration')
+    list_display = ('id', 'shift', 'reason', 'description', 'start', 'end')
 
 
 class ProductionInfoAdmin(admin.ModelAdmin):

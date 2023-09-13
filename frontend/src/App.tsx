@@ -84,8 +84,6 @@ function App(){
                 }
             })
 
-            console.log(response.data[0])
-
             const data = await response.data[0]
             const data2 = await response.data[0].shift[0]
             const data3 = await response.data[0].shift[0].order[0]

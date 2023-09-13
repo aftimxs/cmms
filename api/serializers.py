@@ -40,10 +40,17 @@ class ScrapSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DowntimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Downtime
+        fields = '__all__'
+
+
 class ShiftSerializer(serializers.ModelSerializer):
     order = OrderSerializer(many=True, read_only=True)
     operator = OperatorSerializer(many=True, read_only=True)
     info = ProductionInfoSerializer(many=True, read_only=True)
+    downtime = DowntimeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Shift
@@ -57,10 +64,4 @@ class ProductionLineSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductionLine
-        fields = '__all__'
-
-
-class DowntimeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Downtime
         fields = '__all__'

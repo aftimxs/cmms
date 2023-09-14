@@ -3,8 +3,9 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
+import _ from 'lodash';
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -63,12 +64,17 @@ const BarTooltip = ({ type, barData, data }:any) => {
 
 
 const TimelineBar = ({barData, data}:any) => {
+    const [barD, setBarD] = useState([])
     const w = barData.long * 1.6665
+
+    useEffect(() => {
+        setBarD(barData)
+    }, []);
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(true)
-        getInfo()
+        getInfo(data.bars[_.indexOf(data.bars, barData)])
     };
 
     const [info, setInfo] = useState([])
@@ -78,9 +84,9 @@ const TimelineBar = ({barData, data}:any) => {
       timeout: 1000,
     });
 
-    const getInfo = async () => {
+    const getInfo = async (bar:any) => {
         try {
-            const response = await instance.get(`/downtime/${dayjs(barData.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
+            const response = await instance.get(`/downtime/${dayjs(bar.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
             const x = await response.data
             setInfo(x)
 
@@ -93,12 +99,29 @@ const TimelineBar = ({barData, data}:any) => {
         }
     }
 
+    const redBars = _.filter(data.bars, {'bg': 'bg-danger'})
+
+    const handleBack = () => {
+        getInfo(redBars[(_.indexOf(redBars, barD)-1)])
+        setBarD(redBars[(_.indexOf(redBars, barD)-1)])
+    }
+
+    const handleForward = () => {
+        getInfo(redBars[(_.indexOf(redBars, barD)+1)])
+        setBarD(redBars[(_.indexOf(redBars, barD)+1)])
+    }
+
     return(
         <>
             <CommentModal
                 open={open}
                 setOpen={setOpen}
                 info={info}
+                handlers={{
+                    handleBack: handleBack,
+                    handleForward: handleForward
+                }}
+                setBarD={setBarD}
             />
 
             <ProductionTooltip

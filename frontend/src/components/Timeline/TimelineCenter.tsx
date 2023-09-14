@@ -167,7 +167,8 @@ const TimelineCenter = ({hour, data}:any) => {
                             data = {{
                                 product : data.productData[0].part_num,
                                 rate : (data.productData[0].rate/60),
-                                shiftData: data.shiftData
+                                shiftData: data.shiftData,
+                                bars: bars,
                             }}
                         />
                     )}

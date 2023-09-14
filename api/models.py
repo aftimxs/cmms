@@ -75,6 +75,7 @@ class Scrap(models.Model):
 
 
 class Downtime(models.Model):
+    id = models.CharField(primary_key=True, max_length=50)
     shift = models.ForeignKey(Shift, related_name='downtime', on_delete=models.CASCADE)
     reason = models.CharField(max_length=50, null=True)
     description = models.CharField(max_length=150, null=True)

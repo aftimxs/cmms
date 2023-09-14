@@ -1,6 +1,6 @@
 import TimelineBar from "./TimelineBar.tsx";
 import dayjs from "dayjs";
-import React, {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import _ from 'lodash';
 import axios from "axios";
 
@@ -10,6 +10,7 @@ const TimelineCenter = ({hour, data}:any) => {
     const now = dayjs();
 
     const [bars, setBars] = useState([])
+
 
     const minutes:any = [];
     for (let i= 0; i < 60; i++){
@@ -24,33 +25,38 @@ const TimelineCenter = ({hour, data}:any) => {
       timeout: 1000,
     });
 
-    const getDowntimes = async (start:dayjs.Dayjs) => {
+    const getDowntimes = async (downtime:any) => {
         try {
-            const response = await instance.get('/downtime/', {
-                params: {
-                    shift: data.shiftData.number,
-                    start: dayjs(start).format('HH:mm:ss')
-                }
-            })
-            return await response.data[0].id
+            const response = await instance.get(`/downtime/${dayjs(downtime.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
+            return await response.data
         } catch (error) {
             // @ts-ignore
             if (error.name === 'TypeError') {
-                return 0
+                return []
             }
         }
     }
 
-    const postDowntime = (min:dayjs.Dayjs) => {
-        if (!getDowntimes(min)){
+    const postDowntime = async (downtime:any) => {
+        const x = await getDowntimes(downtime)
+        if (x){
+            instance.put(`/downtime/${x.id}/`,
+            {
+                id: x.id,
+                start: x.start,
+                end: dayjs(downtime.minute).format('HH:mm:ss'),
+                shift: x.shift
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        } else {
             instance.post(`/downtime/`,
             {
-                start: dayjs(min).format('HH:mm:ss'),
-                end: dayjs(min).format('HH:mm:ss'),
+                id: `${dayjs(downtime.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`,
+                start: dayjs(downtime.startTime).format('HH:mm:ss'),
+                end: dayjs(downtime.minute).format('HH:mm:ss'),
                 shift: data.shiftData.number,
-            })
-            .then(function (response) {
-              console.log(response);
             })
             .catch(function (error) {
               console.log(error);
@@ -58,23 +64,9 @@ const TimelineCenter = ({hour, data}:any) => {
         }
     }
 
-    const putDowntime = (start:dayjs.Dayjs, min:dayjs.Dayjs) => {
-        const id = getDowntimes(start)
-        instance.put(`/downtime/${id}/`,
-            {
-                end: dayjs(min).format('HH:mm:ss'),
-            })
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-    }
-
-
     useEffect(() => {
         setBars([])
+        // @ts-ignore
         setBars(printBars)
     }, [data]);
 
@@ -87,6 +79,7 @@ const TimelineCenter = ({hour, data}:any) => {
         let startTime = now;
         let ms = [...minutes];
         const barsProv:any = [];
+        let previous = now;
 
         const checkColor = (c:string, min:dayjs.Dayjs, unused:boolean, items:number) => {
             if (color !== c || c === 'bg-success' ) {
@@ -125,7 +118,16 @@ const TimelineCenter = ({hour, data}:any) => {
 
         ms.forEach((min) => {
             if (now.isAfter(min.time)){
-                checkColor('bg-danger', min.time, true, 0)
+                if ((dayjs(min.time, 'HH:mm').minute()-1) === dayjs(previous, 'HH:mm').minute()) {
+                    previous = min.time;
+                    counter = counter + 1;
+                } else {
+                    id = id + 1;
+                    counter = 1;
+                    startTime = min.time;
+                    previous = min.time;
+                }
+                handleBars(id, 'bg-danger', min.time, counter, 0, startTime)
             }
         })
 
@@ -134,18 +136,19 @@ const TimelineCenter = ({hour, data}:any) => {
         for (const id in byId){
             sortedBars.push(byId[id].slice(-1))
         }
-        console.log(byId)
         sortedBars =  _.flatten(sortedBars)
-
         sortedBars =  _.sortBy(sortedBars, 'minute')
 
 
-        //let danger = _.groupBy(sortedBars, 'bg')
-        //danger = _.flatten(danger['bg-danger'])
+        let danger = _.groupBy(sortedBars, 'bg')
+        // @ts-ignore
+        danger = _.flatten(danger['bg-danger'])
 
+        // @ts-ignore
+        for (let j = 0; j < danger.length; j++){
+            postDowntime(danger[j])
+        }
 
-
-        console.log(sortedBars)
         return sortedBars;
     }
 
@@ -160,10 +163,11 @@ const TimelineCenter = ({hour, data}:any) => {
                     {bars.map((bar: any, index: number) =>
                         <TimelineBar
                             key={index}
-                            bg={bar}
+                            barData={bar}
                             data = {{
                                 product : data.productData[0].part_num,
                                 rate : (data.productData[0].rate/60),
+                                shiftData: data.shiftData
                             }}
                         />
                     )}

@@ -3,7 +3,8 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
-import {useState} from "react";
+import React, {useState} from "react";
+import axios from "axios";
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -18,7 +19,7 @@ const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
       },
   });
 
-const BarTooltip = ({ type, bg, data }:any) => { 
+const BarTooltip = ({ type, barData, data }:any) => {
     
     let header = '';
     let start = '';
@@ -30,15 +31,15 @@ const BarTooltip = ({ type, bg, data }:any) => {
 
     if (type === 'bg-success'){
         header = 'Production Signal'
-        start = dayjs(bg.minute).format('HH:mm')
-        quantity = bg.parts
+        start = dayjs(barData.minute).format('HH:mm')
+        quantity = barData.parts
 
     } else {
-        startMin = dayjs(bg.startTime).minute();
-        endMin = dayjs(bg.minute).minute();
-        start = dayjs(bg.startTime).format('HH:mm')
+        startMin = dayjs(barData.startTime).minute();
+        endMin = dayjs(barData.minute).minute();
+        start = dayjs(barData.startTime).format('HH:mm')
         time = (endMin-startMin+1)
-        quantity = Number(-((data.rate*bg.long)-bg.parts).toFixed(2))
+        quantity = Number(-((data.rate*barData.long)-barData.parts).toFixed(2))
         
         if (type === 'bg-warning'){
             header = 'Speed Loss'
@@ -61,29 +62,54 @@ const BarTooltip = ({ type, bg, data }:any) => {
  }
 
 
-const TimelineBar = ({bg, data}:any) => {
-    const w = bg.long * 1.6665
+const TimelineBar = ({barData, data}:any) => {
+    const w = barData.long * 1.6665
 
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    
+    const handleOpen = () => {
+        setOpen(true)
+        getInfo()
+    };
+
+    const [info, setInfo] = useState([])
+
+    const instance = axios.create({
+      baseURL: 'http://127.0.0.1:8000/api',
+      timeout: 1000,
+    });
+
+    const getInfo = async () => {
+        try {
+            const response = await instance.get(`/downtime/${dayjs(barData.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
+            const x = await response.data
+            setInfo(x)
+
+        } catch (error) {
+            // @ts-ignore
+            if (error.name === 'TypeError') {
+                const x: React.SetStateAction<never[]> = []
+                setInfo(x)
+            }
+        }
+    }
+
     return(
         <>
             <CommentModal
                 open={open}
                 setOpen={setOpen}
-                data = {data}
+                info={info}
             />
 
             <ProductionTooltip
                 title={
-                    <BarTooltip type={bg.bg} bg={bg} data={data}></BarTooltip>
+                    <BarTooltip type={barData.bg} barData={barData} data={data}></BarTooltip>
                 }
                 enterDelay={200} leaveDelay={100}
                 arrow
             >
-                <div className={`d-inline-block h-100 position-relative ${bg.bg}`} style={{width:`${w}%`}} onClick={handleOpen}>
-                    <span className={bg.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2
+                <div className={`d-inline-block h-100 position-relative ${barData.bg}`} style={{width:`${w}%`}} onClick={handleOpen}>
+                    <span className={barData.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2
                         border-light rounded-circle bg-dark p-1` : 'visually-hidden'}
                           style={{zIndex:1}}><span className="visually-hidden">x</span></span>
 

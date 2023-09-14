@@ -1,8 +1,6 @@
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@mui/material";
-import _ from "lodash";
 
 
 const style = {
@@ -19,7 +17,7 @@ const style = {
 };
 
 
-const CommentModal = ({ open, setOpen, data }:any) => {
+const CommentModal = ({ open, setOpen, info }:any) => {
 
     const handleClose = () => setOpen(false);
 
@@ -33,7 +31,12 @@ const CommentModal = ({ open, setOpen, data }:any) => {
             >
                 <Box sx={style}>
                     <Typography color='black' id="modal-modal-title" variant="h6" component="h2" textAlign='center'>
-                        Operators
+                        {info.start} - {info.end}
+                        <br></br>
+                        {info.reason ? info.reason : 'Uncommented'}
+                    </Typography>
+                     <Typography color='black' id="modal-modal-description" textAlign='center'>
+                         {info.description ? info.description : "No description"}
                     </Typography>
                 </Box>
             </Modal>

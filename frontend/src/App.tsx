@@ -5,7 +5,13 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 
+import {barsReset} from "./features/barsSlice.ts";
+import {useAppDispatch} from "./app/hooks.ts";
+
+
 function App(){
+
+    const dispatch = useAppDispatch()
 
     // DATE SELECTOR
     const date = new Date()
@@ -56,6 +62,7 @@ function App(){
     const [productData, setProductData] = useState([{part_num: 'Not Available', rate: 0}])
     const [infoData, setInfoData] = useState([])
 
+    
     // GET INFO EVERY MINUTE
     useEffect(() => {
         //let timer = setInterval(() => getLine({value, shiftSelect, production}), 1000)
@@ -63,7 +70,7 @@ function App(){
         //return function cleanup(){
         //    clearInterval(timer)
         //}
-
+        dispatch(barsReset())
         getLine({value, shiftSelect, production})
 
     }, [value, shiftSelect, production])

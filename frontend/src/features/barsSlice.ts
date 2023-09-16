@@ -4,14 +4,12 @@ import dayjs from "dayjs";
 
 // Define a type for the slice state
 export interface barsState {
-    bars: [
         id: number,
         startTime: dayjs.Dayjs,
         endTime: dayjs.Dayjs,
         background: 'bg-success' | 'bg-warning' | 'bg-danger',
         length: number,
         parts: number,
-    ]
 }
 
 // Define the initial state using that type
@@ -23,7 +21,7 @@ const barsSlice = createSlice({
   name: 'bars',
   initialState,
   reducers: {
-      barAdded(state, action) {
+      barAdded(state, action: PayloadAction<any>) {
           state.push({
               id: ++lastId,
               startTime: action.payload.startTime,
@@ -34,11 +32,16 @@ const barsSlice = createSlice({
           })
       },
 
-      barRemoved(state, action) {
-          state.filter(bar => bar.id !== action.payload.id);
-      }
+      barRemoved(state, action: PayloadAction<any>) {
+          return state.filter(bar => bar.id !== action.payload.id);
+      },
+
+      barsReset() {
+          lastId = 0;
+          return initialState
+      },
     }
 })
 
-export const { barAdded, barRemoved } = barsSlice.actions
+export const { barAdded, barRemoved, barsReset } = barsSlice.actions
 export default barsSlice.reducer

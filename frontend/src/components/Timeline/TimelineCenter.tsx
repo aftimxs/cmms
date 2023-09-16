@@ -4,20 +4,24 @@ import {useEffect, useMemo, useState} from "react";
 import _ from 'lodash';
 import axios from "axios";
 
+import { useAppDispatch } from "../../app/hooks.ts";
+import {barAdded} from "../../features/barsSlice.ts";
+
 const TimelineCenter = ({hour, data}:any) => {
+
+    const dispatch = useAppDispatch()
 
     const shour = hour.split(':');
     const now = dayjs();
 
     const [bars, setBars] = useState([])
 
-
+    //CREATE MINUTES ARRAY
     const minutes:any = [];
     for (let i= 0; i < 60; i++){
-        minutes.push({
-            time: dayjs(data.shiftData.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute'),
-            used: false
-        })
+        minutes.push(
+            dayjs(data.shiftData.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute')
+        )
     }
 
     const instance = axios.create({
@@ -25,6 +29,7 @@ const TimelineCenter = ({hour, data}:any) => {
       timeout: 1000,
     });
 
+    //CHECK IF BAR EXISTS IN DB
     const getDowntimes = async (downtime:any) => {
         try {
             const response = await instance.get(`/downtime/${dayjs(downtime.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
@@ -37,6 +42,7 @@ const TimelineCenter = ({hour, data}:any) => {
         }
     }
 
+    //POST OR PUT BARS TO DB
     const postDowntime = async (downtime:any) => {
         const x = await getDowntimes(downtime)
         if (x){
@@ -71,6 +77,7 @@ const TimelineCenter = ({hour, data}:any) => {
     }, [data]);
 
 
+    //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
     const background = (now:dayjs.Dayjs) => {
         let counter = 1;
         let partsCounter = 0;
@@ -81,6 +88,7 @@ const TimelineCenter = ({hour, data}:any) => {
         const barsProv:any = [];
         let previous = now;
 
+        //CHECK IF THIS MINUTES COLOR MATCHES PREVIOUS MINUTE COLOR
         const checkColor = (c:string, min:dayjs.Dayjs, unused:boolean, items:number) => {
             if (color !== c || c === 'bg-success' ) {
                 id = id + 1;
@@ -94,56 +102,72 @@ const TimelineCenter = ({hour, data}:any) => {
             }
             handleBars(id, c, min, counter, partsCounter, startTime)
             if (!unused) {
-                ms = _.reject(ms, {time: min})
+                ms = _.reject(ms, min)
             }
         }
 
+        //PUSH EACH BAR INTO ARRAY
         const handleBars = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
             barsProv.push({ id: id, long: counter, minute: minute, bg: color, parts: Number(partsCounter), startTime })
         }
 
+        //GET BGCOLOR FOR EACH MINUTE WITH DATA
         data.infoData.forEach((info:any) => {
             for (let i = 0; i < minutes.length; i++) {
-                if (dayjs(info.minute, 'H:mm').minute() === minutes[i].time.minute()) {
+                if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
                     if (info.item_count >= (data.productData[0].rate / 60)) {
-                        checkColor('bg-success', minutes[i].time, false, info.item_count)
+                        checkColor('bg-success', minutes[i], false, info.item_count)
                     } else if (info.item_count < (data.productData[0].rate / 60) && info.item_count > 0) {
-                        checkColor('bg-warning', minutes[i].time, false, info.item_count)
+                        checkColor('bg-warning', minutes[i], false, info.item_count)
                     } else if (info.item_count == 0) {
-                        checkColor('bg-danger', minutes[i].time, false, info.item_count)
+                        checkColor('bg-danger', minutes[i], false, info.item_count)
                     }
                 }
             }
         })
 
+        //SET BARS FOR UNUSED MINUTES WHICH ARE IN THE PAST
         ms.forEach((min) => {
-            if (now.isAfter(min.time)){
-                if ((dayjs(min.time, 'HH:mm').minute()-1) === dayjs(previous, 'HH:mm').minute()) {
-                    previous = min.time;
+            if (now.isAfter(min)){
+                if ((dayjs(min, 'HH:mm').minute()-1) === dayjs(previous, 'HH:mm').minute()) {
+                    previous = min;
                     counter = counter + 1;
                 } else {
                     id = id + 1;
                     counter = 1;
-                    startTime = min.time;
-                    previous = min.time;
+                    startTime = min;
+                    previous = min;
                 }
-                handleBars(id, 'bg-danger', min.time, counter, 0, startTime)
+                handleBars(id, 'bg-danger', min, counter, 0, startTime)
             }
         })
 
+        //GROUP BARS BY ID
         let sortedBars = []
         const byId = _.groupBy(barsProv, 'id')
         for (const id in byId){
             sortedBars.push(byId[id].slice(-1))
         }
+
+        //ORDER BARS BY MINUTE
         sortedBars =  _.flatten(sortedBars)
         sortedBars =  _.sortBy(sortedBars, 'minute')
 
+        //SET BARS IN STORE
+        sortedBars.map(bar => {
+           dispatch(barAdded({
+              startTime: bar.startTime,
+              endTime: bar.minute,
+              background: bar.bg,
+              length: bar.long,
+              parts: bar.parts,
+           }))
+        })
 
+        //GROUP RED BARS INTO ARRAY AND POST TO DATABASE
         let danger = _.groupBy(sortedBars, 'bg')
         // @ts-ignore
         danger = _.flatten(danger['bg-danger'])
-
         // @ts-ignore
         for (let j = 0; j < danger.length; j++){
             postDowntime(danger[j])
@@ -153,8 +177,8 @@ const TimelineCenter = ({hour, data}:any) => {
     }
 
 
-
     const printBars = useMemo(() => background(now), [data.infoData])
+
 
     return (
         <div className="col-10 border-start border-end">

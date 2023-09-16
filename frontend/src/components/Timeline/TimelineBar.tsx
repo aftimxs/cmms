@@ -6,6 +6,7 @@ import CommentModal from "./CommentModal.tsx";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import _ from 'lodash';
+import {useAppSelector} from "../../app/hooks.ts";
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -64,17 +65,20 @@ const BarTooltip = ({ type, barData, data }:any) => {
 
 
 const TimelineBar = ({barData, data}:any) => {
+    const availableBars = useAppSelector(state => state.bars)
+
     const [barD, setBarD] = useState([])
     const w = barData.long * 1.6665
 
     useEffect(() => {
-        setBarD(barData)
+        setBarD(_.find(availableBars, {'startTime': barData.startTime}))
     }, []);
+
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(true)
-        getInfo(data.bars[_.indexOf(data.bars, barData)])
+        getInfo(_.find(availableBars, {'startTime': barData.startTime}))
     };
 
     const [info, setInfo] = useState([])
@@ -99,16 +103,22 @@ const TimelineBar = ({barData, data}:any) => {
         }
     }
 
-    const redBars = _.filter(data.bars, {'bg': 'bg-danger'})
+    const redBars = _.filter(availableBars, {'background': 'bg-danger'})
 
     const handleBack = () => {
-        getInfo(redBars[(_.indexOf(redBars, barD)-1)])
-        setBarD(redBars[(_.indexOf(redBars, barD)-1)])
+        const previousId = (_.indexOf(redBars, barD)-1)
+        if (previousId >= 0) {
+            getInfo(redBars[previousId])
+            setBarD(redBars[previousId])
+        }
     }
 
     const handleForward = () => {
-        getInfo(redBars[(_.indexOf(redBars, barD)+1)])
-        setBarD(redBars[(_.indexOf(redBars, barD)+1)])
+        const nextId = (_.indexOf(redBars, barD)+1)
+        if (nextId < redBars.length) {
+            getInfo(redBars[nextId])
+            setBarD(redBars[nextId])
+        }
     }
 
     return(

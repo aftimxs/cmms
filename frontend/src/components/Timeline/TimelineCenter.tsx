@@ -156,8 +156,8 @@ const TimelineCenter = ({hour, data}:any) => {
         //SET BARS IN STORE
         sortedBars.map(bar => {
            dispatch(barAdded({
-              startTime: bar.startTime,
-              endTime: bar.minute,
+              startTime: bar.startTime.format('DD-MM-YYYY HH:mm:ss Z'),
+              endTime: bar.minute.format('DD-MM-YYYY HH:mm:ss Z'),
               background: bar.bg,
               length: bar.long,
               parts: bar.parts,

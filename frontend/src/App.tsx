@@ -62,7 +62,7 @@ function App(){
     const [productData, setProductData] = useState([{part_num: 'Not Available', rate: 0}])
     const [infoData, setInfoData] = useState([])
 
-    
+
     // GET INFO EVERY MINUTE
     useEffect(() => {
         //let timer = setInterval(() => getLine({value, shiftSelect, production}), 1000)

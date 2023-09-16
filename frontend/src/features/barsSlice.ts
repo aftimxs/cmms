@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../app/store'
-import dayjs from "dayjs";
+
 
 // Define a type for the slice state
 export interface barsState {
         id: number,
-        startTime: dayjs.Dayjs,
-        endTime: dayjs.Dayjs,
+        startTime: string,
+        endTime: string,
         background: 'bg-success' | 'bg-warning' | 'bg-danger',
         length: number,
         parts: number,

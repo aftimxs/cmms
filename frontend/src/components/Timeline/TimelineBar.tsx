@@ -71,14 +71,14 @@ const TimelineBar = ({barData, data}:any) => {
     const w = barData.long * 1.6665
 
     useEffect(() => {
-        setBarD(_.find(availableBars, {'startTime': barData.startTime}))
+        setBarD(_.find(availableBars, {'startTime': barData.startTime.format('DD-MM-YYYY HH:mm:ss Z')}))
     }, []);
 
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(true)
-        getInfo(_.find(availableBars, {'startTime': barData.startTime}))
+        getInfo(_.find(availableBars, {'startTime': barData.startTime.format('DD-MM-YYYY HH:mm:ss Z')}))
     };
 
     const [info, setInfo] = useState([])
@@ -90,7 +90,8 @@ const TimelineBar = ({barData, data}:any) => {
 
     const getInfo = async (bar:any) => {
         try {
-            const response = await instance.get(`/downtime/${dayjs(bar.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
+            const response = await
+                instance.get(`/downtime/${dayjs(bar.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${data.shiftData.id}`)
             const x = await response.data
             setInfo(x)
 

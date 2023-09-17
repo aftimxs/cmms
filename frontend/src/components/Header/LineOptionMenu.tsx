@@ -1,21 +1,41 @@
 import Modal from 'react-bootstrap/Modal';
-import {Accordion, Button, ToggleButton, ToggleButtonGroup} from 'react-bootstrap'
+import {Accordion, ToggleButton, ToggleButtonGroup} from 'react-bootstrap'
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import _ from 'lodash';
-import {useState} from "react";
+import {areaAdded, cellAdded} from "../../features/lineParamsSlice.ts";
+import {useAppDispatch} from "../../app/hooks.ts";
+
 
 
 // @ts-ignore
-const LineOptionMenu = ({title, visibilityPL, lineSelector}) => {
+const LineOptionMenu = ({title, visibility}) => {
 
-    let linesByArea = _.groupBy(lineSelector.lines, 'area')
-    //const [radioValue, setRadioValue] = useState({id: '1', number: '1', area: 'Welding'});
+    const dispatch = useAppDispatch()
+
+    const handlePL = (e: { currentTarget: { value: string; }; }): void => {
+            const eSplit = e.currentTarget.value.split(",");
+            dispatch(cellAdded(eSplit[1]))
+            dispatch(areaAdded(eSplit[2]))
+    }
+
+    const lines = [
+        {id:'1', number:'1', area:'Welding'},
+        {id:'2', number:'10', area:'Welding'},
+        {id:'3', number:'11', area:'Welding'},
+        {id:'4', number:'1', area:'Molding'},
+        {id:'5', number:'2', area:'Molding'},
+        {id:'6', number:'3', area:'Molding'},
+        {id:'7', number:'4', area:'Molding'},
+        {id:'8', number:'5', area:'Molding'},
+    ]
+
+    let linesByArea = _.groupBy(lines, 'area')
 
     return(
          <>
-          <Modal show={visibilityPL.showPL} onHide={visibilityPL.handleClosePL}>
+          <Modal show={visibility.showPL} onHide={visibility.handleClosePL}>
             <Modal.Header closeButton>
               <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
@@ -32,8 +52,8 @@ const LineOptionMenu = ({title, visibilityPL, lineSelector}) => {
                                             id={line.id}
                                             type={'radio'}
                                             value={[line.id, line.number, line.area]}
-                                            checked={lineSelector.production[0].id === line.id}
-                                            onChange={lineSelector.handlePL}
+                                            // checked={}
+                                            onChange={handlePL}
                                         >
                                             {`${line.area} ${line.number}`}
                                         </ToggleButton>
@@ -47,9 +67,9 @@ const LineOptionMenu = ({title, visibilityPL, lineSelector}) => {
                                 {linesByArea.Molding.map((line:any) => (
                                       <button key={line.id}
                                               type="button"
-                                              className={lineSelector.isButtonSelected(line.id) ? "list-group-item list-group-item-action py-1 active" : "list-group-item list-group-item-action py-1"}
+                                              // className={}
                                               value={[line.id, line.number,line.area]}
-                                              onClick={lineSelector.handlePL}
+                                              onClick={handlePL}
                                       >
                                           {`${line.area} ${line.number}`}
 

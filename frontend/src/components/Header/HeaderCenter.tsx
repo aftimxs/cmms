@@ -3,21 +3,30 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, R
 import CustomTooltip from "./CustomTooltip.tsx";
 import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
+import {useAppSelector} from "../../app/hooks.ts";
+import {useState} from "react";
 
-const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
+const HeaderCenter = ({ data }:any) => {
+
+    const lineParams = useAppSelector(state => state.line)
+
+    // SHOW SHIFT SELECTOR MENU
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     return(
         <>
             <ShiftOptionMenu
-                title={"Select date and shift"}
-                visibility={visibility}
-                date={date}
-                shiftSelector={shiftSelector}
+                visibility={{
+                    show:show,
+                    handleClose:handleClose,
+                }}
             />
 
             <div className="col-5">
                 <div className="container py-0">
-                    <button type="button" className="btn w-100" onClick={visibility.handleShow}>
+                    <button type="button" className="btn w-100" onClick={handleShow}>
                         <div className="row">
                             <div className="col-2 text-center">
                                 <i className="bi bi-calendar" style={{fontSize: "1.5rem"}}></i>
@@ -27,7 +36,7 @@ const HeaderCenter = ({visibility, date, shiftSelector, data}:any) => {
                                     <span className="titles">SHIFT</span>
                                 </div>
                                 <div className="row">
-                                    <span>{`${dayjs(date.value).format('dddd DD/MM/YYYY')} - Shift ${shiftSelector.shiftSelect}`}</span>
+                                    <span>{`${dayjs(lineParams.date).format('dddd DD/MM/YYYY')} - Shift ${lineParams.number}`}</span>
                                 </div>
                             </div>
                         </div>

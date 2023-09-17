@@ -1,26 +1,33 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import CalendarPicker from "./CalendarPicker.tsx";
+import React from "react";
+import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
+import {numberAdded} from "../../features/lineParamsSlice.ts";
 
 
-const ShiftOptionMenu = ({title, visibility, date, shiftSelector}:any) => {
+const ShiftOptionMenu = ({ visibility }:any) => {
+
+    const dispatch = useAppDispatch()
+    const lineParams = useAppSelector(state => state.line)
 
     const radios = [
         {id:'1', title:'First Shift'},
         {id:'2', title:'Second Shift'}
     ]
 
+    const isRadioSelected = (value2:string): boolean => lineParams.number === value2;
+    const handleRadio = (e:React.ChangeEvent<HTMLInputElement>): void => dispatch(numberAdded(e.currentTarget.value))
+
     return(
          <>
           <Modal show={visibility.show} onHide={visibility.handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>{title}</Modal.Title>
+              <Modal.Title>"Select date and shift"</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className="container-fluid text-center py-3">
-                    <CalendarPicker
-                        date = {date}
-                    />
+                    <CalendarPicker/>
                 </div>
                 <div className="container-fluid py-3">
                     <Form>
@@ -33,8 +40,8 @@ const ShiftOptionMenu = ({title, visibility, date, shiftSelector}:any) => {
                                     name="shiftSelector"
                                     label={radio.title}
                                     value={radio.id}
-                                    checked={shiftSelector.isRadioSelected(radio.id)}
-                                    onChange={shiftSelector.handleRadio}
+                                    checked={isRadioSelected(radio.id)}
+                                    onChange={handleRadio}
                                 />
                             </div>
                         ))}

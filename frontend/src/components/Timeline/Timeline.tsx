@@ -1,14 +1,18 @@
 import TimelineRow from "./TimelineRow.tsx";
 import TimelineHeader from "./TimelineHeader.tsx";
 import _ from 'lodash';
+import {useAppSelector} from "../../app/hooks.ts";
 
-const Timeline = ({ shiftSelect, data }:any) => {
+
+const Timeline = ({ data }:any) => {
+
+    const lineParams = useAppSelector(state => state.line)
 
     let hours:any = []
-    if (data.shiftData.number === 1){
+    if (lineParams.number === '1'){
         hours = ['06:00:00', '07:00:00', '08:00:00', '09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00']
-    } else if (data.shiftData.number === 2){
-        hours = ['3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm', '10 pm', '11 pm']
+    } else if (lineParams.number === '2'){
+        hours = ['15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00', '21:00:00', '22:00:00', '23:00:00']
     }
 
     const byHour = _.groupBy(data.infoData, 'hour')
@@ -23,7 +27,7 @@ const Timeline = ({ shiftSelect, data }:any) => {
 
     return (<div className="container-fluid" data-bs-theme="light">
                 <TimelineHeader/>
-                    {hours.map((hour, index) =>
+                    {hours.map((hour:string, index:number) =>
                         <TimelineRow
                             key = {index}
                             hour = {hour}

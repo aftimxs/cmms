@@ -1,10 +1,22 @@
 import ProgressBar from "./ProgressBar.tsx";
 import LineOptionMenu from "./LineOptionMenu.tsx";
 import { useState } from "react";
+import {useAppSelector} from "../../app/hooks.ts";
+import {useGetLineState} from "../../app/services/apiSplice.ts";
+import {current} from "@reduxjs/toolkit";
 
 
 // @ts-ignore
-const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
+const HeaderLeft = ({ data }) => {
+
+    const lineParams = useAppSelector(state => state.line)
+    const lineData = useGetLineState(lineParams)
+    console.log(lineData)
+
+    // SHOW PRODUCTION LINE MENU
+    const [showPL, setShowPL] = useState(false);
+    const handleClosePL = () => setShowPL(false);
+    const handleShowPL = () => setShowPL(true);
 
     const infos = data.infoData
     let [total] = useState(0)
@@ -13,17 +25,18 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
         total = total + info.item_count;
     })
 
-    console.log()
 
-    let progress = [(((total-test.scrap)/data.orderData.quantity)*100).toPrecision(4),
-        ((test.scrap/data.orderData.quantity)*100).toFixed(2)]
+    let progress = [Number((((total)/data.orderData.quantity)*100).toPrecision(4)),
+        Number(((0/data.orderData.quantity)*100).toFixed(2))]
 
     return (
         <>
             <LineOptionMenu
                 title={"Select station"}
-                visibilityPL={visibilityPL}
-                lineSelector={lineSelector}
+                visibility={{
+                    showPL:showPL,
+                    handleClosePL:handleClosePL,
+                }}
             />
         <div className="col-5">
             <div className="container py-0">
@@ -32,7 +45,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                         <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                     </div>
 
-                    <button type="button" className="btn col-7" onClick={visibilityPL.handleShowPL}>
+                    <button type="button" className="btn col-7" onClick={handleShowPL}>
                     <div className="row">
                         <div className="col-2">
                             <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
@@ -42,7 +55,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                                 <span className=" titles">PRODUCTION LINE</span>
                             </div>
                             <div className=" row">
-                                <span>{`${lineSelector.production[0].area} ${lineSelector.production[0].number}`}</span>
+                                <span>{`${lineParams.area} ${lineParams.cell}`}</span>
                             </div>
                         </div>
                     </div>
@@ -89,7 +102,7 @@ const HeaderLeft = ({test, data, visibilityPL, lineSelector}) => {
                         <ProgressBar progress={progress}/>
                     </div>
                     <div className=" col-4 text-end">
-                        <span>{total} ({test.scrap}) / {data.orderData.quantity} pcs</span>
+                        <span>{total} ({0}) / {data.orderData.quantity} pcs</span>
                     </div>
                 </div>
             </div>

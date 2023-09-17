@@ -6,54 +6,14 @@ import axios from "axios";
 import dayjs from "dayjs";
 
 import {barsReset} from "./features/barsSlice.ts";
-import {useAppDispatch} from "./app/hooks.ts";
+import {useAppDispatch, useAppSelector} from "./app/hooks.ts";
+import {useGetLineQuery} from "./app/services/apiSplice.ts";
+
 
 
 function App(){
 
     const dispatch = useAppDispatch()
-
-    // DATE SELECTOR
-    const date = new Date()
-    const [value, setValue] = useState(dayjs(date));
-    const handleDate = (newValue:dayjs.Dayjs | null) => {
-        setValue(newValue);
-    }
-
-
-    // SHIFT RADIO SELECTOR
-    const [shiftSelect, setShiftSelect] = useState('1');
-    const isRadioSelected = (value2:string): boolean => shiftSelect === value2;
-    const handleRadio = (e:React.ChangeEvent<HTMLInputElement>): void => setShiftSelect(e.currentTarget.value)
-
-
-    // SET PRODUCTION AREA AND CELL
-    const [production, setProduction] = useState([{id: '1', number: '1', area: 'Welding'}])
-    const isButtonSelected = (x: string): boolean => production[0].id === x;
-    const handlePL = (e: { currentTarget: { value: string; }; }): void => {
-        const newProduction = production.map(production => {
-            const eSplit = e.currentTarget.value.split(",");
-            return {
-                ...production,
-                id: eSplit[0],
-                number: eSplit[1],
-                area: eSplit[2],
-            };
-        });
-        setProduction(newProduction)
-    }
-
-    const lines = [
-        {id:'1', number:'1', area:'Welding'},
-        {id:'2', number:'10', area:'Welding'},
-        {id:'3', number:'11', area:'Welding'},
-        {id:'4', number:'1', area:'Molding'},
-        {id:'5', number:'2', area:'Molding'},
-        {id:'6', number:'3', area:'Molding'},
-        {id:'7', number:'4', area:'Molding'},
-        {id:'8', number:'5', area:'Molding'},
-    ]
-
 
     // BACKEND DATA RETRIEVE
     const [shiftData, setShiftData] = useState([])
@@ -61,6 +21,17 @@ function App(){
     const [orderData, setOrderData] = useState([{quantity:0}])
     const [productData, setProductData] = useState([{part_num: 'Not Available', rate: 0}])
     const [infoData, setInfoData] = useState([])
+
+
+    const lineParams = useAppSelector(state => state.line)
+
+     const { data: shiftData2, isLoading } = useGetLineQuery(
+            {
+                area:lineParams.area,
+                cell:lineParams.cell,
+                date:lineParams.date,
+                number:lineParams.number
+            });
 
 
     // GET INFO EVERY MINUTE
@@ -71,23 +42,25 @@ function App(){
         //    clearInterval(timer)
         //}
         dispatch(barsReset())
-        getLine({value, shiftSelect, production})
+        getLine()
 
-    }, [value, shiftSelect, production])
+    }, [lineParams])
 
     const instance = axios.create({
       baseURL: 'http://127.0.0.1:8000/api',
       timeout: 1000,
     });
 
-    const getLine = async ({value, shiftSelect, production}) => {
+
+
+    const getLine = async () => {
         try {
             const response = await instance.get('/production-line/', {
                 params: {
-                    area: production[0].area,
-                    cell: production[0].number,
-                    date: dayjs(value).format('YYYY-MM-DD'),
-                    number: shiftSelect
+                    area: lineParams.area,
+                    cell: lineParams.cell,
+                    date: lineParams.date,
+                    number: lineParams.number
                 }
             })
 
@@ -118,19 +91,9 @@ function App(){
         }
     }
 
+
     return (<div className="container-fluid" >
                 <Header
-                    dt = {{
-                        value:value,
-                        setValue: setValue,
-                        handleDate: handleDate,
-                    }}
-                    shift = {{
-                        shiftSelect: shiftSelect,
-                        setShiftSelect: setShiftSelect,
-                        isRadioSelected: isRadioSelected,
-                        handleRadio: handleRadio,
-                    }}
                     data = {{
                         shiftData: shiftData,
                         lineData: lineData,
@@ -138,16 +101,8 @@ function App(){
                         productData: productData,
                         infoData: infoData,
                     }}
-                    lineSelector = {{
-                        production: production,
-                        setProduction: setProduction,
-                        isButtonSelected: isButtonSelected,
-                        handlePL: handlePL,
-                        lines: lines,
-                    }}
                 />
                 <Timeline
-                    shiftSelect ={shiftSelect}
                     data = {{
                         shiftData: shiftData,
                         lineData: lineData,

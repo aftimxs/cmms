@@ -31,7 +31,7 @@ function App(){
                 cell:lineParams.cell,
                 date:lineParams.date,
                 number:lineParams.number
-            });
+            }, {pollingInterval:30000});
 
 
     // GET INFO EVERY MINUTE

@@ -3,15 +3,19 @@ import LineOptionMenu from "./LineOptionMenu.tsx";
 import { useState } from "react";
 import {useAppSelector} from "../../app/hooks.ts";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
-import {current} from "@reduxjs/toolkit";
 
 
 // @ts-ignore
 const HeaderLeft = ({ data }) => {
 
     const lineParams = useAppSelector(state => state.line)
-    const lineData = useGetLineState(lineParams)
-    console.log(lineData)
+    const {data: idk} = useGetLineState(lineParams)
+    console.log(idk)
+    const {info} = useGetLineState(undefined, {
+        selectFromResult: ({data}) => ({
+            info: data?.find((info) => info.id === id)
+        })
+    })
 
     // SHOW PRODUCTION LINE MENU
     const [showPL, setShowPL] = useState(false);

@@ -3,12 +3,9 @@ import Timeline from "./components/Timeline/Timeline.tsx";
 import Footer from "./components/Footer/Footer.tsx";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import dayjs from "dayjs";
-
 import {barsReset} from "./features/barsSlice.ts";
 import {useAppDispatch, useAppSelector} from "./app/hooks.ts";
 import {useGetLineQuery} from "./app/services/apiSplice.ts";
-
 
 
 function App(){
@@ -93,15 +90,7 @@ function App(){
 
 
     return (<div className="container-fluid" >
-                <Header
-                    data = {{
-                        shiftData: shiftData,
-                        lineData: lineData,
-                        orderData: orderData,
-                        productData: productData,
-                        infoData: infoData,
-                    }}
-                />
+                <Header/>
                 <Timeline
                     data = {{
                         shiftData: shiftData,

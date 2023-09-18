@@ -1,5 +1,22 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 
+// Define a type for the slice state
+export interface lineState {
+    area: string,
+    cell: number,
+    id: number,
+    machine: [],
+    scrap: [],
+    shift: [],
+}
+
+// Define the initial state using that type
+//const initialState: lineState = {
+//    area: 'Welding',
+//    cell: '1',
+//    date: dayjs().format('YYYY-MM-DD'),
+//    number: '1',
+//}
 
 export const productionApi = createApi({
     reducerPath: 'productionApi',
@@ -13,6 +30,10 @@ export const productionApi = createApi({
       }),
       getLine: builder.query({
           query: ({area, cell, date, number}) => `production-line?area=${area}&cell=${cell}&date=${date}&number=${number}`,
+          transformResponse: (response) => {
+              // @ts-ignore
+              return response[0]
+          }
       })
   }),
 })

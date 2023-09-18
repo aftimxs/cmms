@@ -4,13 +4,39 @@ import {useEffect, useMemo, useState} from "react";
 import _ from 'lodash';
 import axios from "axios";
 
-import { useAppDispatch } from "../../app/hooks.ts";
+import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {barAdded} from "../../features/barsSlice.ts";
+import {useGetLineState} from "../../app/services/apiSplice.ts";
 
 
 const TimelineCenter = ({hour, data}:any) => {
 
     const dispatch = useAppDispatch()
+
+    const lineParams = useAppSelector(state => state.line)
+
+     const {shift, product, production} = useGetLineState(lineParams, {
+        selectFromResult: ({data:state}) => ({
+            shift: state? state['shift'][0] : undefined,
+            product: state? state['shift'][0]? state['shift'][0]['order'][0]?
+                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+            production: state? state['shift'][0]? state['shift'][0]['info'] : undefined : undefined,
+        })
+    })
+
+    //const byHour = _.groupBy(production, 'hour')
+    //let productionByHour = []
+//
+    //const find = (hour:any) => {
+    //    if (byHour[(hour).toString()] !== undefined){
+    //        productionByHour = byHour[(hour).toString()]
+    //    } else {
+    //        productionByHour = []
+    //    }
+    //}
+//
+    //console.log(byHour)
+
 
     const shour = hour.split(':');
     const now = dayjs();
@@ -21,7 +47,7 @@ const TimelineCenter = ({hour, data}:any) => {
     const minutes:any = [];
     for (let i= 0; i < 60; i++){
         minutes.push(
-            dayjs(data.shiftData.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute')
+            dayjs(shift?.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute')
         )
     }
 
@@ -33,7 +59,8 @@ const TimelineCenter = ({hour, data}:any) => {
     //CHECK IF BAR EXISTS IN DB
     const getDowntimes = async (downtime:any) => {
         try {
-            const response = await instance.get(`/downtime/${dayjs(downtime.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`)
+            const response = await
+                instance.get(`/downtime/${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`)
             return await response.data
         } catch (error) {
             // @ts-ignore
@@ -60,10 +87,10 @@ const TimelineCenter = ({hour, data}:any) => {
         } else {
             instance.post(`/downtime/`,
             {
-                id: `${dayjs(downtime.startTime).format('DDMMYYHHmm')}${data.shiftData.id}`,
+                id: `${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`,
                 start: dayjs(downtime.startTime).format('HH:mm:ss'),
                 end: dayjs(downtime.minute).format('HH:mm:ss'),
-                shift: data.shiftData.number,
+                shift: shift?.number,
             })
             .catch(function (error) {
               console.log(error);
@@ -73,9 +100,10 @@ const TimelineCenter = ({hour, data}:any) => {
 
     useEffect(() => {
         setBars([])
+        find(hour)
         // @ts-ignore
         setBars(printBars)
-    }, [data]);
+    }, [production]);
 
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
@@ -116,9 +144,9 @@ const TimelineCenter = ({hour, data}:any) => {
         data.infoData.forEach((info:any) => {
             for (let i = 0; i < minutes.length; i++) {
                 if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
-                    if (info.item_count >= (data.productData[0].rate / 60)) {
+                    if (info.item_count >= (product?.rate / 60)) {
                         checkColor('bg-success', minutes[i], false, info.item_count)
-                    } else if (info.item_count < (data.productData[0].rate / 60) && info.item_count > 0) {
+                    } else if (info.item_count < (product?.rate / 60) && info.item_count > 0) {
                         checkColor('bg-warning', minutes[i], false, info.item_count)
                     } else if (info.item_count == 0) {
                         checkColor('bg-danger', minutes[i], false, info.item_count)

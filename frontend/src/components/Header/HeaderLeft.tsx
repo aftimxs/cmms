@@ -6,14 +6,16 @@ import {useGetLineState} from "../../app/services/apiSplice.ts";
 
 
 // @ts-ignore
-const HeaderLeft = ({ data }) => {
+const HeaderLeft = () => {
 
     const lineParams = useAppSelector(state => state.line)
-    const {data: idk} = useGetLineState(lineParams)
-    console.log(idk)
-    const {info} = useGetLineState(undefined, {
-        selectFromResult: ({data}) => ({
-            info: data?.find((info) => info.id === id)
+
+    const {shift, order, product} = useGetLineState(lineParams, {
+        selectFromResult: ({data:state}) => ({
+            shift: state? state['shift'][0] : undefined,
+            order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
+            product: state? state['shift'][0]? state['shift'][0]['order'][0]?
+                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
         })
     })
 
@@ -22,16 +24,15 @@ const HeaderLeft = ({ data }) => {
     const handleClosePL = () => setShowPL(false);
     const handleShowPL = () => setShowPL(true);
 
-    const infos = data.infoData
     let [total] = useState(0)
 
-    infos.map((info: { item_count: number; }) => {
+    shift?.info.map((info: { item_count: number; }) => {
         total = total + info.item_count;
     })
 
 
-    let progress = [Number((((total)/data.orderData.quantity)*100).toPrecision(4)),
-        Number(((0/data.orderData.quantity)*100).toFixed(2))]
+    let progress = [Number((((total)/order?.quantity)*100).toPrecision(4)),
+        Number(((0/order?.quantity)*100).toFixed(2))]
 
     return (
         <>
@@ -96,7 +97,7 @@ const HeaderLeft = ({ data }) => {
                 </div>
                 <div className=" row">
                     <div className=" col-4">
-                        <span>{data.productData[0].part_num}</span>
+                        <span>{product? product.part_num : 'Part N/A' }</span>
                     </div>
                     <div className=" col-8">
                     </div>
@@ -106,7 +107,7 @@ const HeaderLeft = ({ data }) => {
                         <ProgressBar progress={progress}/>
                     </div>
                     <div className=" col-4 text-end">
-                        <span>{total} ({0}) / {data.orderData.quantity} pcs</span>
+                        <span>{total} ({0}) / {order? order.quantity : 0} pcs</span>
                     </div>
                 </div>
             </div>

@@ -5,10 +5,19 @@ import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
 import {useAppSelector} from "../../app/hooks.ts";
 import {useState} from "react";
+import {useGetLineState} from "../../app/services/apiSplice.ts";
 
-const HeaderCenter = ({ data }:any) => {
+const HeaderCenter = () => {
 
     const lineParams = useAppSelector(state => state.line)
+
+    const {production, product} = useGetLineState(lineParams, {
+        selectFromResult: ({data:state}) => ({
+            production: state? state['shift'][0]? state['shift'][0]['info'] : undefined : undefined,
+            product: state? state['shift'][0]? state['shift'][0]['order'][0]?
+                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+        })
+    })
 
     // SHOW SHIFT SELECTOR MENU
     const [show, setShow] = useState(false);
@@ -36,7 +45,8 @@ const HeaderCenter = ({ data }:any) => {
                                     <span className="titles">SHIFT</span>
                                 </div>
                                 <div className="row">
-                                    <span>{`${dayjs(lineParams.date).format('dddd DD/MM/YYYY')} - Shift ${lineParams.number}`}</span>
+                                    <span>{`${dayjs(lineParams.date).
+                                    format('dddd DD/MM/YYYY')} - Shift ${lineParams.number}`}</span>
                                 </div>
                             </div>
                         </div>
@@ -60,19 +70,19 @@ const HeaderCenter = ({ data }:any) => {
                     <div className="row">
                         <ResponsiveContainer width="100%" height={150}>
                         <LineChart
-                          data={data.infoData}
+                          data={production}
                         >
                           <CartesianGrid vertical={false}/>
                           <XAxis dataKey="minute" />
                           <YAxis width={25} axisLine={false} tickCount={6} interval={0} domain={[0, 'dataMax']}/>
                           <Tooltip offset={15} wrapperClassName={"recharts-tooltip-wrapper"}
                                    content={<CustomTooltip
-                                       target={((data.productData[0].rate)/60).toFixed(2)}
-                                       product={data.productData[0].part_num}
+                                       target={((product?.rate)/60).toFixed(2)}
+                                       product={product?.part_num}
                                    />}
                           />
                           <Line type="step" dataKey="item_count" dot={false} stroke="white" strokeWidth={2} />
-                          <ReferenceLine y={data.productData[0].rate/60} stroke={"yellow"} strokeDasharray="3 3"/>
+                          <ReferenceLine y={product?.rate/60} stroke={"yellow"} strokeDasharray="3 3"/>
                         </LineChart>
                         </ResponsiveContainer>
                     </div>

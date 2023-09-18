@@ -2,7 +2,7 @@ import TimelineLeft from "./TimelineLeft.tsx";
 import TimelineRight from "./TimelineRight.tsx";
 import TimelineCenter from "./TimelineCenter.tsx";
 
-const TimelineRow = ({ hour, data }:any) => {
+const TimelineRow = ({ hour }:any) => {
 
     return (
         <div className="row" style={{height:'8vh'}}>
@@ -11,10 +11,9 @@ const TimelineRow = ({ hour, data }:any) => {
             />
             <TimelineCenter
                 hour = {hour}
-                data = {data}
             />
             <TimelineRight
-                data = {data}
+                hour = {hour}
             />
         </div>
     )

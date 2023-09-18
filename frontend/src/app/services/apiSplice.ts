@@ -1,4 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import dayjs from "dayjs";
 
 // Define a type for the slice state
 export interface lineState {
@@ -29,14 +30,23 @@ export const productionApi = createApi({
           query: () => 'production-line',
       }),
       getLine: builder.query({
-          query: ({area, cell, date, number}) => `production-line?area=${area}&cell=${cell}&date=${date}&number=${number}`,
+          query: ({area, cell, date, number}) =>
+              `production-line?area=${area}&cell=${cell}&date=${date}&number=${number}`,
           transformResponse: (response) => {
               // @ts-ignore
               return response[0]
           }
-      })
+      }),
+      getDowntimes: builder.query({
+          query: ({startTime, shiftId}) =>
+              `downtime/${dayjs(startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shiftId}`,
+          transformResponse: (response) => {
+              // @ts-ignore
+              return response
+          }
+      }),
   }),
 })
 
-export const {useGetLineQuery} = productionApi
+export const {useGetLineQuery, useGetDowntimesQuery} = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

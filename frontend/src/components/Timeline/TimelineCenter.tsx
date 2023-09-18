@@ -9,7 +9,7 @@ import {barAdded} from "../../features/barsSlice.ts";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
 
 
-const TimelineCenter = ({hour, data}:any) => {
+const TimelineCenter = ({ hour }:any) => {
 
     const dispatch = useAppDispatch()
 
@@ -20,23 +20,9 @@ const TimelineCenter = ({hour, data}:any) => {
             shift: state? state['shift'][0] : undefined,
             product: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
-            production: state? state['shift'][0]? state['shift'][0]['info'] : undefined : undefined,
+            production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'], 'hour')[hour] : undefined : undefined,
         })
     })
-
-    //const byHour = _.groupBy(production, 'hour')
-    //let productionByHour = []
-//
-    //const find = (hour:any) => {
-    //    if (byHour[(hour).toString()] !== undefined){
-    //        productionByHour = byHour[(hour).toString()]
-    //    } else {
-    //        productionByHour = []
-    //    }
-    //}
-//
-    //console.log(byHour)
-
 
     const shour = hour.split(':');
     const now = dayjs();
@@ -98,12 +84,14 @@ const TimelineCenter = ({hour, data}:any) => {
         }
     }
 
+
+
     useEffect(() => {
         setBars([])
-        find(hour)
         // @ts-ignore
         setBars(printBars)
-    }, [production]);
+    }, [shift]);
+
 
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
@@ -141,7 +129,7 @@ const TimelineCenter = ({hour, data}:any) => {
         }
 
         //GET BGCOLOR FOR EACH MINUTE WITH DATA
-        data.infoData.forEach((info:any) => {
+        production?.forEach((info:any) => {
             for (let i = 0; i < minutes.length; i++) {
                 if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
                     if (info.item_count >= (product?.rate / 60)) {
@@ -206,7 +194,7 @@ const TimelineCenter = ({hour, data}:any) => {
     }
 
 
-    const printBars = useMemo(() => background(now), [data.infoData])
+    const printBars = useMemo(() => background(now), [shift])
 
 
     return (
@@ -217,12 +205,6 @@ const TimelineCenter = ({hour, data}:any) => {
                         <TimelineBar
                             key={index}
                             barData={bar}
-                            data = {{
-                                product : data.productData[0].part_num,
-                                rate : (data.productData[0].rate/60),
-                                shiftData: data.shiftData,
-                                bars: bars,
-                            }}
                         />
                     )}
                 </div>

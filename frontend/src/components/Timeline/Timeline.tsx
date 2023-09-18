@@ -1,19 +1,11 @@
 import TimelineRow from "./TimelineRow.tsx";
 import TimelineHeader from "./TimelineHeader.tsx";
-import _ from 'lodash';
 import {useAppSelector} from "../../app/hooks.ts";
-import {useGetLineState} from "../../app/services/apiSplice.ts";
 
 
-const Timeline = ({ data }:any) => {
+const Timeline = () => {
 
     const lineParams = useAppSelector(state => state.line)
-
-     const {production} = useGetLineState(lineParams, {
-        selectFromResult: ({data:state}) => ({
-            production: state? state['shift'][0]? state['shift'][0]['info'] : undefined : undefined,
-        })
-    })
 
     let hours:any = []
     if (lineParams.number === '1'){
@@ -22,29 +14,12 @@ const Timeline = ({ data }:any) => {
         hours = ['15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00', '21:00:00', '22:00:00', '23:00:00']
     }
 
-    const byHour = _.groupBy(production, 'hour')
-
-    const find = (hour:any) => {
-        if (byHour[(hour).toString()] !== undefined){
-            return byHour[(hour).toString()]
-        } else {
-            return []
-        }
-    }
-
     return (<div className="container-fluid" data-bs-theme="light">
                 <TimelineHeader/>
                     {hours.map((hour:string, index:number) =>
                         <TimelineRow
                             key = {index}
                             hour = {hour}
-                            data = {{
-                                shiftData: data.shiftData,
-                                lineData: data.lineData,
-                                orderData: data.orderData,
-                                productData: data.productData,
-                                infoData: find(hour),
-                            }}
                         />
                     )}
             </div>)

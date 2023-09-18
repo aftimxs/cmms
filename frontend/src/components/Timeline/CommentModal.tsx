@@ -10,6 +10,8 @@ import NavigateBeforeOutlinedIcon from '@mui/icons-material/NavigateBeforeOutlin
 import NavigateNextOutlinedIcon from '@mui/icons-material/NavigateNextOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import _ from "lodash";
+import {useGetDowntimesQuery} from "../../app/services/apiSplice.ts";
+import {useAppSelector} from "../../app/hooks.ts";
 
 
 const style = {
@@ -60,6 +62,16 @@ const CommentModal = ({ open, setOpen, info, handlers }:any) => {
     const handleClose = () => {
         setOpen(false)
     };
+
+    const x = useAppSelector(state => state.downtime)
+    console.log(x)
+
+    const { data: bD, isLoading } = useGetDowntimesQuery(
+            {
+                startTime: "13-09-2023 06:41:00 -07:00",
+                shiftId:1,
+            });
+    console.log(bD)
 
     return(
         <>

@@ -5,6 +5,8 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@mui/material";
 import _ from 'lodash';
+import {useAppSelector} from "../../app/hooks.ts";
+import {useGetLineState} from "../../app/services/apiSplice.ts";
 
 
 const style = {
@@ -20,7 +22,15 @@ const style = {
     borderRadius: '4px',
 };
 
-const OperatorModal = ({ open, setOpen, data }:any ) => {
+const OperatorModal = ({ open, setOpen }:any ) => {
+
+    const lineParams = useAppSelector(state => state.line)
+
+     const {shift} = useGetLineState(lineParams, {
+        selectFromResult: ({data:state}) => ({
+            shift: state? state['shift'][0] : undefined,
+        })
+    })
 
     const handleClose = () => setOpen(false);
     const [operatorData, setOperatorData] = useState([])
@@ -29,8 +39,8 @@ const OperatorModal = ({ open, setOpen, data }:any ) => {
     // GET OPERATORS
     useEffect(() => {
         getOperators()
-        setSelected(data.shiftData.operators)
-    }, [data])
+        setSelected(shift?.operators)
+    }, [shift])
 
     const instance = axios.create({
       baseURL: 'http://127.0.0.1:8000/api',
@@ -63,14 +73,14 @@ const OperatorModal = ({ open, setOpen, data }:any ) => {
         }
         setSelected(s)
 
-        axios.put(`http://127.0.0.1:8000/api/shift/${data.shiftData.id}/`, {
-            date: data.shiftData.date,
+        axios.put(`http://127.0.0.1:8000/api/shift/${shift?.id}/`, {
+            date: shift?.date,
             operators: s,
         })
-        .then(function (response) {
+        .then(function (_response) {
           //console.log(response);
         })
-        .catch(function (error) {
+        .catch(function (_error) {
           //console.log(error);
         });
 

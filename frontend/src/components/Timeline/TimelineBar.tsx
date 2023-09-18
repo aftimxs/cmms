@@ -7,6 +7,8 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import _ from 'lodash';
 import {useAppSelector} from "../../app/hooks.ts";
+import {useGetDowntimesQuery, useGetLineQuery, useGetLineState} from "../../app/services/apiSplice.ts";
+
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -21,12 +23,11 @@ const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
       },
   });
 
-const BarTooltip = ({ type, barData, data }:any) => {
-    
+const BarTooltip = ({ type, barData, product }:any) => {
+
     let header = '';
     let start = '';
     let time = 0;
-    const product = data.product;
     let quantity = 0;
     let startMin = 0;
     let endMin = 0;
@@ -41,7 +42,7 @@ const BarTooltip = ({ type, barData, data }:any) => {
         endMin = dayjs(barData.minute).minute();
         start = dayjs(barData.startTime).format('HH:mm')
         time = (endMin-startMin+1)
-        quantity = Number(-((data.rate*barData.long)-barData.parts).toFixed(2))
+        quantity = Number(-(((product.rate/60)*barData.long)-barData.parts).toFixed(2))
         
         if (type === 'bg-warning'){
             header = 'Speed Loss'
@@ -49,12 +50,11 @@ const BarTooltip = ({ type, barData, data }:any) => {
             header = 'Downtime'
         }
     }    
-     
-    
+
     return(
         <>
             <Typography color='inherit'>{header}</Typography>
-            {`Product: ${product}`}
+            {`Product: ${product? product.part_num : "N/A"}`}
             <br></br>
             {`Time: ${start} (${time} mins)`}
             <br></br>
@@ -64,8 +64,17 @@ const BarTooltip = ({ type, barData, data }:any) => {
  }
 
 
-const TimelineBar = ({barData, data}:any) => {
+const TimelineBar = ({ barData }:any) => {
     const availableBars = useAppSelector(state => state.bars)
+
+    const lineParams = useAppSelector(state => state.line)
+    const {shift, product} = useGetLineState(lineParams, {
+    selectFromResult: ({data: state}) => ({
+        shift: state ? state['shift'][0] : undefined,
+        product: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
+            state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+    })
+})
 
     const [barD, setBarD] = useState([])
     const w = barData.long * 1.6665
@@ -89,9 +98,10 @@ const TimelineBar = ({barData, data}:any) => {
     });
 
     const getInfo = async (bar:any) => {
+        console.log(bar)
         try {
             const response = await
-                instance.get(`/downtime/${dayjs(bar.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${data.shiftData.id}`)
+                instance.get(`/downtime/${dayjs(bar.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`)
             const x = await response.data
             setInfo(x)
 
@@ -137,7 +147,7 @@ const TimelineBar = ({barData, data}:any) => {
 
             <ProductionTooltip
                 title={
-                    <BarTooltip type={barData.bg} barData={barData} data={data}></BarTooltip>
+                    <BarTooltip type={barData.bg} barData={barData} product={product} ></BarTooltip>
                 }
                 enterDelay={200} leaveDelay={100}
                 arrow

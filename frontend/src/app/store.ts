@@ -1,6 +1,7 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import barsReducer from '../features/barsSlice.ts';
 import lineReducer from '../features/lineParamsSlice.ts';
+import downtimeReducer from '../features/downtimeSlice.ts';
 import {productionApi} from "./services/apiSplice.ts";
 import {setupListeners} from "@reduxjs/toolkit/query";
 
@@ -8,6 +9,7 @@ export const store = configureStore({
   reducer: {
     line:lineReducer,
     bars:barsReducer,
+    downtime:downtimeReducer,
     [productionApi.reducerPath]: productionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

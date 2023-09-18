@@ -86,7 +86,7 @@ const HeaderLeft = () => {
                          <span className=" titles">OEE</span>
                         </div>
                         <div className=" row">
-                            <span className=" fs-2">65%</span>
+                            <span className=" fs-2">- %</span>
                         </div>
                     </div>
                 </div>

@@ -22,7 +22,7 @@ const LongNavItem = styled(BottomNavigationAction)<BottomNavigationActionProps>(
     paddingBottom: '10px'
 }));
 
-const Footer = ({ data }) => {
+const Footer = () => {
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(false);
@@ -35,7 +35,6 @@ const Footer = ({ data }) => {
             <OperatorModal
                 open={open}
                 setOpen={setOpen}
-                data = {data}
             />
             <ThemeProvider theme={darkTheme}>
                 <div className="container-fluid pt-2">
@@ -45,7 +44,7 @@ const Footer = ({ data }) => {
                         }}
                         showLabels
                         value = {value}
-                        onChange={(event, newValue) => {setValue(newValue)}}
+                        onChange={(_event, newValue) => {setValue(newValue)}}
                     >
                         <LongNavItem label="Operators" icon={<EngineeringIcon/>} onClick={handleOpen}/>
                         <LongNavItem label="Product Changeover" icon={<ChangeCircleIcon/>}/>

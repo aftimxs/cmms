@@ -46,11 +46,18 @@ class DowntimeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SpeedlossSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Speedloss
+        fields = '__all__'
+
+
 class ShiftSerializer(serializers.ModelSerializer):
     order = OrderSerializer(many=True, read_only=True)
     operator = OperatorSerializer(many=True, read_only=True)
     info = ProductionInfoSerializer(many=True, read_only=True)
     downtime = DowntimeSerializer(many=True, read_only=True)
+    speedloss = SpeedlossSerializer(many=True, read_only=True)
 
     class Meta:
         model = Shift

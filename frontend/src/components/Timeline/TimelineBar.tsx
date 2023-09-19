@@ -3,9 +3,7 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
-import React, {useEffect, useState} from "react";
-import axios from "axios";
-import _ from 'lodash';
+import React, {useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
@@ -86,41 +84,34 @@ const TimelineBar = ({ barData }:any) => {
         setOpen(true)
         dispatch(downtimeSelected({
             id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
-            start: dayjs(barData.startTime,).format('HH:mm:ss'),
+            start: dayjs(barData.startTime).format('HH:mm:ss'),
             end: dayjs(barData.minute).format('HH:mm:ss'),
             shift: shift?.id,
             background: barData.bg,
             length: barData.long,
             parts: barData.parts,
         }))
-        //dispatch(downtimeSelected({
-        //    id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
-        //    start: dayjs(barData.startTime,).format('HH:mm:ss'),
-        //    end: dayjs(barData.minute).format('HH:mm:ss'),
-        //    shift: shift?.id,
-        //    reason: null,
-        //    description: null,
-        //}))
     };
 
     const handleClick = (type:string, downtime:any) => {
-        let newId = 0;
-        const id = downtimes.findIndex((obj:any) => {
+        let newIndex = 0;
+        const index = bars.findIndex((obj:any) => {
             return obj.id === downtime.id;
         })
         if (type === 'back'){
-            newId = id-1;
+            newIndex = index-1;
         } else if (type === 'forward'){
-            newId = id+1;
+            newIndex = index+1;
         }
-        if (newId >= 0 && newId < downtimes.length) {
+        if (newIndex >= 0 && newIndex < bars.length) {
             dispatch(downtimeSelected({
-                id: downtimes[newId].id,
-                start: downtimes[newId].start,
-                end: downtimes[newId].end,
+                id: bars[newIndex].id,
+                start: dayjs(bars[newIndex].startTime, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
+                end: dayjs(bars[newIndex].endTime, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
                 shift: shift?.id,
-                reason: null,
-                description: null,
+                background: bars[newIndex].background,
+                length: bars[newIndex].length,
+                parts: bars[newIndex].parts,
             }))
             }
     };

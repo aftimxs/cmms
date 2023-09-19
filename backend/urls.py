@@ -29,7 +29,7 @@ router.register(r'operator', views.OperatorView, 'operator')
 router.register(r'product-info', views.ProductionInfoView, 'product-info')
 router.register(r'scrap', views.ScrapView, 'scrap')
 router.register(r'downtime', views.DowntimeView, 'downtime')
-
+router.register(r'speedloss', views.SpeedlossView, 'speedloss')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

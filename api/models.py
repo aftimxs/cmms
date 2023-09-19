@@ -84,3 +84,15 @@ class Downtime(models.Model):
 
     class Meta:
         ordering = ['start']
+
+
+class Speedloss(models.Model):
+    id = models.CharField(primary_key=True, max_length=50)
+    shift = models.ForeignKey(Shift, related_name='speedloss', on_delete=models.CASCADE)
+    reason = models.CharField(max_length=50, null=True)
+    description = models.CharField(max_length=150, null=True)
+    start = models.TimeField()
+    end = models.TimeField()
+
+    class Meta:
+        ordering = ['start']

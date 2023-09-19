@@ -6,7 +6,12 @@ import axios from "axios";
 
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {barAdded} from "../../features/barsSlice.ts";
-import {useGetLineState} from "../../app/services/apiSplice.ts";
+import {
+    useDowntimeAddedMutation,
+    useGetLineQuery,
+    useGetLineState,
+    useGetShiftDowntimesQuery
+} from "../../app/services/apiSplice.ts";
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -173,11 +178,12 @@ const TimelineCenter = ({ hour }:any) => {
         //SET BARS IN STORE
         sortedBars.map(bar => {
            dispatch(barAdded({
-              startTime: bar.startTime.format('DD-MM-YYYY HH:mm:ss Z'),
-              endTime: bar.minute.format('DD-MM-YYYY HH:mm:ss Z'),
-              background: bar.bg,
-              length: bar.long,
-              parts: bar.parts,
+               id: `${dayjs(bar.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
+               startTime: bar.startTime.format('DD-MM-YYYY HH:mm:ss Z'),
+               endTime: bar.minute.format('DD-MM-YYYY HH:mm:ss Z'),
+               background: bar.bg,
+               length: bar.long,
+               parts: bar.parts,
            }))
         })
 

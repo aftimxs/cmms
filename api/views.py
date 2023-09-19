@@ -68,11 +68,22 @@ class ScrapView(viewsets.ModelViewSet):
 
 
 class DowntimeView(viewsets.ModelViewSet):
-    queryset = Downtime.objects.all()
     serializer_class = DowntimeSerializer
 
     def get_queryset(self):
         queryset = Downtime.objects.all()
+        shift = self.request.query_params.get('shift')
+
+        if shift is not None:
+            queryset = (queryset.filter(shift=shift))
+        return queryset
+
+
+class SpeedlossView(viewsets.ModelViewSet):
+    serializer_class = SpeedlossSerializer
+
+    def get_queryset(self):
+        queryset = Speedloss.objects.all()
         shift = self.request.query_params.get('shift')
 
         if shift is not None:

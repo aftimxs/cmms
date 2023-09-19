@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 // Define a type for the slice state
 export interface barsState {
-        id: number,
+        id: string,
         startTime: string,
         endTime: string,
         background: 'bg-success' | 'bg-warning' | 'bg-danger',
@@ -14,7 +14,6 @@ export interface barsState {
 // Define the initial state using that type
 const initialState: barsState[] = []
 
-let lastId:number = 0;
 
 const barsSlice = createSlice({
   name: 'bars',
@@ -22,7 +21,7 @@ const barsSlice = createSlice({
   reducers: {
       barAdded(state, action: PayloadAction<any>) {
           state.push({
-              id: ++lastId,
+              id: action.payload.id,
               startTime: action.payload.startTime,
               endTime: action.payload.endTime,
               background: action.payload.background,
@@ -36,7 +35,6 @@ const barsSlice = createSlice({
       },
 
       barsReset() {
-          lastId = 0;
           return initialState
       },
     }

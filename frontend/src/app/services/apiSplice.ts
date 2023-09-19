@@ -27,8 +27,19 @@ export const productionApi = createApi({
               return response
           }
       }),
+      downtimeAdded: builder.mutation({
+          query: (body) => ({
+              url: `downtime/`,
+              method: 'POST',
+              body,
+          })
+      })
   }),
 })
 
-export const {useGetLineQuery, useGetShiftDowntimesQuery} = productionApi
+export const {
+    useGetLineQuery,
+    useGetShiftDowntimesQuery,
+    useDowntimeAddedMutation,
+} = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

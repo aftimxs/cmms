@@ -34,6 +34,10 @@ class DowntimeAdmin(admin.ModelAdmin):
     list_display = ('id', 'shift', 'reason', 'description', 'start', 'end')
 
 
+class SpeedlossAdmin(admin.ModelAdmin):
+    list_display = ('id', 'shift', 'reason', 'description', 'start', 'end')
+
+
 class ProductionInfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'hour', 'minute', 'item_count', 'line', 'shift')
 
@@ -47,5 +51,6 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(Operator, OperatorAdmin)
 admin.site.register(Scrap, ScrapAdmin)
 admin.site.register(Downtime, DowntimeAdmin)
+admin.site.register(Speedloss, SpeedlossAdmin)
 admin.site.register(ProductionInfo, ProductionInfoAdmin)
 

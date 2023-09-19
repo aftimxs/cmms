@@ -74,10 +74,7 @@ class DowntimeView(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Downtime.objects.all()
         shift = self.request.query_params.get('shift')
-        start = self.request.query_params.get('start')
 
         if shift is not None:
             queryset = (queryset.filter(shift=shift))
-        if shift and start is not None:
-            queryset = (queryset.filter(shift=shift, start=start))
         return queryset

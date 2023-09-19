@@ -20,7 +20,7 @@ const TimelineCenter = ({ hour }:any) => {
             shift: state? state['shift'][0] : undefined,
             product: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
-            production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'], 'hour')[hour] : undefined : undefined,
+            production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
         })
     })
 

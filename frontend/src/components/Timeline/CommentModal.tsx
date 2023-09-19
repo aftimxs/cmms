@@ -10,8 +10,11 @@ import NavigateBeforeOutlinedIcon from '@mui/icons-material/NavigateBeforeOutlin
 import NavigateNextOutlinedIcon from '@mui/icons-material/NavigateNextOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import _ from "lodash";
-import {useGetDowntimesQuery} from "../../app/services/apiSplice.ts";
-import {useAppSelector} from "../../app/hooks.ts";
+import {useGetDowntimesQuery, useGetLineState} from "../../app/services/apiSplice.ts";
+import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
+import dayjs from "dayjs";
+import {downtimeSelected} from "../../features/downtimeSlice.ts";
+import {useEffect} from "react";
 
 
 const style = {
@@ -57,21 +60,20 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, info, handlers }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
 
     const handleClose = () => {
         setOpen(false)
     };
 
-    const x = useAppSelector(state => state.downtime)
-    console.log(x)
+    let start = dayjs(downtime.start, 'HH:mm:ss').format('HH:mm');
+    let end = dayjs(downtime.end, 'HH:mm:ss').format('HH:mm');
 
-    const { data: bD, isLoading } = useGetDowntimesQuery(
-            {
-                startTime: "13-09-2023 06:41:00 -07:00",
-                shiftId:1,
-            });
-    console.log(bD)
+    useEffect(() => {
+        start = dayjs(downtime.start, 'HH:mm:ss').format('HH:mm')
+        end = dayjs(downtime.end, 'HH:mm:ss').format('HH:mm')
+    }, [downtime]);
+
 
     return(
         <>
@@ -90,20 +92,20 @@ const CommentModal = ({ open, setOpen, info, handlers }:any) => {
                     alignItems="center">
                     <Grid container spacing={5}>
                         <Grid>
-                            <IconButton onClick={handlers.handleBack}>
+                            <IconButton onClick={() => handleClick('back', downtime)}>
                                 <NavigateBeforeOutlinedIcon/>
                             </IconButton>
                         </Grid>
                         <Grid>
                             <Typography color='black' id="modal-modal-title" align='center' variant="subtitle2">
-                                {info.start} - {info.end}
+                                {downtime? `${start} - ${end}`  : 'N/A'}
                             </Typography>
                             <Typography color='black' align='center' variant={'h6'}>
-                                {info.reason ? info.reason : 'Uncommented'}
+                                {downtime.reason ? downtime.reason : 'Uncommented'}
                             </Typography>
                         </Grid>
                         <Grid>
-                            <IconButton onClick={handlers.handleForward}>
+                            <IconButton onClick={() => handleClick('forward', downtime)}>
                                 <NavigateNextOutlinedIcon/>
                             </IconButton>
                         </Grid>
@@ -117,7 +119,14 @@ const CommentModal = ({ open, setOpen, info, handlers }:any) => {
                                     variant='contained'
                                     onClick={() => {alert('clicked')}}
                                 >
-                                    {info.description ? "Edit reason" : "Add reason"}
+                                    {downtime.description ? "Edit reason" : "Add reason"}
+                                </Button>
+                                <Button
+                                    color={'gray'}
+                                    variant='contained'
+                                    onClick={() => {alert('clicked')}}
+                                >
+                                    {"Add scrap"}
                                 </Button>
                             </Stack>
                         </ThemeProvider>

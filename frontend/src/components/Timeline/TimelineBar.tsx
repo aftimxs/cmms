@@ -6,8 +6,9 @@ import CommentModal from "./CommentModal.tsx";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import _ from 'lodash';
-import {useAppSelector} from "../../app/hooks.ts";
-import {useGetDowntimesQuery, useGetLineQuery, useGetLineState} from "../../app/services/apiSplice.ts";
+import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
+import {useGetLineState} from "../../app/services/apiSplice.ts";
+import {downtimeSelected} from "../../features/downtimeSlice.ts";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -65,91 +66,76 @@ const BarTooltip = ({ type, barData, product }:any) => {
 
 
 const TimelineBar = ({ barData }:any) => {
-    const availableBars = useAppSelector(state => state.bars)
 
+    console.log(barData)
+
+    const dispatch = useAppDispatch()
+    const bars = useAppSelector(state => state.bars)
     const lineParams = useAppSelector(state => state.line)
-    const {shift, product} = useGetLineState(lineParams, {
-    selectFromResult: ({data: state}) => ({
-        shift: state ? state['shift'][0] : undefined,
-        product: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
-            state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+    const {shift, product, downtimes} = useGetLineState(lineParams, {
+        selectFromResult: ({data: state}) => ({
+            shift: state ? state['shift'][0] : undefined,
+            product: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
+                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+            downtimes: state ? state['shift'][0]? state['shift'][0]['downtime'] : undefined : undefined,
+        })
     })
-})
 
-    const [barD, setBarD] = useState([])
     const w = barData.long * 1.6665
-
-    useEffect(() => {
-        setBarD(_.find(availableBars, {'startTime': barData.startTime.format('DD-MM-YYYY HH:mm:ss Z')}))
-    }, []);
-
+    console.log(bars)
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(true)
-        getInfo(_.find(availableBars, {'startTime': barData.startTime.format('DD-MM-YYYY HH:mm:ss Z')}))
+        dispatch(downtimeSelected({
+            id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
+            start: dayjs(barData.startTime,).format('HH:mm:ss'),
+            end: dayjs(barData.minute).format('HH:mm:ss'),
+            shift: shift?.id,
+            reason: null,
+            description: null,
+        }))
     };
 
-    const [info, setInfo] = useState([])
-
-    const instance = axios.create({
-      baseURL: 'http://127.0.0.1:8000/api',
-      timeout: 1000,
-    });
-
-    const getInfo = async (bar:any) => {
-        console.log(bar)
-        try {
-            const response = await
-                instance.get(`/downtime/${dayjs(bar.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`)
-            const x = await response.data
-            setInfo(x)
-
-        } catch (error) {
-            // @ts-ignore
-            if (error.name === 'TypeError') {
-                const x: React.SetStateAction<never[]> = []
-                setInfo(x)
+    const handleClick = (type:string, downtime:any) => {
+        let newId = 0;
+        const id = downtimes.findIndex((obj:any) => {
+            return obj.id === downtime.id;
+        })
+        if (type === 'back'){
+            newId = id-1;
+        } else if (type === 'forward'){
+            newId = id+1;
+        }
+        if (newId >= 0 && newId < downtimes.length) {
+            dispatch(downtimeSelected({
+                id: downtimes[newId].id,
+                start: downtimes[newId].start,
+                end: downtimes[newId].end,
+                shift: shift?.id,
+                reason: null,
+                description: null,
+            }))
             }
-        }
-    }
+    };
 
-    const redBars = _.filter(availableBars, {'background': 'bg-danger'})
-
-    const handleBack = () => {
-        const previousId = (_.indexOf(redBars, barD)-1)
-        if (previousId >= 0) {
-            getInfo(redBars[previousId])
-            setBarD(redBars[previousId])
-        }
-    }
-
-    const handleForward = () => {
-        const nextId = (_.indexOf(redBars, barD)+1)
-        if (nextId < redBars.length) {
-            getInfo(redBars[nextId])
-            setBarD(redBars[nextId])
-        }
-    }
+    const downtime = useAppSelector(state => state.downtime)
 
     return(
         <>
             <CommentModal
                 open={open}
                 setOpen={setOpen}
-                info={info}
-                handlers={{
-                    handleBack: handleBack,
-                    handleForward: handleForward
-                }}
-                setBarD={setBarD}
+                handleClick = {handleClick}
+                downtime = {downtime}
             />
 
             <ProductionTooltip
                 title={
                     <BarTooltip type={barData.bg} barData={barData} product={product} ></BarTooltip>
                 }
-                enterDelay={200} leaveDelay={100}
+                enterDelay={200}
+                leaveDelay={100}
                 arrow
             >
                 <div className={`d-inline-block h-100 position-relative ${barData.bg}`} style={{width:`${w}%`}} onClick={handleOpen}>

@@ -1,23 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import dayjs from "dayjs";
 
-// Define a type for the slice state
-export interface lineState {
-    area: string,
-    cell: number,
-    id: number,
-    machine: [],
-    scrap: [],
-    shift: [],
-}
-
-// Define the initial state using that type
-//const initialState: lineState = {
-//    area: 'Welding',
-//    cell: '1',
-//    date: dayjs().format('YYYY-MM-DD'),
-//    number: '1',
-//}
 
 export const productionApi = createApi({
     reducerPath: 'productionApi',
@@ -37,9 +19,9 @@ export const productionApi = createApi({
               return response[0]
           }
       }),
-      getDowntimes: builder.query({
-          query: ({startTime, shiftId}) =>
-              `downtime/${dayjs(startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shiftId}`,
+      getShiftDowntimes: builder.query({
+          query: ({shiftId}) =>
+              `downtime/?shift=${shiftId}`,
           transformResponse: (response) => {
               // @ts-ignore
               return response
@@ -48,5 +30,5 @@ export const productionApi = createApi({
   }),
 })
 
-export const {useGetLineQuery, useGetDowntimesQuery} = productionApi
+export const {useGetLineQuery, useGetShiftDowntimesQuery} = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

@@ -67,8 +67,6 @@ const BarTooltip = ({ type, barData, product }:any) => {
 
 const TimelineBar = ({ barData }:any) => {
 
-    console.log(barData)
-
     const dispatch = useAppDispatch()
     const bars = useAppSelector(state => state.bars)
     const lineParams = useAppSelector(state => state.line)
@@ -82,7 +80,6 @@ const TimelineBar = ({ barData }:any) => {
     })
 
     const w = barData.long * 1.6665
-    console.log(bars)
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
@@ -92,9 +89,18 @@ const TimelineBar = ({ barData }:any) => {
             start: dayjs(barData.startTime,).format('HH:mm:ss'),
             end: dayjs(barData.minute).format('HH:mm:ss'),
             shift: shift?.id,
-            reason: null,
-            description: null,
+            background: barData.bg,
+            length: barData.long,
+            parts: barData.parts,
         }))
+        //dispatch(downtimeSelected({
+        //    id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
+        //    start: dayjs(barData.startTime,).format('HH:mm:ss'),
+        //    end: dayjs(barData.minute).format('HH:mm:ss'),
+        //    shift: shift?.id,
+        //    reason: null,
+        //    description: null,
+        //}))
     };
 
     const handleClick = (type:string, downtime:any) => {

@@ -4,10 +4,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 // Define a type for the slice state
 export interface downtimeState {
     id: string,
-    reason?: string,
-    description?: string,
     start: string,
     end: string,
+    background: 'bg-success' | 'bg-warning' | 'bg-danger',
+    length: number,
+    parts: number,
     shift: number,
 }
 
@@ -16,6 +17,9 @@ const initialState: downtimeState = {
     id: '',
     start: '',
     end: '',
+    background: 'bg-success',
+    length: 0,
+    parts: 0,
     shift: 0,
 }
 
@@ -27,10 +31,11 @@ const downtimeSlice = createSlice({
           return {
               ...state,
               id: action.payload.id,
-              reason: action.payload.reason,
-              description: action.payload.description,
               start: action.payload.start,
               end: action.payload.end,
+              background: action.payload.background,
+              length: action.payload.length,
+              parts: action.payload.parts,
               shift: action.payload.shift,
           }
       },

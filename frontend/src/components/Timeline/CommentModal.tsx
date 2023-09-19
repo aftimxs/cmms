@@ -8,13 +8,11 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import NavigateBeforeOutlinedIcon from '@mui/icons-material/NavigateBeforeOutlined';
 import NavigateNextOutlinedIcon from '@mui/icons-material/NavigateNextOutlined';
+import CircleIcon from '@mui/icons-material/Circle';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import _ from "lodash";
-import {useGetDowntimesQuery, useGetLineState} from "../../app/services/apiSplice.ts";
-import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import dayjs from "dayjs";
-import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import {useEffect} from "react";
+import {red} from "@mui/material/colors";
 
 
 const style = {
@@ -68,13 +66,32 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
 
     let start = dayjs(downtime.start, 'HH:mm:ss').format('HH:mm');
     let end = dayjs(downtime.end, 'HH:mm:ss').format('HH:mm');
+    let circleColor = '';
+
+    const color = (background:string) => {
+         switch (background){
+            case 'bg-success': {
+                return 'green';
+            }
+            case 'bg-warning': {
+                return 'yellow';
+            }
+            case 'bg-danger': {
+                return 'red';
+            }
+            default: {
+                return 'black';
+            }
+        }
+     }
 
     useEffect(() => {
         start = dayjs(downtime.start, 'HH:mm:ss').format('HH:mm')
         end = dayjs(downtime.end, 'HH:mm:ss').format('HH:mm')
+        circleColor = color(downtime?.background)
     }, [downtime]);
 
-
+    console.log(color(downtime.background))
     return(
         <>
             <Modal
@@ -97,8 +114,8 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                             </IconButton>
                         </Grid>
                         <Grid>
-                            <Typography color='black' id="modal-modal-title" align='center' variant="subtitle2">
-                                {downtime? `${start} - ${end}`  : 'N/A'}
+                            <Typography color='black' id="modal-modal-title" align='center' variant="subtitle1">
+                                <CircleIcon sx={{color: circleColor, fontSize:'12px', verticalAlign:'0px'}}/> {downtime? `${start} - ${end}`  : 'N/A'}
                             </Typography>
                             <Typography color='black' align='center' variant={'h6'}>
                                 {downtime.reason ? downtime.reason : 'Uncommented'}

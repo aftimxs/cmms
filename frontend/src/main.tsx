@@ -4,6 +4,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 import './App.css'
 import { Provider } from 'react-redux';
 import { store } from './app/store';
+import {enableMapSet} from "immer"
+
+enableMapSet()
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

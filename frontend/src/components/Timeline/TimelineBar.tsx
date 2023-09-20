@@ -124,7 +124,7 @@ const TimelineBar = ({ barData }:any) => {
                 open={open}
                 setOpen={setOpen}
                 handleClick = {handleClick}
-                downtime = {downtime}
+                bar = {downtime}
             />
 
             <ProductionTooltip

@@ -2,7 +2,7 @@ import Modal from "@mui/material/Modal";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from "@mui/material/Typography";
-import {Container} from "@mui/material";
+import {Container, InputAdornment, TextField} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -20,6 +20,7 @@ import {NavigateBeforeOutlined, NavigateNextOutlined, Circle, ExpandLess, Expand
     from '@mui/icons-material';
 import {useState} from "react";
 import _ from 'lodash';
+import {produce} from "immer"
 
 
 
@@ -66,7 +67,7 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, bar }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -89,27 +90,19 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
         }
      }
 
-    let start = dayjs(downtime.start, 'HH:mm:ss').format('HH:mm');
-    let end = dayjs(downtime.end, 'HH:mm:ss').format('HH:mm');
-    let circleColor = color(downtime.background);
+    let start = dayjs(bar.start, 'HH:mm:ss').format('HH:mm');
+    let end = dayjs(bar.end, 'HH:mm:ss').format('HH:mm');
+    let circleColor = color(bar.background);
 
-    const [openList, setOpenList] = useState({open0:false, open1:false, open2:false});
+    const [openList, setOpenList] = useState([{index:'open0', active:false}, {index:'open1', active:false}, {index:'open2', active:false}]);
 
-    const handleListClick = (index) => {
-        const caca = {...openList}
-        Object.keys(openList).forEach((item) => {
-                if (item === `open${index}`){
-                    caca.append(!openList[item])
-                } else {
-                    caca.append(openList[item])
-                }
+    const handleListClick = (index:string) => {
+        const y = _.findIndex(openList, ['index', index])
+        const nextState = produce(openList, draftState => {
+            draftState[y].active = !draftState[y].active
         })
-        console.log(caca)
-        setOpenList(
-
-        );
+        setOpenList(nextState)
     };
-    console.log(openList)
     //const [expanded, setExpanded] = useState(false);
     //const handleChange =
     //    (list: string) => (event, isExpanded: boolean) => {
@@ -133,20 +126,20 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                     alignItems="center">
                     <Grid container spacing={5}>
                         <Grid>
-                            <IconButton onClick={() => handleClick('back', downtime)}>
+                            <IconButton onClick={() => handleClick('back', bar)}>
                                 <NavigateBeforeOutlined/>
                             </IconButton>
                         </Grid>
                         <Grid>
                             <Typography color='black' id="modal-modal-title" align='center' variant="subtitle1">
-                                <Circle sx={{color: circleColor, fontSize:'12px', verticalAlign:'0px'}}/> {downtime? `${start} - ${end}`  : 'N/A'}
+                                <Circle sx={{color: circleColor, fontSize:'12px', verticalAlign:'0px'}}/> {bar? `${start} - ${end}`  : 'N/A'}
                             </Typography>
                             <Typography color='black' align='center' variant={'h6'}>
-                                {downtime.reason ? downtime.reason : 'Uncommented'}
+                                {bar.reason ? bar.reason : 'Uncommented'}
                             </Typography>
                         </Grid>
                         <Grid>
-                            <IconButton onClick={() => handleClick('forward', downtime)}>
+                            <IconButton onClick={() => handleClick('forward', bar)}>
                                 <NavigateNextOutlined/>
                             </IconButton>
                         </Grid>
@@ -161,7 +154,7 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                                     variant='contained'
                                     onClick={() => {alert('clicked')}}
                                 >
-                                    {downtime.description ? "Edit reason" : "Add reason"}
+                                    {bar.description ? "Edit reason" : "Add reason"}
                                 </Button>
                                 <Button
                                     color={'gray'}
@@ -178,7 +171,7 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                                   aria-controls="panel1bh-content"
                                   id="panel1bh-header"
                                 >
-                                    <Typography sx={{ width: '100%', flexShrink: 0 }}>
+                                    <Typography variant="subtitle1">
                                       Add reason
                                     </Typography>
                                 </AccordionSummary>
@@ -187,14 +180,14 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                                       sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
                                       component="nav"
                                     >
-                                          <ListItemButton onClick={() => handleListClick(0)}>
+                                          <ListItemButton onClick={() => handleListClick('open0')} sx={{bgcolor:'#e8e8e8'}}>
                                               <ListItemIcon>
                                                   <EditCalendar />
                                               </ListItemIcon>
                                               <ListItemText primary="Operational" />
-                                              {openList ? <ExpandLess /> : <ExpandMore />}
+                                              {openList[0].active ? <ExpandLess /> : <ExpandMore />}
                                           </ListItemButton>
-                                          <Collapse in={openList[0]} timeout="auto" unmountOnExit>
+                                          <Collapse in={openList[0].active} timeout="auto" unmountOnExit>
                                               <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                               <List component="div" disablePadding>
                                                 <ListItemButton sx={{ pl: 9 }}>
@@ -207,15 +200,16 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                                                     <ListItemText primary="Operators in training" />
                                                 </ListItemButton>
                                               </List>
+                                               <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                           </Collapse>
-                                        <ListItemButton onClick={() => handleListClick(1)}>
+                                        <ListItemButton onClick={() => handleListClick('open1')} sx={{bgcolor:'#e8e8e8'}}>
                                               <ListItemIcon>
                                                   <Engineering/>
                                               </ListItemIcon>
                                               <ListItemText primary="Maintenance" />
-                                              {openList ? <ExpandLess /> : <ExpandMore />}
+                                              {openList[1].active ? <ExpandLess /> : <ExpandMore />}
                                           </ListItemButton>
-                                          <Collapse in={openList[1]} timeout="auto" unmountOnExit>
+                                          <Collapse in={openList[1].active} timeout="auto" unmountOnExit>
                                               <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                             <List component="div" disablePadding>
                                               <ListItemButton sx={{ pl: 9 }}>
@@ -225,23 +219,35 @@ const CommentModal = ({ open, setOpen, handleClick, downtime }:any) => {
                                                   <ListItemText primary="Unplanned maintenance" />
                                               </ListItemButton>
                                             </List>
+                                               <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                           </Collapse>
-                                        <ListItemButton onClick={() => handleListClick(2)}>
+                                        <ListItemButton onClick={() => handleListClick('open2')} sx={{bgcolor:'#e8e8e8'}}>
                                               <ListItemIcon>
                                                   <AltRoute/>
                                               </ListItemIcon>
                                               <ListItemText primary="Other" />
-                                              {openList ? <ExpandLess /> : <ExpandMore />}
+                                              {openList[2].active ? <ExpandLess /> : <ExpandMore />}
                                           </ListItemButton>
-                                          <Collapse in={openList[2]} timeout="auto" unmountOnExit>
+                                          <Collapse in={openList[2].active} timeout="auto" unmountOnExit>
                                               <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                             <List component="div" disablePadding>
                                               <ListItemButton sx={{ pl: 9 }}>
                                                   <ListItemText primary="Break" />
                                               </ListItemButton>
                                             </List>
+                                               <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                           </Collapse>
                                     </List>
+                                    <TextField
+                                        id="description"
+                                        label="Description"
+                                        fullWidth
+                                        sx={{mt:'10px'}}
+                                        //defaultValue="Optional"
+                                        //InputProps={{
+                                        //  endAdornment: <InputAdornment position="end">pcs</InputAdornment>,
+                                        //}}
+                                    />
                                 </AccordionDetails>
                             </Accordion>
                         </ThemeProvider>

@@ -3,10 +3,13 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
-import React, {useState} from "react";
+import {useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
-import {useGetLineState} from "../../app/services/apiSplice.ts";
+import {useGetDowntimeQuery, useGetLineState} from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
+import {Paper, TextField} from "@mui/material";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Unstable_Grid2";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -60,7 +63,7 @@ const BarTooltip = ({ type, barData, product }:any) => {
             {`Quantity: ${quantity} pcs`}
         </>
     )
- }
+}
 
 
 const TimelineBar = ({ barData }:any) => {
@@ -68,12 +71,11 @@ const TimelineBar = ({ barData }:any) => {
     const dispatch = useAppDispatch()
     const bars = useAppSelector(state => state.bars)
     const lineParams = useAppSelector(state => state.line)
-    const {shift, product, downtimes} = useGetLineState(lineParams, {
+    const {shift, product} = useGetLineState(lineParams, {
         selectFromResult: ({data: state}) => ({
             shift: state ? state['shift'][0] : undefined,
             product: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
                 state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
-            downtimes: state ? state['shift'][0]? state['shift'][0]['downtime'] : undefined : undefined,
         })
     })
 
@@ -93,10 +95,10 @@ const TimelineBar = ({ barData }:any) => {
         }))
     };
 
-    const handleClick = (type:string, downtime:any) => {
+    const handleClick = (type:string, bar:any) => {
         let newIndex = 0;
         const index = bars.findIndex((obj:any) => {
-            return obj.id === downtime.id;
+            return obj.id === bar.id;
         })
         if (type === 'back'){
             newIndex = index-1;
@@ -116,7 +118,35 @@ const TimelineBar = ({ barData }:any) => {
             }
     };
 
-    const downtime = useAppSelector(state => state.downtime)
+    const bar = useAppSelector(state => state.downtime)
+
+
+    const {data:comments} = useGetDowntimeQuery(bar, {refetchOnMountOrArgChange: true});
+
+    const color = (background:string) => {
+         switch (background){
+            case 'bg-success': {
+                return 'green';
+            }
+            case 'bg-warning': {
+                return '#F3E25B';
+            }
+            case 'bg-danger': {
+                return 'red';
+            }
+            default: {
+                return 'black';
+            }
+        }
+}
+
+    const Item = styled(Box)(({ theme }) => ({
+        backgroundColor: color(barData.bg),
+        ...theme.typography.body2,
+        height: '100%',
+        textAlign: 'center',
+        color: 'white',
+    }));
 
     return(
         <>
@@ -124,7 +154,8 @@ const TimelineBar = ({ barData }:any) => {
                 open={open}
                 setOpen={setOpen}
                 handleClick = {handleClick}
-                bar = {downtime}
+                bar = {bar}
+                comments = {comments}
             />
 
             <ProductionTooltip
@@ -135,12 +166,21 @@ const TimelineBar = ({ barData }:any) => {
                 leaveDelay={100}
                 arrow
             >
-                <div className={`d-inline-block h-100 position-relative ${barData.bg}`} style={{width:`${w}%`}} onClick={handleOpen}>
-                    <span className={barData.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2
-                        border-light rounded-circle bg-dark p-1` : 'visually-hidden'}
-                          style={{zIndex:1}}><span className="visually-hidden">x</span></span>
-
-                </div>
+                <Grid xs={12} sx={{width: `${w}%`, height:'75%'}} onClick={handleOpen}>
+                    <Item>{barData.bg !== 'bg-success' ? 'reason' : ''}</Item>
+                </Grid>
+                {/*<div className={`d-inline-block h-100 position-relative ${barData.bg}`}*/}
+                {/*     style={{width:`${w}%`}} onClick={handleOpen}>*/}
+                {/*    <Typography*/}
+                {/*        align={'center'}*/}
+                {/*        mt={5}*/}
+                {/*    >*/}
+                {/*       {barData.bg !== 'bg-success' ? 'reason' : ''}*/}
+                {/*    </Typography>*/}
+                {/*    <span className={barData.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2*/}
+                {/*        border-light rounded-circle bg-dark p-1` : 'visually-hidden'}*/}
+                {/*          style={{zIndex:1}}><span className="visually-hidden">x</span></span>*/}
+                {/*</div>*/}
             </ProductionTooltip>
         </>
     )

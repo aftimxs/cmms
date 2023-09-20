@@ -1,5 +1,13 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 
+interface comments {
+    id: string,
+    reason: string,
+    description: string,
+    start: string,
+    end: string,
+    shift:number,
+}
 
 export const productionApi = createApi({
     reducerPath: 'productionApi',
@@ -27,11 +35,26 @@ export const productionApi = createApi({
               return response
           }
       }),
+      getDowntime: builder.query({
+          query: ({id}) =>
+              `downtime/${id}`,
+          transformResponse: (response:comments) => {
+              // @ts-ignore
+              return response
+          },
+      }),
       downtimeAdded: builder.mutation({
-          query: (body) => ({
+          query: (downtime) => ({
               url: `downtime/`,
               method: 'POST',
-              body,
+              body: downtime,
+          })
+      }),
+      downtimeUpdated: builder.mutation({
+          query: (downtime) => ({
+              url: `downtime/${downtime.id}/`,
+              method: 'PATCH',
+              body: downtime,
           })
       })
   }),
@@ -40,6 +63,8 @@ export const productionApi = createApi({
 export const {
     useGetLineQuery,
     useGetShiftDowntimesQuery,
+    useGetDowntimeQuery,
     useDowntimeAddedMutation,
+    useDowntimeUpdatedMutation,
 } = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

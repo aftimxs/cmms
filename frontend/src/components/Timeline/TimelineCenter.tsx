@@ -12,6 +12,8 @@ import {
     useGetLineState,
     useGetShiftDowntimesQuery
 } from "../../app/services/apiSplice.ts";
+import Grid from "@mui/material/Unstable_Grid2";
+import {Container} from "@mui/material";
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -204,18 +206,20 @@ const TimelineCenter = ({ hour }:any) => {
 
 
     return (
-        <div className="col-10 border-start border-end">
-            <div className="row bg-black h-100 align-items-center">
-                <div className="container px-0 h-75">
+        // <div className="col-10 border-start border-end">
+        //     <div className="row bg-black h-100 align-items-center">
+        //         <div className="container px-0 h-75">
+                <Grid container sx={{bgcolor:'black', paddingX:0}} xs={10} alignItems={'center'}>
                     {bars.map((bar: any, index: number) =>
                         <TimelineBar
                             key={index}
                             barData={bar}
                         />
                     )}
-                </div>
-            </div>
-        </div>
+                </Grid>
+        //         </div>
+        //     </div>
+        // </div>
     )
 
 }

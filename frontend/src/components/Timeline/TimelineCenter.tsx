@@ -7,13 +7,9 @@ import axios from "axios";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {barAdded} from "../../features/barsSlice.ts";
 import {
-    useDowntimeAddedMutation,
-    useGetLineQuery,
-    useGetLineState,
-    useGetShiftDowntimesQuery
+    useGetLineState, useScrapAddedMutation,
 } from "../../app/services/apiSplice.ts";
 import Grid from "@mui/material/Unstable_Grid2";
-import {Container} from "@mui/material";
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -22,12 +18,14 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, product, production} = useGetLineState(lineParams, {
+     const {shift, product, production, scrap} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
             product: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
+            scrap: state ? state['shift'][0] ? state['shift'][0]['scrap'] ? state['shift'][0]['scrap'] : undefined :
+                undefined : undefined,
         })
     })
 
@@ -91,15 +89,13 @@ const TimelineCenter = ({ hour }:any) => {
         }
     }
 
-
-
     useEffect(() => {
         setBars([])
         // @ts-ignore
         setBars(printBars)
     }, [shift]);
 
-
+    const [postScrap] = useScrapAddedMutation()
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
     const background = (now:dayjs.Dayjs) => {
@@ -120,6 +116,16 @@ const TimelineCenter = ({ hour }:any) => {
                 partsCounter = items;
                 color = c;
                 startTime = min;
+                if (c !== 'bg-danger' && !_.includes(scrap, {'id':`S${dayjs(min).format('DDMMYYHHmm')}${shift?.id}`})){
+                    postScrap({
+                        id: `S${dayjs(min).format('DDMMYYHHmm')}${shift?.id}`,
+                        reason: null,
+                        pieces: null,
+                        comments: null,
+                        minute: dayjs(min).format('HH:mm:ss'),
+                        shift: shift?.id,
+                    })
+                }
             } else {
                 counter = counter + 1;
                 partsCounter = partsCounter + items;
@@ -209,7 +215,13 @@ const TimelineCenter = ({ hour }:any) => {
         // <div className="col-10 border-start border-end">
         //     <div className="row bg-black h-100 align-items-center">
         //         <div className="container px-0 h-75">
-                <Grid container sx={{bgcolor:'black', paddingX:0}} xs={10} alignItems={'center'}>
+                <Grid
+                    container
+                    sx={{bgcolor:'rgb(44,44,44)', paddingX:0}}
+                    xs={10}
+                    alignItems={'center'}
+                    component={'div'}
+                >
                     {bars.map((bar: any, index: number) =>
                         <TimelineBar
                             key={index}

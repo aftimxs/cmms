@@ -5,11 +5,17 @@ import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
 import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
-import {useGetDowntimeQuery, useGetLineState} from "../../app/services/apiSplice.ts";
+import {
+    useGetDowntimeQuery,
+    useGetLineState,
+    useGetScrapQuery, useLazyGetDowntimeQuery, useLazyGetScrapQuery,
+    useScrapAddedMutation
+} from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import Box, { BoxProps } from '@mui/material/Box';
 import Grid from "@mui/material/Unstable_Grid2";
-import {Avatar, Badge} from "@mui/material";
+import {Avatar, Badge, Container} from "@mui/material";
+import _ from 'lodash';
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -85,13 +91,17 @@ const color = (background:string) => {
 const TimelineBar = ({ barData }:any) => {
 
     const dispatch = useAppDispatch()
+
     const bars = useAppSelector(state => state.bars)
+
     const lineParams = useAppSelector(state => state.line)
-    const {shift, product} = useGetLineState(lineParams, {
+    const {shift, product, scrap} = useGetLineState(lineParams, {
         selectFromResult: ({data: state}) => ({
             shift: state ? state['shift'][0] : undefined,
             product: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
                 state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+            scrap: state ? state['shift'][0] ? state['shift'][0]['scrap'] ? state['shift'][0]['scrap'] : undefined :
+                undefined : undefined,
         })
     })
 
@@ -102,14 +112,16 @@ const TimelineBar = ({ barData }:any) => {
         setOpen(true)
         dispatch(downtimeSelected({
             id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
-            start: dayjs(barData.startTime).format('HH:mm:ss'),
-            end: dayjs(barData.minute).format('HH:mm:ss'),
+            start: dayjs(barData.startTime).format('DD-MM-YYYY HH:mm:ss Z'),
+            end: dayjs(barData.minute).format('DD-MM-YYYY HH:mm:ss Z'),
             shift: shift?.id,
             background: barData.bg,
             length: barData.long,
             parts: barData.parts,
         }))
     };
+
+
 
     const handleClick = (type:string, bar:any) => {
         let newIndex = 0;
@@ -124,8 +136,8 @@ const TimelineBar = ({ barData }:any) => {
         if (newIndex >= 0 && newIndex < bars.length) {
             dispatch(downtimeSelected({
                 id: bars[newIndex].id,
-                start: dayjs(bars[newIndex].startTime, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
-                end: dayjs(bars[newIndex].endTime, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
+                start: bars[newIndex].startTime,
+                end: bars[newIndex].endTime,
                 shift: shift?.id,
                 background: bars[newIndex].background,
                 length: bars[newIndex].length,
@@ -134,29 +146,33 @@ const TimelineBar = ({ barData }:any) => {
             }
     };
 
+
+
     const bar = useAppSelector(state => state.downtime)
-    const {data:comments} = useGetDowntimeQuery(bar, {refetchOnMountOrArgChange: true});
-    const {data:nonGreenData} = useGetDowntimeQuery({
-        id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
-    }, {refetchOnMountOrArgChange: true, pollingInterval:1000});
+    const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
+    const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery()
+    const [getScrap, {data:scrapData}] = useLazyGetScrapQuery()
+
+
+    useEffect(() => {
+        if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
+            getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`},)
+        } else if (bar.background === 'bg-danger'){
+            getDowntime(bar)
+        }
+    }, [bar.background]);
+
+    useEffect(() => {
+        if (barData.bg === 'bg-danger'){
+            getBarDowntime({id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`})
+        }
+    }, [barData]);
 
     const [barReason, setBarReason] = useState('');
 
     useEffect(() => {
         setBarReason(nonGreenData?.reason)
     }, [nonGreenData]);
-
-    const Item = styled(Box)(({ theme }) => ({
-        backgroundColor: color(barData.bg),
-        ...theme.typography.body2,
-        height: '100%',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1rem',
-        fontWeight: '700',
-    }));
 
     return(
         <>
@@ -166,6 +182,7 @@ const TimelineBar = ({ barData }:any) => {
                 handleClick = {handleClick}
                 bar = {bar}
                 comments = {comments}
+                scrap = {scrapData}
                 setBarReason = {setBarReason}
             />
 
@@ -177,7 +194,12 @@ const TimelineBar = ({ barData }:any) => {
                 leaveDelay={100}
                 arrow
             >
-                <Grid sx={{width: `${w}%`, height:'75%'}} onClick={handleOpen} component={'span'}>
+
+                <Container
+                    sx={{width:`${w}%`, height:'75%', backgroundColor: color(barData.bg),}}
+                    disableGutters
+                    maxWidth={false}
+                    onClick={handleOpen}>
                     {/*<Badge*/}
                     {/*    badgeContent=""*/}
                     {/*    color="primary"*/}
@@ -185,12 +207,22 @@ const TimelineBar = ({ barData }:any) => {
                     {/*      vertical: 'bottom',*/}
                     {/*      horizontal: 'right',*/}
                     {/*    }}*/}
-                    {/*>*/}
-                    <Item>
-                        {barData.bg !== 'bg-success' ? barReason : ''}
-                    </Item>
-                    {/*</Badge>*/}
-                </Grid>
+                    {/*    >*/}
+                            <Box
+                                sx={{height: '100%',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1rem',
+                                fontWeight: '400',
+                                }}
+                            >
+                                {barData.bg !== 'bg-success' ? barReason : ' '}
+                            </Box>
+                        {/*</Badge>*/}
+                </Container>
+
 
                 {/*<div className={`d-inline-block h-100 position-relative ${barData.bg}`}*/}
                 {/*     style={{width:`${w}%`}} onClick={handleOpen}>*/}

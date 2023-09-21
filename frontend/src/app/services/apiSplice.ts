@@ -9,6 +9,15 @@ interface comments {
     shift:number,
 }
 
+interface scrap {
+    id: string,
+    reason: string,
+    comments: string,
+    pieces: number,
+    minute: string,
+    shift:number,
+}
+
 export const productionApi = createApi({
     reducerPath: 'productionApi',
     baseQuery: fetchBaseQuery({
@@ -56,7 +65,29 @@ export const productionApi = createApi({
               method: 'PATCH',
               body: downtime,
           })
-      })
+      }),
+      getScrap: builder.query({
+          query: ({id}) =>
+              `scrap/${id}`,
+          transformResponse: (response:scrap) => {
+              // @ts-ignore
+              return response
+          },
+      }),
+      scrapAdded: builder.mutation({
+          query: (scrap) => ({
+              url: `scrap/`,
+              method: 'POST',
+              body: scrap,
+          })
+      }),
+      scrapUpdated: builder.mutation({
+          query: (scrap) => ({
+              url: `scrap/${scrap.id}/`,
+              method: 'PATCH',
+              body: scrap,
+          })
+      }),
   }),
 })
 
@@ -66,5 +97,10 @@ export const {
     useGetDowntimeQuery,
     useDowntimeAddedMutation,
     useDowntimeUpdatedMutation,
+    useGetScrapQuery,
+    useScrapAddedMutation,
+    useScrapUpdatedMutation,
+    useLazyGetScrapQuery,
+    useLazyGetDowntimeQuery
 } = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

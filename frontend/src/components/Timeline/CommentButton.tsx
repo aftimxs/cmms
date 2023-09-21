@@ -2,7 +2,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 
 
-const CommentButton = ({comments, updateDowntime, reasonState, setReasonState, title}:any) => {
+const CommentButton = ({comments, updateDowntime, reasonState, setReasonState, title, setBarReason}:any) => {
 
     return(
         <ListItemButton
@@ -10,6 +10,7 @@ const CommentButton = ({comments, updateDowntime, reasonState, setReasonState, t
             onClick={() => {
                 updateDowntime({...comments, reason: title})
                 setReasonState(title)
+                setBarReason(title)
             }}
             selected={reasonState === title}
         >

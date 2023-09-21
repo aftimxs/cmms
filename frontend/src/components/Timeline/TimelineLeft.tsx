@@ -1,7 +1,7 @@
 
 const TimelineLeft = ({ hour }:any) => {
     return (<div className="col-1 text-center">
-                <div className="row h-100 align-items-center">
+                <div className="row h-100 align-items-center border-end">
                     <span>{hour}</span>
                 </div>
             </div>)

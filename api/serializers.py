@@ -58,6 +58,7 @@ class ShiftSerializer(serializers.ModelSerializer):
     info = ProductionInfoSerializer(many=True, read_only=True)
     downtime = DowntimeSerializer(many=True, read_only=True)
     speedloss = SpeedlossSerializer(many=True, read_only=True)
+    scrap = ScrapSerializer(many=True, read_only=True)
 
     class Meta:
         model = Shift

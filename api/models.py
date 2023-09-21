@@ -68,10 +68,12 @@ class ProductionInfo(models.Model):
 
 
 class Scrap(models.Model):
-    title = models.CharField(max_length=50, null=True)
-    pieces = models.IntegerField(null=False)
+    id = models.CharField(primary_key=True, max_length=50)
+    shift = models.ForeignKey(Shift, related_name='scrap', on_delete=models.CASCADE)
+    reason = models.CharField(max_length=50, null=True)
+    pieces = models.IntegerField(null=True)
     comments = models.CharField(max_length=200, null=True)
-    production = models.ForeignKey(ProductionLine, related_name='scrap', on_delete=models.CASCADE)
+    minute = models.TimeField()
 
 
 class Downtime(models.Model):

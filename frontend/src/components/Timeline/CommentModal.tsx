@@ -21,7 +21,12 @@ import {NavigateBeforeOutlined, NavigateNextOutlined, Circle, ExpandLess, Expand
 import {useEffect, useState} from "react";
 import _ from 'lodash';
 import {produce} from "immer"
-import {useDowntimeUpdatedMutation, useGetDowntimeQuery} from "../../app/services/apiSplice.ts";
+import {
+    useDowntimeUpdatedMutation,
+    useGetDowntimeQuery,
+    useScrapAddedMutation,
+    useScrapUpdatedMutation
+} from "../../app/services/apiSplice.ts";
 import CommentButton from "./CommentButton.tsx";
 
 
@@ -69,7 +74,7 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBarReason }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -92,18 +97,23 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
         }
     }
 
-    let start = dayjs(bar.start, 'HH:mm:ss').format('HH:mm');
-    let end = dayjs(bar.end, 'HH:mm:ss').format('HH:mm');
+    let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm');
+    let end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm');
     let circleColor = color(bar.background);
     let description = comments ? comments.description ? comments.description : '' : '';
     let reason = comments ? comments.reason ? comments.reason : '' : '';
 
-    const [reasonState, setReasonState] = useState('')
+    let scrapReason = scrap ? scrap.reason ? scrap.reason : '' : '';
+    let scrapComments = scrap ? scrap.comments ? scrap.comments : '' : '';
+    let scrapQuantity = scrap ? scrap.pieces ? scrap.pieces : 0 : 0;
 
+    //UPDATE REASON
+    const [reasonState, setReasonState] = useState('')
     useEffect(() => {
         setReasonState(reason)
-    }, [reason]);
+    }, [bar, reason, open, handleClick]);
 
+    //OPEN REASON LIST SUBCATEGORIES
     const [openList, setOpenList] = useState([{index:'open0', active:false}, {index:'open1', active:false}, {index:'open2', active:false}]);
 
     const handleListClick = (index:string) => {
@@ -113,14 +123,9 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
         })
         setOpenList(nextState)
     };
-    //const [expanded, setExpanded] = useState(false);
-    //const handleChange =
-    //    (list: string) => (event, isExpanded: boolean) => {
-    //      setExpanded(isExpanded ? panel : false);
-    //};
-
 
     const [updateDowntime] = useDowntimeUpdatedMutation()
+    const [updateScrap] = useScrapUpdatedMutation()
 
     return(
         <>
@@ -148,7 +153,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                 <Circle sx={{color: circleColor, fontSize:'12px', verticalAlign:'0px'}}/> {bar? `${start} - ${end}`  : 'N/A'}
                             </Typography>
                             <Typography color='black' align='center' variant={'subtitle1'}>
-                                {circleColor !== 'green' ? reasonState ? reasonState : 'Uncommented' : 'Good rate'}
+                                {circleColor !== 'green' ? reason ? reason : 'Uncommented' : 'Good rate'}
                             </Typography>
                         </Grid>
                         <Grid>
@@ -200,6 +205,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                                     updateDowntime={updateDowntime}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
+                                                    setBarReason={setBarReason}
                                                     title={'No material'}
                                                 />
                                                 <CommentButton
@@ -207,6 +213,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                                     updateDowntime={updateDowntime}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
+                                                    setBarReason={setBarReason}
                                                     title={'No operators'}
                                                 />
                                                 <CommentButton
@@ -214,6 +221,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                                     updateDowntime={updateDowntime}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
+                                                    setBarReason={setBarReason}
                                                     title={'Operators in training'}
                                                 />
                                             </List>
@@ -234,6 +242,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                                       updateDowntime={updateDowntime}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
+                                                      setBarReason={setBarReason}
                                                       title={'Planned maintenance'}
                                                   />
                                                 <CommentButton
@@ -241,6 +250,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                                       updateDowntime={updateDowntime}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
+                                                      setBarReason={setBarReason}
                                                       title={'Unplanned maintenance'}
                                                   />
                                             </List>
@@ -261,6 +271,7 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                                       updateDowntime={updateDowntime}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
+                                                      setBarReason={setBarReason}
                                                       title={'Break'}
                                                   />
                                             </List>
@@ -280,13 +291,39 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason 
                                         disabled={!reasonState}
                                         placeholder={description}
                                         onChange={(event) => updateDowntime({...comments, description: event.target.value})}
-                                        //
                                         //InputProps={{
                                         //  endAdornment: <InputAdornment position="end">pcs</InputAdornment>,
                                         //}}
                                     />
                                 </AccordionDetails>
                             </Accordion>
+
+                            <Accordion sx={{display: circleColor !== 'red' ? 'block' : 'none'}}>
+                                <AccordionSummary
+                                  expandIcon={<ExpandMore />}
+                                  aria-controls="panel1bh-content"
+                                  id="panel1bh-header"
+                                >
+                                    <Typography variant="subtitle1">
+                                        {scrapQuantity ? "Edit scrap" : "Add scrap"}
+                                    </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <TextField
+                                        id="scrap"
+                                        label="Scrapped"
+                                        helperText="Quantity of bad pieces"
+                                        fullWidth
+                                        sx={{mt:'10px'}}
+                                        placeholder={`${scrapQuantity}`}
+                                        onChange={(event) => updateScrap({...scrap, pieces: Number(event.target.value)})}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">pcs</InputAdornment>,
+                                        }}
+                                    />
+                                </AccordionDetails>
+                            </Accordion>
+
                         </ThemeProvider>
                     </Grid>
                 </Grid>

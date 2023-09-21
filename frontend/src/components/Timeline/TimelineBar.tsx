@@ -3,13 +3,13 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {useGetDowntimeQuery, useGetLineState} from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
-import {Paper, TextField} from "@mui/material";
-import Box from "@mui/material/Box";
+import Box, { BoxProps } from '@mui/material/Box';
 import Grid from "@mui/material/Unstable_Grid2";
+import {Avatar, Badge} from "@mui/material";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -65,6 +65,22 @@ const BarTooltip = ({ type, barData, product }:any) => {
     )
 }
 
+const color = (background:string) => {
+         switch (background){
+            case 'bg-success': {
+                return '#198754';
+            }
+            case 'bg-warning': {
+                return '#ffc107';
+            }
+            case 'bg-danger': {
+                return '#dc3545';
+            }
+            default: {
+                return 'black';
+            }
+        }
+}
 
 const TimelineBar = ({ barData }:any) => {
 
@@ -119,33 +135,27 @@ const TimelineBar = ({ barData }:any) => {
     };
 
     const bar = useAppSelector(state => state.downtime)
-
-
     const {data:comments} = useGetDowntimeQuery(bar, {refetchOnMountOrArgChange: true});
+    const {data:nonGreenData} = useGetDowntimeQuery({
+        id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`,
+    }, {refetchOnMountOrArgChange: true, pollingInterval:1000});
 
-    const color = (background:string) => {
-         switch (background){
-            case 'bg-success': {
-                return 'green';
-            }
-            case 'bg-warning': {
-                return '#F3E25B';
-            }
-            case 'bg-danger': {
-                return 'red';
-            }
-            default: {
-                return 'black';
-            }
-        }
-}
+    const [barReason, setBarReason] = useState('');
+
+    useEffect(() => {
+        setBarReason(nonGreenData?.reason)
+    }, [nonGreenData]);
 
     const Item = styled(Box)(({ theme }) => ({
         backgroundColor: color(barData.bg),
         ...theme.typography.body2,
         height: '100%',
-        textAlign: 'center',
         color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '1rem',
+        fontWeight: '700',
     }));
 
     return(
@@ -156,6 +166,7 @@ const TimelineBar = ({ barData }:any) => {
                 handleClick = {handleClick}
                 bar = {bar}
                 comments = {comments}
+                setBarReason = {setBarReason}
             />
 
             <ProductionTooltip
@@ -166,9 +177,21 @@ const TimelineBar = ({ barData }:any) => {
                 leaveDelay={100}
                 arrow
             >
-                <Grid xs={12} sx={{width: `${w}%`, height:'75%'}} onClick={handleOpen}>
-                    <Item>{barData.bg !== 'bg-success' ? 'reason' : ''}</Item>
+                <Grid sx={{width: `${w}%`, height:'75%'}} onClick={handleOpen} component={'span'}>
+                    {/*<Badge*/}
+                    {/*    badgeContent=""*/}
+                    {/*    color="primary"*/}
+                    {/*    anchorOrigin={{*/}
+                    {/*      vertical: 'bottom',*/}
+                    {/*      horizontal: 'right',*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    <Item>
+                        {barData.bg !== 'bg-success' ? barReason : ''}
+                    </Item>
+                    {/*</Badge>*/}
                 </Grid>
+
                 {/*<div className={`d-inline-block h-100 position-relative ${barData.bg}`}*/}
                 {/*     style={{width:`${w}%`}} onClick={handleOpen}>*/}
                 {/*    <Typography*/}

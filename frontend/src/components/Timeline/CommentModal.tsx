@@ -69,7 +69,7 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, bar, comments }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, bar, comments, setBarReason }:any) => {
 
     const handleClose = () => {
         setOpen(false)

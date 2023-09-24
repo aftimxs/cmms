@@ -1,15 +1,16 @@
 import TimelineBar from "./TimelineBar.tsx";
 import dayjs from "dayjs";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import _ from 'lodash';
-import axios from "axios";
-
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {barAdded} from "../../features/barsSlice.ts";
 import {
-    useGetLineState, useScrapAddedMutation,
+    useDowntimeAddedMutation,
+    useDowntimeUpdatedMutation,
+    useGetLineState, useGetProductQuery, useLazyGetDowntimeQuery, useProductionInfoAddedMutation,
 } from "../../app/services/apiSplice.ts";
 import Grid from "@mui/material/Unstable_Grid2";
+import {minuteAdded, minutesReset} from "../../features/minutesSlice.tsx";
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -18,19 +19,20 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, product, production, scrap} = useGetLineState(lineParams, {
+     const {shift, productID, production} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
-            product: state? state['shift'][0]? state['shift'][0]['order'][0]?
-                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+            productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
+                state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
-            scrap: state ? state['shift'][0] ? state['shift'][0]['scrap'] ? state['shift'][0]['scrap'] : undefined :
-                undefined : undefined,
         })
     })
 
+    const {data:product} = useGetProductQuery({id:productID})
+
     const shour = hour.split(':');
     const now = dayjs();
+    const now1 = dayjs().add(1, 'minute')
 
     const [bars, setBars] = useState([])
 
@@ -42,60 +44,46 @@ const TimelineCenter = ({ hour }:any) => {
         )
     }
 
-    const instance = axios.create({
-      baseURL: 'http://127.0.0.1:8000/api',
-      timeout: 1000,
-    });
+    const [updateDowntime] = useDowntimeUpdatedMutation()
+    const [addDowntime] = useDowntimeAddedMutation()
+    const [getDowntime] = useLazyGetDowntimeQuery()
 
-    //CHECK IF BAR EXISTS IN DB
-    const getDowntimes = async (downtime:any) => {
-        try {
-            const response = await
-                instance.get(`/downtime/${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`)
-            return await response.data
-        } catch (error) {
-            // @ts-ignore
-            if (error.name === 'TypeError') {
-                return []
-            }
-        }
-    }
+    const [addProductionInfo] = useProductionInfoAddedMutation()
 
     //POST OR PUT BARS TO DB
     const postDowntime = async (downtime:any) => {
-        const x = await getDowntimes(downtime)
-        if (x){
-            instance.put(`/downtime/${x.id}/`,
-            {
-                id: x.id,
-                start: x.start,
-                end: dayjs(downtime.minute).format('HH:mm:ss'),
-                shift: x.shift
+        const query= await getDowntime({id:`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
+        if (query.isSuccess){
+            updateDowntime({
+                id: query.data.id,
+                start: query.data.start,
+                end:dayjs(downtime.minute).format('HH:mm:ss'),
+                shift: query.data.shift,
             })
-            .catch(function (error) {
-              console.log(error);
-            });
         } else {
-            instance.post(`/downtime/`,
-            {
+            addDowntime({
                 id: `${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`,
                 start: dayjs(downtime.startTime).format('HH:mm:ss'),
                 end: dayjs(downtime.minute).format('HH:mm:ss'),
-                shift: shift?.number,
+                shift: shift?.id,
             })
-            .catch(function (error) {
-              console.log(error);
-            });
         }
     }
+
+    var [date, setDate] = useState(new Date())
+
+    useEffect(() => {
+        var timer = setInterval(() => setDate(new Date()), 30000)
+        return function cleanup(){
+            clearInterval(timer)
+        }
+    }, []);
 
     useEffect(() => {
         setBars([])
         // @ts-ignore
-        setBars(printBars)
-    }, [shift]);
-
-    const [postScrap] = useScrapAddedMutation()
+        setBars(background(now))
+    }, [shift, date]);
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
     const background = (now:dayjs.Dayjs) => {
@@ -108,6 +96,10 @@ const TimelineCenter = ({ hour }:any) => {
         const barsProv:any = [];
         let previous = now;
 
+        if (hour === '06:00:00' || hour === '15:00:00'){
+            dispatch(minutesReset())
+        }
+
         //CHECK IF THIS MINUTES COLOR MATCHES PREVIOUS MINUTE COLOR
         const checkColor = (c:string, min:dayjs.Dayjs, unused:boolean, items:number) => {
             if (color !== c || c === 'bg-success' ) {
@@ -116,16 +108,6 @@ const TimelineCenter = ({ hour }:any) => {
                 partsCounter = items;
                 color = c;
                 startTime = min;
-                if (c !== 'bg-danger' && !_.includes(scrap, {'id':`S${dayjs(min).format('DDMMYYHHmm')}${shift?.id}`})){
-                    postScrap({
-                        id: `S${dayjs(min).format('DDMMYYHHmm')}${shift?.id}`,
-                        reason: null,
-                        pieces: null,
-                        comments: null,
-                        minute: dayjs(min).format('HH:mm:ss'),
-                        shift: shift?.id,
-                    })
-                }
             } else {
                 counter = counter + 1;
                 partsCounter = partsCounter + items;
@@ -143,6 +125,7 @@ const TimelineCenter = ({ hour }:any) => {
 
         //GET BGCOLOR FOR EACH MINUTE WITH DATA
         production?.forEach((info:any) => {
+            dispatch(minuteAdded({minute: dayjs(info.minute, 'H:mm').format('h:mm a'), count: info.item_count}))
             for (let i = 0; i < minutes.length; i++) {
                 if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
                     if (info.item_count >= (product?.rate / 60)) {
@@ -159,6 +142,7 @@ const TimelineCenter = ({ hour }:any) => {
         //SET BARS FOR UNUSED MINUTES WHICH ARE IN THE PAST
         ms.forEach((min) => {
             if (now.isAfter(min)){
+                dispatch(minuteAdded({minute: dayjs(min).format('h:mm a'), count: 0}))
                 if ((dayjs(min, 'HH:mm').minute()-1) === dayjs(previous, 'HH:mm').minute()) {
                     previous = min;
                     counter = counter + 1;
@@ -170,6 +154,19 @@ const TimelineCenter = ({ hour }:any) => {
                 }
                 handleBars(id, 'bg-danger', min, counter, 0, startTime)
             }
+            // console.log(min)
+            // console.log(now1)
+            // console.log(min.isAfter(now1))
+            // if (min.isAfter(now1)) {
+            //      addProductionInfo({
+            //         hour: hour,
+            //         minute: dayjs(min).format('HH:mm:ss'),
+            //         item_count: 0,
+            //         line: shift.line,
+            //         shift: shift.id,
+            //     })
+            //     ms = _.reject(ms, min)
+            // }
         })
 
         //GROUP BARS BY ID
@@ -207,31 +204,24 @@ const TimelineCenter = ({ hour }:any) => {
         return sortedBars;
     }
 
-
-    const printBars = useMemo(() => background(now), [shift])
-
+    //const printBars = useMemo(() => background(now), [shift])
 
     return (
-        // <div className="col-10 border-start border-end">
-        //     <div className="row bg-black h-100 align-items-center">
-        //         <div className="container px-0 h-75">
-                <Grid
-                    container
-                    sx={{bgcolor:'rgb(44,44,44)', paddingX:0}}
-                    xs={10}
-                    alignItems={'center'}
-                    component={'div'}
-                >
-                    {bars.map((bar: any, index: number) =>
-                        <TimelineBar
-                            key={index}
-                            barData={bar}
-                        />
-                    )}
-                </Grid>
-        //         </div>
-        //     </div>
-        // </div>
+        <Grid
+            container
+            display="flex"
+            sx={{bgcolor:'rgb(44,44,44)', paddingX:0}}
+            xs={10}
+            alignItems={'center'}
+            component={'div'}
+        >
+            {bars.map((bar: any, index: number) =>
+                    <TimelineBar
+                        key={index}
+                        barData={bar}
+                    />
+            )}
+        </Grid>
     )
 
 }

@@ -23,11 +23,15 @@ import _ from 'lodash';
 import {produce} from "immer"
 import {
     useDowntimeUpdatedMutation,
-    useGetDowntimeQuery,
-    useScrapAddedMutation,
+    useGetDowntimeQuery, useLazyGetDowntimeQuery, useLazyGetScrapQuery,
+    useScrapAddedMutation, useScrapDeletedMutation,
     useScrapUpdatedMutation
 } from "../../app/services/apiSplice.ts";
 import CommentButton from "./CommentButton.tsx";
+import {useAppSelector} from "../../app/hooks.ts";
+import {request} from "axios";
+import {QueryResultSelectorResult} from "@reduxjs/toolkit/dist/query/core/buildSelectors";
+import ScrapButton from "./ScrapButton.tsx";
 
 
 
@@ -74,7 +78,7 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBarReason }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -97,6 +101,18 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBar
         }
     }
 
+    const bar = useAppSelector(state => state.downtime)
+    const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
+    const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+
+    useEffect(() => {
+        if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
+            getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
+        } else if (bar.background === 'bg-danger'){
+            getDowntime(bar)
+        }
+    }, [bar]);
+
     let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm');
     let end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm');
     let circleColor = color(bar.background);
@@ -105,16 +121,26 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBar
 
     let scrapReason = scrap ? scrap.reason ? scrap.reason : '' : '';
     let scrapComments = scrap ? scrap.comments ? scrap.comments : '' : '';
-    let scrapQuantity = scrap ? scrap.pieces ? scrap.pieces : 0 : 0;
+    let scrapQuantity = scrap ? scrap.id.slice(1) === bar.id ? scrap.pieces ? scrap.pieces : 0 : 0 : 0;
 
     //UPDATE REASON
     const [reasonState, setReasonState] = useState('')
+    const [scrapReasonState, setScrapReasonState] = useState('')
     useEffect(() => {
-        setReasonState(reason)
+        if (bar.background === 'bg-success') {
+            setScrapReasonState(scrapReason)
+        } else if (bar.background === 'bg-warning') {
+            setScrapReasonState(scrapReason)
+            setReasonState(reason)
+        } else if (bar.background === 'bg-danger') {
+            setReasonState(reason)
+        }
     }, [bar, reason, open, handleClick]);
 
     //OPEN REASON LIST SUBCATEGORIES
     const [openList, setOpenList] = useState([{index:'open0', active:false}, {index:'open1', active:false}, {index:'open2', active:false}]);
+    const [openScrapList, setOpenScrapList] = useState([{index:'open0', active:false}, {index:'open1', active:false}, {index:'open2', active:false}]);
+
 
     const handleListClick = (index:string) => {
         const y = _.findIndex(openList, ['index', index])
@@ -124,8 +150,25 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBar
         setOpenList(nextState)
     };
 
+    const handleScrapListClick = (index:string) => {
+        const y = _.findIndex(openScrapList, ['index', index])
+        const nextState = produce(openScrapList, draftState => {
+            draftState[y].active = !draftState[y].active
+        })
+        setOpenScrapList(nextState)
+    };
+
     const [updateDowntime] = useDowntimeUpdatedMutation()
     const [updateScrap] = useScrapUpdatedMutation()
+    const [postScrap] = useScrapAddedMutation()
+    const [deleteScrap] = useScrapDeletedMutation()
+
+
+    const checkScrapPieces = () => {
+        if (scrap?.pieces === 0){
+            deleteScrap(scrap)
+        }
+    }
 
     return(
         <>
@@ -165,16 +208,6 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBar
                     <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                     <Grid xs={12}>
                         <ThemeProvider theme={theme}>
-                            <Stack spacing={1} direction={'column'} mt={2}>
-                                <Button
-                                    color={'gray'}
-                                    sx = {{display: circleColor !== 'red' ? 'block' : 'none'}}
-                                    variant='contained'
-                                    onClick={() => {alert('clicked')}}
-                                >
-                                    Add scrap
-                                </Button>
-                            </Stack>
                             <Accordion sx={{display: circleColor !== 'green' ? 'block' : 'none'}}>
                                 <AccordionSummary
                                   expandIcon={<ExpandMore />}
@@ -291,14 +324,13 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBar
                                         disabled={!reasonState}
                                         placeholder={description}
                                         onChange={(event) => updateDowntime({...comments, description: event.target.value})}
-                                        //InputProps={{
-                                        //  endAdornment: <InputAdornment position="end">pcs</InputAdornment>,
-                                        //}}
                                     />
                                 </AccordionDetails>
                             </Accordion>
 
-                            <Accordion sx={{display: circleColor !== 'red' ? 'block' : 'none'}}>
+                            <Accordion
+                                sx={{display: circleColor !== 'red' ? 'block' : 'none'}}
+                            >
                                 <AccordionSummary
                                   expandIcon={<ExpandMore />}
                                   aria-controls="panel1bh-content"
@@ -312,15 +344,141 @@ const CommentModal = ({ open, setOpen, handleClick, bar, comments, scrap, setBar
                                     <TextField
                                         id="scrap"
                                         label="Scrapped"
-                                        helperText="Quantity of bad pieces"
+                                        helperText={`Quantity of bad pieces (max: ${bar.parts})`}
                                         fullWidth
+                                        type={'number'}
+                                        inputProps={{min:0, max:bar.parts}}
                                         sx={{mt:'10px'}}
                                         placeholder={`${scrapQuantity}`}
-                                        onChange={(event) => updateScrap({...scrap, pieces: Number(event.target.value)})}
+                                        InputLabelProps={{ shrink: true }}
+                                        onClick={() => postScrap({
+                                            id: `S${bar.id}`,
+                                            reason: null,
+                                            pieces: null,
+                                            comments: null,
+                                            minute: dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
+                                            shift: bar.shift,
+                                        })}
+                                        onChange={(event) => updateScrap({
+                                            id: `S${bar.id}`,
+                                            reason: null,
+                                            pieces: event.target.value,
+                                            comments: null,
+                                            minute: dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
+                                            shift: bar.shift
+                                        })}
+                                        onBlur={() => checkScrapPieces()}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">pcs</InputAdornment>,
                                         }}
                                     />
+
+                                    <List
+                                      sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+                                      component="nav"
+                                    >
+                                        <ListItemButton
+                                            onClick={() => handleScrapListClick('open0')}
+                                            sx={{bgcolor:'#e8e8e8'}}
+                                            disabled={ !scrapQuantity }
+                                        >
+                                            <ListItemIcon>
+                                                <EditCalendar />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Material" />
+                                            {openScrapList[0].active ? <ExpandLess /> : <ExpandMore />}
+                                        </ListItemButton>
+                                        <Collapse in={openScrapList[0].active} timeout="auto" unmountOnExit>
+                                            <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                                            <List component="div" disablePadding>
+                                                <ScrapButton
+                                                    scrap={scrap}
+                                                    updateScrap={updateScrap}
+                                                    scrapReasonState={scrapReasonState}
+                                                    setScrapReasonState={setScrapReasonState}
+                                                    title={'Damaged material'}
+                                                />
+                                                <ScrapButton
+                                                    scrap={scrap}
+                                                    updateScrap={updateScrap}
+                                                    scrapReasonState={scrapReasonState}
+                                                    setScrapReasonState={setScrapReasonState}
+                                                    title={'Wrong dimensions'}
+                                                />
+                                            </List>
+                                            <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                                        </Collapse>
+                                        <ListItemButton
+                                            onClick={() => handleScrapListClick('open1')}
+                                            sx={{bgcolor:'#e8e8e8'}}
+                                            disabled={ !scrapQuantity }
+                                        >
+                                            <ListItemIcon>
+                                                <Engineering/>
+                                            </ListItemIcon>
+                                            <ListItemText primary="Process" />
+                                            {openScrapList[1].active ? <ExpandLess /> : <ExpandMore />}
+                                        </ListItemButton>
+                                        <Collapse in={openScrapList[1].active} timeout="auto" unmountOnExit>
+                                            <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                                            <List component="div" disablePadding>
+                                                <ScrapButton
+                                                      scrap={scrap}
+                                                      updateScrap={updateScrap}
+                                                      scrapReasonState={scrapReasonState}
+                                                      setScrapReasonState={setScrapReasonState}
+                                                      title={'Bad assembly'}
+                                                  />
+                                                <ScrapButton
+                                                      scrap={scrap}
+                                                      updateScrap={updateScrap}
+                                                      scrapReasonState={scrapReasonState}
+                                                      setScrapReasonState={setScrapReasonState}
+                                                      title={'Failed QC test'}
+                                                  />
+                                            </List>
+                                            <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                                        </Collapse>
+                                        <ListItemButton
+                                            onClick={() => handleScrapListClick('open2')}
+                                            sx={{bgcolor:'#e8e8e8'}}
+                                            disabled={ !scrapQuantity }
+                                        >
+                                              <ListItemIcon>
+                                                  <AltRoute/>
+                                              </ListItemIcon>
+                                              <ListItemText primary="Other" />
+                                              {openScrapList[2].active ? <ExpandLess /> : <ExpandMore />}
+                                        </ListItemButton>
+                                        <Collapse in={openScrapList[2].active} timeout="auto" unmountOnExit>
+                                            <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                                            <List component="div" disablePadding>
+                                                <ScrapButton
+                                                      scrap={scrap}
+                                                      updateScrap={updateScrap}
+                                                      scrapReasonState={scrapReasonState}
+                                                      setScrapReasonState={setScrapReasonState}
+                                                      title={'Other'}
+                                                  />
+                                            </List>
+                                            <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                                        </Collapse>
+                                    </List>
+
+                                    <TextField
+                                        id="scrap-comments"
+                                        label="Extra comments"
+                                        helperText="Optional"
+                                        fullWidth
+                                        sx={{mt:'10px'}}
+                                        InputLabelProps={{
+                                          shrink: true,
+                                        }}
+                                        disabled={!scrapReasonState}
+                                        placeholder={scrapComments}
+                                        onChange={(event) => updateScrap({...scrap, comments: event.target.value})}
+                                    />
+
                                 </AccordionDetails>
                             </Accordion>
 

@@ -63,8 +63,15 @@ class ProductionInfoView(viewsets.ModelViewSet):
 
 
 class ScrapView(viewsets.ModelViewSet):
-    queryset = Scrap.objects.all()
     serializer_class = ScrapSerializer
+
+    def get_queryset(self):
+        queryset = Scrap.objects.all()
+        shift = self.request.query_params.get('shift')
+
+        if shift is not None:
+            queryset = (queryset.filter(shift=shift))
+        return queryset
 
 
 class DowntimeView(viewsets.ModelViewSet):

@@ -13,7 +13,7 @@ function App(){
 
     const lineParams = useAppSelector(state => state.line)
 
-    const { data, isLoading } = useGetLineQuery(
+    const {data} = useGetLineQuery(
            {
                area:lineParams.area,
                cell:lineParams.cell,
@@ -21,7 +21,6 @@ function App(){
                number:lineParams.number
            }, {pollingInterval:30000}
     );
-
 
     // GET INFO EVERY MINUTE
     useEffect(() => {

@@ -2,7 +2,12 @@ import ProgressBar from "./ProgressBar.tsx";
 import LineOptionMenu from "./LineOptionMenu.tsx";
 import { useState } from "react";
 import {useAppSelector} from "../../app/hooks.ts";
-import {useGetLineState} from "../../app/services/apiSplice.ts";
+import {
+    useGetAllScrapQuery,
+    useGetLineState,
+    useGetProductQuery,
+    useGetScrapQuery
+} from "../../app/services/apiSplice.ts";
 
 
 // @ts-ignore
@@ -10,14 +15,17 @@ const HeaderLeft = () => {
 
     const lineParams = useAppSelector(state => state.line)
 
-    const {shift, order, product} = useGetLineState(lineParams, {
+    const {shift, order, productID, scrap} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
             order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
-            product: state? state['shift'][0]? state['shift'][0]['order'][0]?
-                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+            productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
+                state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
+            scrap: state? state['shift'][0]? state['shift'][0]['scrap'] : undefined : undefined,
         })
     })
+
+    const {data:product} = useGetProductQuery({id:productID})
 
     // SHOW PRODUCTION LINE MENU
     const [showPL, setShowPL] = useState(false);
@@ -30,9 +38,14 @@ const HeaderLeft = () => {
         total = total + info.item_count;
     })
 
+    let [totalScrap] = useState(0)
 
-    let progress = [Number((((total)/order?.quantity)*100).toPrecision(4)),
-        Number(((0/order?.quantity)*100).toFixed(2))]
+    scrap?.map((scr: { pieces: number; }) => {
+        totalScrap = totalScrap + scr.pieces;
+    })
+
+    let progress = [Number((((total-totalScrap)/order?.quantity)*100).toPrecision(4)),
+        Number(((totalScrap/order?.quantity)*100).toFixed(2))]
 
     return (
         <>
@@ -107,7 +120,7 @@ const HeaderLeft = () => {
                         <ProgressBar progress={progress}/>
                     </div>
                     <div className=" col-4 text-end">
-                        <span>{total} ({0}) / {order? order.quantity : 0} pcs</span>
+                        <span>{total} <span style={{color:'#ffc107'}}>({totalScrap})</span> / {order? order.quantity : 0} pcs</span>
                     </div>
                 </div>
             </div>

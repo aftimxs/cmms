@@ -6,16 +6,12 @@ import CommentModal from "./CommentModal.tsx";
 import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
-    useGetDowntimeQuery,
-    useGetLineState,
-    useGetScrapQuery, useLazyGetDowntimeQuery, useLazyGetScrapQuery,
-    useScrapAddedMutation
+    useGetLineState, useGetProductQuery,
+    useLazyGetDowntimeQuery,
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import Box, { BoxProps } from '@mui/material/Box';
-import Grid from "@mui/material/Unstable_Grid2";
-import {Avatar, Badge, Container} from "@mui/material";
-import _ from 'lodash';
+import {Container} from "@mui/material";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -95,15 +91,15 @@ const TimelineBar = ({ barData }:any) => {
     const bars = useAppSelector(state => state.bars)
 
     const lineParams = useAppSelector(state => state.line)
-    const {shift, product, scrap} = useGetLineState(lineParams, {
+    const {shift, productID} = useGetLineState(lineParams, {
         selectFromResult: ({data: state}) => ({
             shift: state ? state['shift'][0] : undefined,
-            product: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
-                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
-            scrap: state ? state['shift'][0] ? state['shift'][0]['scrap'] ? state['shift'][0]['scrap'] : undefined :
-                undefined : undefined,
+            productID: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
+                state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
         })
     })
+
+    const {data:product} = useGetProductQuery({id:productID})
 
     const w = barData.long * 1.6665
 
@@ -146,21 +142,7 @@ const TimelineBar = ({ barData }:any) => {
             }
     };
 
-
-
-    const bar = useAppSelector(state => state.downtime)
-    const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
     const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery()
-    const [getScrap, {data:scrapData}] = useLazyGetScrapQuery()
-
-
-    useEffect(() => {
-        if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
-            getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`},)
-        } else if (bar.background === 'bg-danger'){
-            getDowntime(bar)
-        }
-    }, [bar.background]);
 
     useEffect(() => {
         if (barData.bg === 'bg-danger'){
@@ -180,9 +162,6 @@ const TimelineBar = ({ barData }:any) => {
                 open={open}
                 setOpen={setOpen}
                 handleClick = {handleClick}
-                bar = {bar}
-                comments = {comments}
-                scrap = {scrapData}
                 setBarReason = {setBarReason}
             />
 
@@ -196,46 +175,24 @@ const TimelineBar = ({ barData }:any) => {
             >
 
                 <Container
-                    sx={{width:`${w}%`, height:'75%', backgroundColor: color(barData.bg),}}
+                    sx={{width:`${w}%`, height:'75%', backgroundColor: color(barData.bg), marginX:0}}
                     disableGutters
                     maxWidth={false}
-                    onClick={handleOpen}>
-                    {/*<Badge*/}
-                    {/*    badgeContent=""*/}
-                    {/*    color="primary"*/}
-                    {/*    anchorOrigin={{*/}
-                    {/*      vertical: 'bottom',*/}
-                    {/*      horizontal: 'right',*/}
-                    {/*    }}*/}
-                    {/*    >*/}
-                            <Box
-                                sx={{height: '100%',
-                                color: 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1rem',
-                                fontWeight: '400',
-                                }}
-                            >
-                                {barData.bg !== 'bg-success' ? barReason : ' '}
-                            </Box>
-                        {/*</Badge>*/}
+                    onClick={handleOpen}
+                >
+                    <Box
+                        sx={{height: '100%',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1rem',
+                            fontWeight: '400',
+                        }}
+                    >
+                        {barData.bg !== 'bg-success' ? barReason : ' '}
+                    </Box>
                 </Container>
-
-
-                {/*<div className={`d-inline-block h-100 position-relative ${barData.bg}`}*/}
-                {/*     style={{width:`${w}%`}} onClick={handleOpen}>*/}
-                {/*    <Typography*/}
-                {/*        align={'center'}*/}
-                {/*        mt={5}*/}
-                {/*    >*/}
-                {/*       {barData.bg !== 'bg-success' ? 'reason' : ''}*/}
-                {/*    </Typography>*/}
-                {/*    <span className={barData.bg === 'bg-success' ? `position-absolute top-100 start-100 translate-middle badge border border-2*/}
-                {/*        border-light rounded-circle bg-dark p-1` : 'visually-hidden'}*/}
-                {/*          style={{zIndex:1}}><span className="visually-hidden">x</span></span>*/}
-                {/*</div>*/}
             </ProductionTooltip>
         </>
     )

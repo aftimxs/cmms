@@ -1,23 +1,27 @@
-
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
 import CustomTooltip from "./CustomTooltip.tsx";
 import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
 import {useAppSelector} from "../../app/hooks.ts";
 import {useState} from "react";
-import {useGetLineState} from "../../app/services/apiSplice.ts";
+import {useGetLineState, useGetProductQuery} from "../../app/services/apiSplice.ts";
+import _ from 'lodash';
 
 const HeaderCenter = () => {
 
     const lineParams = useAppSelector(state => state.line)
+    const minutes = useAppSelector(state => state.minutes)
 
-    const {production, product} = useGetLineState(lineParams, {
+    const orderedMinutes = _.orderBy(minutes, ['id'], ['asc']);
+
+    const {productID} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
-            production: state? state['shift'][0]? state['shift'][0]['info'] : undefined : undefined,
-            product: state? state['shift'][0]? state['shift'][0]['order'][0]?
-                state['shift'][0]['order'][0]['products'][0] : undefined : undefined : undefined,
+            productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
+                state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
         })
     })
+
+    const {data:product} = useGetProductQuery({id:productID})
 
     // SHOW SHIFT SELECTOR MENU
     const [show, setShow] = useState(false);
@@ -70,10 +74,10 @@ const HeaderCenter = () => {
                     <div className="row">
                         <ResponsiveContainer width="100%" height={150}>
                         <LineChart
-                          data={production}
+                          data={orderedMinutes}
                         >
                           <CartesianGrid vertical={false}/>
-                          <XAxis dataKey="minute" />
+                          <XAxis dataKey="minute" interval={59}/>
                           <YAxis width={25} axisLine={false} tickCount={6} interval={0} domain={[0, 'dataMax']}/>
                           <Tooltip offset={15} wrapperClassName={"recharts-tooltip-wrapper"}
                                    content={<CustomTooltip
@@ -81,7 +85,7 @@ const HeaderCenter = () => {
                                        product={product?.part_num}
                                    />}
                           />
-                          <Line type="step" dataKey="item_count" dot={false} stroke="white" strokeWidth={2} />
+                          <Line type="step" dataKey="count" dot={false} stroke="white" strokeWidth={2}/>
                           <ReferenceLine y={product?.rate/60} stroke={"yellow"} strokeDasharray="3 3"/>
                         </LineChart>
                         </ResponsiveContainer>

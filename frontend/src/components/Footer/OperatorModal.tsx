@@ -22,7 +22,7 @@ const style = {
     borderRadius: '4px',
 };
 
-const OperatorModal = ({ open, setOpen }:any ) => {
+const OperatorModal = ({ open, setOpen, value }:any ) => {
 
     const lineParams = useAppSelector(state => state.line)
 
@@ -90,7 +90,7 @@ const OperatorModal = ({ open, setOpen }:any ) => {
     return(
         <>
             <Modal
-              open={open}
+              open={open && value===0}
               onClose={handleClose}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"

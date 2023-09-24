@@ -23,7 +23,7 @@ const ShiftOptionMenu = ({ visibility }:any) => {
          <>
           <Modal show={visibility.show} onHide={visibility.handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>"Select date and shift"</Modal.Title>
+              <Modal.Title>Select date and shift</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className="container-fluid text-center py-3">

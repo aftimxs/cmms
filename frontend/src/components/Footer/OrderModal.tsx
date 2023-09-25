@@ -1,46 +1,16 @@
 import Modal from "@mui/material/Modal";
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Typography from "@mui/material/Typography";
 import {Container, InputAdornment, MenuItem, TextField} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
 import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import dayjs from "dayjs";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Collapse from '@mui/material/Collapse';
-import {NavigateBeforeOutlined, NavigateNextOutlined, Circle, ExpandLess, ExpandMore, EditCalendar, Engineering, AltRoute}
-    from '@mui/icons-material';
-import {useEffect, useState} from "react";
-import _ from 'lodash';
-import {produce} from "immer"
 import {
-    useDowntimeUpdatedMutation,
     useGetAllProductsQuery,
-    useGetDowntimeQuery,
-    useGetLineQuery,
-    useGetLineState,
-    useLazyGetDowntimeQuery,
-    useLazyGetScrapQuery, useProductUpdatedMutation,
+    useGetLineState, useOrderAddedMutation,
+    useProductUpdatedMutation,
     useQuantityUpdatedMutation,
-    useScrapAddedMutation,
-    useScrapDeletedMutation,
-    useScrapUpdatedMutation
 } from "../../app/services/apiSplice.ts";
-import CommentButton from "./CommentButton.tsx";
-import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
-import {request} from "axios";
-import {QueryResultSelectorResult} from "@reduxjs/toolkit/dist/query/core/buildSelectors";
-import ScrapButton from "./ScrapButton.tsx";
+import {useAppSelector} from "../../app/hooks.ts";
 import Box from "@mui/material/Box";
-
 
 
 const style = {
@@ -72,8 +42,9 @@ const CommentModal = ({ open, setOpen, value }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {order, product} = useGetLineState(lineParams, {
+     const {shift, order, product} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
+            shift: state? state['shift'][0] : undefined,
             order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
             product: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
@@ -82,6 +53,22 @@ const CommentModal = ({ open, setOpen, value }:any) => {
 
     const [updateQuantity] = useQuantityUpdatedMutation();
     const [updateProduct] = useProductUpdatedMutation();
+    const [addOrder] = useOrderAddedMutation();
+
+    const handleProductChange = (event:any) => {
+       if (order){
+           updateProduct({
+               ...order,
+               product: event.target.value
+           })
+       } else {
+           addOrder({
+               product: event.target.value,
+               line: shift?.line,
+               shift: shift?.id
+           })
+       }
+    }
 
     return(
         <>
@@ -121,10 +108,7 @@ const CommentModal = ({ open, setOpen, value }:any) => {
                                     defaultValue={ product ? product.toString() : '1'}
                                     helperText="Select product being made"
                                     sx={{mt:'20px'}}
-                                    onChange={(event) => updateProduct({
-                                      ...order,
-                                      product: event.target.value
-                                  })}
+                                    onChange={(event) => handleProductChange(event)}
                                 >
                                     {products?.map((option:product) => (
                                         <MenuItem key={option.id} value={option.id}>
@@ -146,6 +130,9 @@ const CommentModal = ({ open, setOpen, value }:any) => {
                                       ...order,
                                       quantity: event.target.value
                                   })}
+                                  InputProps={{
+                                      endAdornment: <InputAdornment position="end">pcs</InputAdornment>,
+                                  }}
                                 />
                           </div>
                         </Box>

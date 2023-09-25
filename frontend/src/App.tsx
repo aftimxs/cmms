@@ -23,9 +23,9 @@ function App(){
     );
 
     // GET INFO EVERY MINUTE
-    useEffect(() => {
-        dispatch(barsReset())
-    }, [lineParams])
+    //useEffect(() => {
+    //    dispatch(barsReset())
+    //}, [lineParams])
 
 
     return (<div className="container-fluid" >

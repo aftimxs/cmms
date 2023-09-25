@@ -50,7 +50,7 @@ class Machine(models.Model):
 
 
 class Order(models.Model):
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(null=True)
     product = models.ForeignKey(Product, related_name='order', default=1, on_delete=models.CASCADE)
     line = models.ForeignKey(ProductionLine, related_name='orderL', on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, related_name='order',  default=0, on_delete=models.CASCADE)

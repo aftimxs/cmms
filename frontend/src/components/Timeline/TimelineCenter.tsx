@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import {useEffect, useState} from "react";
 import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
-import {barAdded} from "../../features/barsSlice.ts";
+import {barAdded, barsReset} from "../../features/barsSlice.ts";
 import {
     useDowntimeAddedMutation,
     useDowntimeUpdatedMutation,
@@ -11,6 +11,7 @@ import {
 } from "../../app/services/apiSplice.ts";
 import Grid from "@mui/material/Unstable_Grid2";
 import {minuteAdded, minutesReset} from "../../features/minutesSlice.tsx";
+import {produce} from "immer"
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -30,9 +31,7 @@ const TimelineCenter = ({ hour }:any) => {
 
     const {data:product} = useGetProductQuery({id:productID})
 
-    const shour = hour.split(':');
     const now = dayjs();
-    const now1 = dayjs().add(1, 'minute')
 
     const [bars, setBars] = useState([])
 
@@ -40,17 +39,15 @@ const TimelineCenter = ({ hour }:any) => {
     const minutes:any = [];
     for (let i= 0; i < 60; i++){
         minutes.push(
-            dayjs(shift?.date, 'YYYY-MM-DD').add(shour[0], 'h').add(i, 'minute')
+            dayjs(shift?.date, 'YYYY-MM-DD').add(Number(dayjs(hour, 'HH:mm:ss').format('HH')), 'h').add(i, 'minute')
         )
     }
 
+    //POST OR PUT BARS TO DB
     const [updateDowntime] = useDowntimeUpdatedMutation()
     const [addDowntime] = useDowntimeAddedMutation()
     const [getDowntime] = useLazyGetDowntimeQuery()
 
-    const [addProductionInfo] = useProductionInfoAddedMutation()
-
-    //POST OR PUT BARS TO DB
     const postDowntime = async (downtime:any) => {
         const query= await getDowntime({id:`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
         if (query.isSuccess){
@@ -70,16 +67,21 @@ const TimelineCenter = ({ hour }:any) => {
         }
     }
 
-    var [date, setDate] = useState(new Date())
+    //REFRESH EVERY 30SECS
+    const [date, setDate] = useState(new Date());
 
     useEffect(() => {
-        var timer = setInterval(() => setDate(new Date()), 30000)
+        const timer = setInterval(() => setDate(new Date()), 30000);
         return function cleanup(){
             clearInterval(timer)
         }
     }, []);
 
     useEffect(() => {
+        if (hour === '06:00:00' || hour === '15:00:00'){
+            dispatch(barsReset())
+            dispatch(minutesReset())
+        }
         setBars([])
         // @ts-ignore
         setBars(background(now))
@@ -93,12 +95,8 @@ const TimelineCenter = ({ hour }:any) => {
         let id = 0;
         let startTime = now;
         let ms = [...minutes];
-        const barsProv:any = [];
+        let barsProv:any = [];
         let previous = now;
-
-        if (hour === '06:00:00' || hour === '15:00:00'){
-            dispatch(minutesReset())
-        }
 
         //CHECK IF THIS MINUTES COLOR MATCHES PREVIOUS MINUTE COLOR
         const checkColor = (c:string, min:dayjs.Dayjs, unused:boolean, items:number) => {
@@ -108,19 +106,35 @@ const TimelineCenter = ({ hour }:any) => {
                 partsCounter = items;
                 color = c;
                 startTime = min;
+                newBar(id, c, min, counter, partsCounter, startTime)
             } else {
                 counter = counter + 1;
                 partsCounter = partsCounter + items;
+                updateBar(id, c, min)
             }
-            handleBars(id, c, min, counter, partsCounter, startTime)
+            //handleBars(id, c, min, counter, partsCounter, startTime)
             if (!unused) {
                 ms = _.reject(ms, min)
             }
         }
 
         //PUSH EACH BAR INTO ARRAY
-        const handleBars = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
-            barsProv.push({ id: id, long: counter, minute: minute, bg: color, parts: Number(partsCounter), startTime })
+        //const handleBars = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
+        //    barsProv.push({ id: id, long: counter, minute: minute, bg: color, parts: Number(partsCounter), startTime })
+        //}
+
+        const newBar = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
+            const x = produce(barsProv, draftState => {
+                draftState.push({ id: id, long: counter, minute: minute, bg: color, parts: Number(partsCounter), startTime })
+            })
+            barsProv = x
+        }
+
+        const updateBar = (id:number, color:string, minute:dayjs.Dayjs) => {
+           const y = produce(barsProv, draftState => {
+                draftState[id].minute = minute
+            })
+            //barsProv = y
         }
 
         //GET BGCOLOR FOR EACH MINUTE WITH DATA
@@ -152,7 +166,8 @@ const TimelineCenter = ({ hour }:any) => {
                     startTime = min;
                     previous = min;
                 }
-                handleBars(id, 'bg-danger', min, counter, 0, startTime)
+
+                //handleBars(id, 'bg-danger', min, counter, 0, startTime)
             }
             // console.log(min)
             // console.log(now1)
@@ -169,6 +184,7 @@ const TimelineCenter = ({ hour }:any) => {
             // }
         })
 
+        console.log(barsProv)
         //GROUP BARS BY ID
         let sortedBars = []
         const byId = _.groupBy(barsProv, 'id')

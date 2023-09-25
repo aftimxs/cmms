@@ -46,7 +46,7 @@ const BarTooltip = ({ type, barData, product }:any) => {
         endMin = dayjs(barData.minute).minute();
         start = dayjs(barData.startTime).format('HH:mm')
         time = (endMin-startMin+1)
-        quantity = Number(-(((product.rate/60)*barData.long)-barData.parts).toFixed(2))
+        quantity = Number(-(((product?.rate/60)*barData.long)-barData.parts).toFixed(2))
         
         if (type === 'bg-warning'){
             header = 'Speed Loss'
@@ -116,8 +116,6 @@ const TimelineBar = ({ barData }:any) => {
             parts: barData.parts,
         }))
     };
-
-
 
     const handleClick = (type:string, bar:any) => {
         let newIndex = 0;

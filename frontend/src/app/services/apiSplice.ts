@@ -41,7 +41,7 @@ export const productionApi = createApi({
       getShiftDowntimes: builder.query({
           query: ({shiftId}) =>
               `downtime/?shift=${shiftId}`,
-          transformResponse: (response) => {
+          transformResponse: (response:comments) => {
               // @ts-ignore
               return response
           }
@@ -138,6 +138,14 @@ export const productionApi = createApi({
           }),
           invalidatesTags: ['Shift'],
       }),
+      orderAdded: builder.mutation({
+          query: (order) => ({
+              url: 'order/',
+              method: 'POST',
+              body: order
+          }),
+          invalidatesTags: ['Shift']
+      }),
   }),
 })
 
@@ -164,5 +172,6 @@ export const {
     useGetAllProductsQuery,
     useProductUpdatedMutation,
     useQuantityUpdatedMutation,
+    useOrderAddedMutation,
 } = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

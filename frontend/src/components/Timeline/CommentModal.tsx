@@ -1,6 +1,4 @@
 import Modal from "@mui/material/Modal";
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Typography from "@mui/material/Typography";
 import {Container, InputAdornment, TextField} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
@@ -23,14 +21,12 @@ import _ from 'lodash';
 import {produce} from "immer"
 import {
     useDowntimeUpdatedMutation,
-    useGetDowntimeQuery, useLazyGetDowntimeQuery, useLazyGetScrapQuery,
+    useLazyGetDowntimeQuery, useLazyGetScrapQuery,
     useScrapAddedMutation, useScrapDeletedMutation,
     useScrapUpdatedMutation
 } from "../../app/services/apiSplice.ts";
 import CommentButton from "./CommentButton.tsx";
 import {useAppSelector} from "../../app/hooks.ts";
-import {request} from "axios";
-import {QueryResultSelectorResult} from "@reduxjs/toolkit/dist/query/core/buildSelectors";
 import ScrapButton from "./ScrapButton.tsx";
 
 
@@ -349,8 +345,7 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                         type={'number'}
                                         inputProps={{min:0, max:bar.parts}}
                                         sx={{mt:'10px'}}
-                                        placeholder={`${scrapQuantity}`}
-                                        InputLabelProps={{ shrink: true }}
+                                        defaultValue={`${scrapQuantity}`}
                                         onClick={() => postScrap({
                                             id: `S${bar.id}`,
                                             reason: null,

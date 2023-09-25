@@ -9,6 +9,7 @@ import DoDisturbOnIcon from '@mui/icons-material/DoDisturbOn';
 import SpeedIcon from '@mui/icons-material/Speed';
 import OperatorModal from "./OperatorModal.tsx";
 import OrderModal from "./OrderModal.tsx";
+import DowntimeModal from "./DowntimeModal.tsx";
 
 
 const darkTheme = createTheme({
@@ -40,6 +41,11 @@ const Footer = () => {
                 setOpen={setOpen}
                 value={value}
             />
+            <DowntimeModal
+                open={open}
+                setOpen={setOpen}
+                value={value}
+            />
             <ThemeProvider theme={darkTheme}>
                 <div className="container-fluid pt-2">
                     <BottomNavigation
@@ -52,7 +58,7 @@ const Footer = () => {
                     >
                         <LongNavItem label="Operators" icon={<EngineeringIcon/>} onClick={() => setOpen(true)}/>
                         <LongNavItem label="Order" icon={<ChangeCircleIcon/>} onClick={() => setOpen(true)}/>
-                        <LongNavItem label="Downtime" icon={<CancelIcon/>}/>
+                        <LongNavItem label="Downtime" icon={<CancelIcon/>} onClick={() => setOpen(true)}/>
                         <LongNavItem label="Speed Loss" icon={<SpeedIcon/>}/>
                         <LongNavItem label="Scrap" icon={<DoDisturbOnIcon/>}/>
                     </BottomNavigation>

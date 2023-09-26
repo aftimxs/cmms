@@ -28,9 +28,8 @@ const HeaderLeft = () => {
     const {data:product} = useGetProductQuery({id:productID})
 
     // SHOW PRODUCTION LINE MENU
-    const [showPL, setShowPL] = useState(false);
-    const handleClosePL = () => setShowPL(false);
-    const handleShowPL = () => setShowPL(true);
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
 
     let [total] = useState(0)
 
@@ -50,11 +49,8 @@ const HeaderLeft = () => {
     return (
         <>
             <LineOptionMenu
-                title={"Select station"}
-                visibility={{
-                    showPL:showPL,
-                    handleClosePL:handleClosePL,
-                }}
+                open={open}
+                setOpen={setOpen}
             />
         <div className="col-5">
             <div className="container py-0">
@@ -63,7 +59,7 @@ const HeaderLeft = () => {
                         <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                     </div>
 
-                    <button type="button" className="btn col-7" onClick={handleShowPL}>
+                    <button type="button" className="btn col-7" onClick={handleOpen}>
                     <div className="row">
                         <div className="col-2">
                             <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>

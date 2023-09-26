@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {useAppDispatch} from "../../app/hooks.ts";
+import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import Modal from "@mui/material/Modal";
 import {Container} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -17,6 +17,8 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import MicrowaveIcon from '@mui/icons-material/Microwave';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import MasksIcon from '@mui/icons-material/Masks';
+import {areaAdded, cellAdded} from "../../features/lineParamsSlice.ts";
+import {useState} from "react";
 
 
 const style = {
@@ -37,10 +39,16 @@ const style = {
 const LineOptionMenu = ({open, setOpen}) => {
 
     const dispatch = useAppDispatch()
+    const lineParams = useAppSelector(state => state.line)
 
     const handleClose = () => {
         setOpen(false)
     };
+
+    const handleClick = ({cell, area}:any) => {
+        dispatch(cellAdded(cell))
+        dispatch(areaAdded(area))
+    }
 
     const lines = [
         {id:'1', number:'1', area:'Welding'},
@@ -55,57 +63,18 @@ const LineOptionMenu = ({open, setOpen}) => {
 
     let linesByArea = _.groupBy(lines, 'area')
 
+    const [expanded, setExpanded] = useState<string | false>(false);
+
+    const handleChange = (panel: string) => (_event:any, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
+
+    const checkSelected = (line:any) => {
+        return line.area === lineParams.area && line.number === lineParams.cell;
+    }
+
     return(
          <>
-          {/*<Modal show={visibility.showPL} onHide={visibility.handleClosePL}>*/}
-          {/*  <Modal.Header closeButton>*/}
-          {/*    <Modal.Title>{title}</Modal.Title>*/}
-          {/*  </Modal.Header>*/}
-          {/*  <Modal.Body>*/}
-          {/*      <div className="container-fluid py-3">*/}
-          {/*          <Accordion>*/}
-          {/*              <AccordionItem eventKey='0'>*/}
-          {/*                  <AccordionHeader>Welding</AccordionHeader>*/}
-          {/*                  <AccordionBody>*/}
-          {/*                      <ToggleButtonGroup type={"radio"} name="lineOptions">*/}
-          {/*                          {linesByArea.Welding.map((line:any) => (*/}
-          {/*                              <ToggleButton*/}
-          {/*                                  key={line.id}*/}
-          {/*                                  id={line.id}*/}
-          {/*                                  type={'radio'}*/}
-          {/*                                  value={[line.id, line.number, line.area]}*/}
-          {/*                                  // checked={}*/}
-          {/*                                  onChange={handlePL}*/}
-          {/*                              >*/}
-          {/*                                  {`${line.area} ${line.number}`}*/}
-          {/*                              </ToggleButton>*/}
-          {/*                          ))}*/}
-          {/*                      </ToggleButtonGroup>*/}
-          {/*                  </AccordionBody>*/}
-          {/*              </AccordionItem>*/}
-          {/*              <AccordionItem eventKey='1'>*/}
-          {/*                  <AccordionHeader>Molding</AccordionHeader>*/}
-          {/*                  <AccordionBody>*/}
-          {/*                      {linesByArea.Molding.map((line:any) => (*/}
-          {/*                            <button key={line.id}*/}
-          {/*                                    type="button"*/}
-          {/*                                    // className={}*/}
-          {/*                                    value={[line.id, line.number,line.area]}*/}
-          {/*                                    onClick={handlePL}*/}
-          {/*                            >*/}
-          {/*                                {`${line.area} ${line.number}`}*/}
-
-          {/*                            </button>*/}
-          {/*                      ))}*/}
-          {/*                  </AccordionBody>*/}
-          {/*              </AccordionItem>*/}
-          {/*          </Accordion>*/}
-          {/*          <div className="list-group">*/}
-
-          {/*          </div>*/}
-          {/*      </div>*/}
-          {/*  </Modal.Body>*/}
-          {/*</Modal>*/}
              <Modal
                  open={open}
                  onClose={handleClose}
@@ -127,7 +96,7 @@ const LineOptionMenu = ({open, setOpen}) => {
                          </Grid>
                          <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                          <Grid xs={12}>
-                             <Accordion>
+                             <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                                  <AccordionSummary
                                      expandIcon={<ExpandMore />}
                                      aria-controls="panel1-content"
@@ -146,6 +115,8 @@ const LineOptionMenu = ({open, setOpen}) => {
                                              <ListItemButton
                                                  sx={{bgcolor:'#e8e8e8'}}
                                                  key={line.id}
+                                                 onClick={() => handleClick({cell:line.number,area:line.area})}
+                                                 selected={checkSelected(line)}
                                              >
                                              <ListItemIcon>
                                                  <ElectricBoltIcon />
@@ -157,7 +128,7 @@ const LineOptionMenu = ({open, setOpen}) => {
                                  </AccordionDetails>
                              </Accordion>
 
-                             <Accordion>
+                             <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
                                  <AccordionSummary
                                      expandIcon={<ExpandMore />}
                                      aria-controls="panel2-content"
@@ -176,6 +147,8 @@ const LineOptionMenu = ({open, setOpen}) => {
                                              <ListItemButton
                                                  sx={{bgcolor:'#e8e8e8'}}
                                                  key={line.id}
+                                                 onClick={() => handleClick({cell:line.number,area:line.area})}
+                                                 selected={checkSelected(line)}
                                              >
                                              <ListItemIcon>
                                                  <MicrowaveIcon />
@@ -187,7 +160,7 @@ const LineOptionMenu = ({open, setOpen}) => {
                                  </AccordionDetails>
                              </Accordion>
 
-                             <Accordion>
+                             <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
                                  <AccordionSummary
                                      expandIcon={<ExpandMore />}
                                      aria-controls="panel3-content"
@@ -205,6 +178,8 @@ const LineOptionMenu = ({open, setOpen}) => {
                                          <ListItemButton
                                                  sx={{bgcolor:'#e8e8e8'}}
                                                  key={0}
+                                                 onClick={() => handleClick({cell:1,area:'Pleating'})}
+                                                 selected={checkSelected({area: 'Pleating', number: 1})}
                                              >
                                              <ListItemIcon>
                                                  <MasksIcon />
@@ -215,7 +190,7 @@ const LineOptionMenu = ({open, setOpen}) => {
                                  </AccordionDetails>
                              </Accordion>
 
-                             <Accordion>
+                             <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
                                  <AccordionSummary
                                      expandIcon={<ExpandMore />}
                                      aria-controls="panel4-content"
@@ -233,6 +208,8 @@ const LineOptionMenu = ({open, setOpen}) => {
                                          <ListItemButton
                                                  sx={{bgcolor:'#e8e8e8'}}
                                                  key={0}
+                                                 onClick={() => handleClick({cell:1,area:'Cepheid'})}
+                                                 selected={checkSelected({area: 'Cepheid', number: 1})}
                                              >
                                              <ListItemIcon>
                                                  <PrecisionManufacturingIcon />

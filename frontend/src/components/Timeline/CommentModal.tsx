@@ -80,6 +80,7 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         setOpen(false)
     };
 
+    //CONVERT BOOTSTRAP COLORS TO MUI
     const color = (background:string) => {
          switch (background){
             case 'bg-success': {
@@ -97,10 +98,14 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         }
     }
 
+    //GET SELECTED BAR INFO
     const bar = useAppSelector(state => state.downtime)
+
+    //LAZY QUERIES TRIGGERS DECLARATION
     const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
     const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
 
+    //PULL INFO DEPENDING ON BAR TYPE
     useEffect(() => {
         if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
             getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
@@ -109,6 +114,8 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         }
     }, [bar]);
 
+
+    //LOGIC TO CHECK IF THERE IS INFO IN THE QUERIED VARIABLES
     let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
     let end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
     let circleColor = color(bar.background);
@@ -118,6 +125,7 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
     let scrapReason = scrap ? scrap.reason ? scrap.reason : '' : '';
     let scrapComments = scrap ? scrap.comments ? scrap.comments : '' : '';
     let scrapQuantity = scrap ? scrap.id.slice(1) === bar.id ? scrap.pieces ? scrap.pieces : 0 : 0 : 0;
+
 
     //UPDATE REASON
     const [reasonState, setReasonState] = useState('')
@@ -133,11 +141,13 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         }
     }, [bar, reason, open, handleClick]);
 
+
     //OPEN REASON LIST SUBCATEGORIES
     const [openList, setOpenList] = useState([{index:'open0', active:false}, {index:'open1', active:false}, {index:'open2', active:false}]);
     const [openScrapList, setOpenScrapList] = useState([{index:'open0', active:false}, {index:'open1', active:false}, {index:'open2', active:false}]);
 
 
+    //SET REASON SELECTION ACTIVE
     const handleListClick = (index:string) => {
         const y = _.findIndex(openList, ['index', index])
         const nextState = produce(openList, draftState => {
@@ -146,6 +156,7 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         setOpenList(nextState)
     };
 
+    //SET SCRAP REASON SELECTION ACTIVE
     const handleScrapListClick = (index:string) => {
         const y = _.findIndex(openScrapList, ['index', index])
         const nextState = produce(openScrapList, draftState => {
@@ -154,17 +165,24 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         setOpenScrapList(nextState)
     };
 
+    //MUTATION TRIGGERS
     const [updateDowntime] = useDowntimeUpdatedMutation()
     const [updateScrap] = useScrapUpdatedMutation()
     const [postScrap] = useScrapAddedMutation()
     const [deleteScrap] = useScrapDeletedMutation()
 
-
+    //CHECK IF SCRAP PIECES ARE 0
     const checkScrapPieces = () => {
         if (scrap?.pieces === 0){
             deleteScrap(scrap)
         }
     }
+
+    //CONTROL ACCORDIONS
+    const [expanded, setExpanded] = useState<string | false>(false);
+    const handleChange = (panel: string) => (_event:any, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
     return(
         <>
@@ -204,7 +222,10 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                     <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                     <Grid xs={12}>
                         <ThemeProvider theme={theme}>
-                            <Accordion sx={{display: circleColor !== 'green' ? 'block' : 'none'}}>
+                            <Accordion
+                                sx={{display: circleColor !== 'green' ? 'block' : 'none'}}
+                                expanded={expanded === 'panel1'} onChange={handleChange('panel1')}
+                            >
                                 <AccordionSummary
                                   expandIcon={<ExpandMore />}
                                   aria-controls="panel1bh-content"
@@ -326,11 +347,12 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
 
                             <Accordion
                                 sx={{display: circleColor !== 'red' ? 'block' : 'none'}}
+                                 expanded={expanded === 'panel2'} onChange={handleChange('panel2')}
                             >
                                 <AccordionSummary
                                   expandIcon={<ExpandMore />}
-                                  aria-controls="panel1bh-content"
-                                  id="panel1bh-header"
+                                  aria-controls="panel2bh-content"
+                                  id="panel2bh-header"
                                 >
                                     <Typography variant="subtitle1">
                                         {scrapQuantity ? "Edit scrap" : "Add scrap"}

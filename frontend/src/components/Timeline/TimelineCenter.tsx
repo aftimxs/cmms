@@ -1,6 +1,6 @@
 import TimelineBar from "./TimelineBar.tsx";
 import dayjs from "dayjs";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import _ from 'lodash';
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {barAdded, barsReset} from "../../features/barsSlice.ts";
@@ -21,12 +21,14 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, productID, production} = useGetLineState(lineParams, {
-        selectFromResult: ({data:state}) => ({
+     const {shift, productID, production, isSuccess, isFetching} = useGetLineState(lineParams, {
+        selectFromResult: ({currentData:state, isSuccess, isFetching}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
+            isSuccess: isSuccess,
+            isFetching: isFetching
         })
     })
 
@@ -76,20 +78,36 @@ const TimelineCenter = ({ hour }:any) => {
         return function cleanup(){
             clearInterval(timer)
         }
-    }, []);
+    }, [shift]);
+
+    console.log(date)
 
     useEffect(() => {
-        if (hour === '06:00:00' || hour === '15:00:00'){
-            dispatch(barsReset())
-            dispatch(minutesReset())
-        }
-        setBars([])
         // @ts-ignore
         setBars(background(now))
-    }, [shift, date]);
+    }, []);
+
+    if (hour === '06:00:00'){
+        console.log(isFetching)
+        console.log(isSuccess)
+        console.log(production)
+    }
+
+    //useEffect(() => {
+    //    if (hour === '06:00:00' || hour === '15:00:00'){
+    //        dispatch(barsReset())
+    //        dispatch(minutesReset())
+    //    }
+    //    setBars([])
+    //    // @ts-ignore
+    //    setBars(background(now))
+    //}, [shift, date]);
+
+
+
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
-    const background = (now:dayjs.Dayjs) => {
+    const background = useCallback((now:dayjs.Dayjs) => {
         let counter = 1;
         let partsCounter = 0;
         let color = '';
@@ -141,7 +159,7 @@ const TimelineCenter = ({ hour }:any) => {
         //GET BGCOLOR FOR EACH MINUTE WITH DATA
         production?.forEach((info:any) => {
             dispatch(minuteAdded({
-                id: Number(dayjs(info.minute, 'H:mm').format('hhmm')),
+                id: Number(dayjs(info.minute, 'H:mm').format('Hmm')),
                 minute: dayjs(info.minute, 'H:mm').format('h:mm a'),
                 count: info.item_count
             }))
@@ -162,7 +180,7 @@ const TimelineCenter = ({ hour }:any) => {
         ms.forEach((min) => {
             if (now.isAfter(dayjs(min).add(1, 'minute'))){
                 dispatch(minuteAdded({
-                    id: Number(dayjs(min, 'H:mm').format('hhmm')),
+                    id: Number(dayjs(min, 'H:mm').format('Hmm')),
                     minute: dayjs(min).format('h:mm a'),
                     count: 0}))
                 if ((dayjs(min, 'HH:mm').minute()-1) === dayjs(previous, 'HH:mm').minute()) {
@@ -204,9 +222,8 @@ const TimelineCenter = ({ hour }:any) => {
         }
 
         return sortedBars;
-    }
+    }, [shift, date])
 
-    //const printBars = useMemo(() => background(now), [shift])
 
     return (
         <Grid

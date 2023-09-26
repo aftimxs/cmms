@@ -2,6 +2,13 @@ import Hour from "./Hour.tsx";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {dateAdded, numberAdded} from "../../features/lineParamsSlice.ts";
 import dayjs from "dayjs";
+import {ButtonGroup, Container} from "@mui/material";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import IconButton from "@mui/material/IconButton";
+import SettingsSharpIcon from '@mui/icons-material/SettingsSharp';
+import Grid from "@mui/material/Unstable_Grid2";
 
 
 // @ts-ignore
@@ -36,38 +43,26 @@ const HeaderRight = () => {
     }
 
     return (
-        <div className="col-2">
-            <div className="container py-0">
-            <div className="row">
-                <div className="col-8">
-                    <div className="row">
-                        <div className="col-4">
-                            <button type="button" className="btn" onClick={handleBackShift}>
-                                <i className="bi bi-chevron-left" style={{fontSize: "1.5rem"}}></i></button>
-                        </div>
-                        <div className="col-4">
-                            <button type="button" className="btn" onClick={handleForwardShift}>
-                                <i className="bi bi-chevron-right" style={{fontSize: "1.5rem"}}></i></button>
-                        </div>
-                        <div className="col-4">
-                            <button type="button" className="btn" onClick={handleTodayShift}>
-                                <i className="bi bi-chevron-double-right" style={{fontSize: "1.5rem"}}></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-4 text-center">
-                    <button type="button" className="btn"><i className="bi bi-gear-fill"
-                                                                      style={{fontSize: "1.5rem"}}></i></button>
-                </div>
-            </div>
-            </div>
-            <div className="row align-items-center pt-2">
-                    <Hour/>
-            </div>
-            <div className="col pt-3 text-center">
+        <Grid container xs={2} direction={'column'} alignItems={'center'} px={0}>
+            <Grid>
+                <ButtonGroup
+                    variant="text"
+                    disableElevation
+                    fullWidth
+                >
+                    <IconButton onClick={handleBackShift}> <ChevronLeftIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                    <IconButton onClick={handleForwardShift}> <ChevronRightIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                    <IconButton onClick={handleTodayShift}> <LastPageIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                    <IconButton> <SettingsSharpIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                </ButtonGroup>
+            </Grid>
+            <Grid pt={2}>
+                <Hour/>
+            </Grid>
+            <Grid pt={2}>
                 <img src="./src/assets/ag.png" alt="AG" className="img-fluid" style={{maxWidth: "100px"}}/>
-            </div>
-        </div>
+            </Grid>
+        </Grid>
     );
 }
 

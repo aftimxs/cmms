@@ -35,18 +35,20 @@ const BarTooltip = ({ type, barData, product }:any) => {
     let quantity = 0;
     let startMin = 0;
     let endMin = 0;
+    let loss = 0;
 
     if (type === 'bg-success'){
         header = 'Production Signal'
-        start = dayjs(barData.minute).format('HH:mm')
+        start = dayjs(barData.minute).format('h:mm a')
         quantity = barData.parts
 
     } else {
         startMin = dayjs(barData.startTime).minute();
         endMin = dayjs(barData.minute).minute();
-        start = dayjs(barData.startTime).format('HH:mm')
+        start = dayjs(barData.startTime).format('h:mm a')
         time = (endMin-startMin+1)
-        quantity = Number(-(((product?.rate/60)*barData.long)-barData.parts).toFixed(2))
+        quantity = barData.parts
+        loss = Number(-(((product?.rate/60)*barData.long)-barData.parts).toFixed(2))
         
         if (type === 'bg-warning'){
             header = 'Speed Loss'
@@ -63,6 +65,8 @@ const BarTooltip = ({ type, barData, product }:any) => {
             {`Time: ${start} (${time} mins)`}
             <br></br>
             {`Quantity: ${quantity} pcs`}
+            <br></br>
+            {loss ? `Loss: ${loss} pcs` : ''}
         </>
     )
 }

@@ -7,7 +7,8 @@ import {barAdded, barsReset} from "../../features/barsSlice.ts";
 import {
     useDowntimeAddedMutation,
     useDowntimeUpdatedMutation,
-    useGetLineState, useGetProductQuery, useLazyGetDowntimeQuery, useProductionInfoAddedMutation,
+    useGetLineState,
+    useGetProductQuery, useGetShiftDowntimesQuery,
 } from "../../app/services/apiSplice.ts";
 import Grid from "@mui/material/Unstable_Grid2";
 import {minuteAdded, minutesReset} from "../../features/minutesSlice.tsx";
@@ -30,6 +31,7 @@ const TimelineCenter = ({ hour }:any) => {
     })
 
     const {data:product} = useGetProductQuery({id:productID})
+    const {data:downtimes} = useGetShiftDowntimesQuery({shiftId: shift?.id})
 
     const now = dayjs();
 
@@ -46,16 +48,15 @@ const TimelineCenter = ({ hour }:any) => {
     //POST OR PUT BARS TO DB
     const [updateDowntime] = useDowntimeUpdatedMutation()
     const [addDowntime] = useDowntimeAddedMutation()
-    const [getDowntime] = useLazyGetDowntimeQuery()
 
     const postDowntime = async (downtime:any) => {
-        const query= await getDowntime({id:`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
-        if (query.isSuccess){
+        const query:any = _.find(downtimes, {'id':`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
+        if (query){
             updateDowntime({
-                id: query.data.id,
-                start: query.data.start,
+                id: query.id,
+                start: query.start,
                 end:dayjs(downtime.minute).format('HH:mm:ss'),
-                shift: query.data.shift,
+                shift: query.shift,
             })
         } else {
             addDowntime({
@@ -92,7 +93,7 @@ const TimelineCenter = ({ hour }:any) => {
         let counter = 1;
         let partsCounter = 0;
         let color = '';
-        let id = 0;
+        let id = -1;
         let startTime = now;
         let ms = [...minutes];
         let barsProv:any = [];
@@ -110,36 +111,40 @@ const TimelineCenter = ({ hour }:any) => {
             } else {
                 counter = counter + 1;
                 partsCounter = partsCounter + items;
-                updateBar(id, c, min)
+                updateBar(id, counter, min)
             }
-            //handleBars(id, c, min, counter, partsCounter, startTime)
             if (!unused) {
                 ms = _.reject(ms, min)
             }
         }
 
-        //PUSH EACH BAR INTO ARRAY
-        //const handleBars = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
-        //    barsProv.push({ id: id, long: counter, minute: minute, bg: color, parts: Number(partsCounter), startTime })
-        //}
-
         const newBar = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
-            const x = produce(barsProv, draftState => {
-                draftState.push({ id: id, long: counter, minute: minute, bg: color, parts: Number(partsCounter), startTime })
+            barsProv = produce(barsProv, draftState => {
+                draftState.push({
+                    id: id,
+                    long: counter,
+                    minute: minute,
+                    bg: color,
+                    parts: Number(partsCounter),
+                    startTime
+                })
             })
-            barsProv = x
         }
 
-        const updateBar = (id:number, color:string, minute:dayjs.Dayjs) => {
-           const y = produce(barsProv, draftState => {
+        const updateBar = (id:number, counter:number, minute:dayjs.Dayjs) => {
+            barsProv = produce(barsProv, draftState => {
                 draftState[id].minute = minute
+                draftState[id].long = counter
             })
-            //barsProv = y
         }
 
         //GET BGCOLOR FOR EACH MINUTE WITH DATA
         production?.forEach((info:any) => {
-            dispatch(minuteAdded({minute: dayjs(info.minute, 'H:mm').format('h:mm a'), count: info.item_count}))
+            dispatch(minuteAdded({
+                id: Number(dayjs(info.minute, 'H:mm').format('hhmm')),
+                minute: dayjs(info.minute, 'H:mm').format('h:mm a'),
+                count: info.item_count
+            }))
             for (let i = 0; i < minutes.length; i++) {
                 if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
                     if (info.item_count >= (product?.rate / 60)) {
@@ -155,46 +160,27 @@ const TimelineCenter = ({ hour }:any) => {
 
         //SET BARS FOR UNUSED MINUTES WHICH ARE IN THE PAST
         ms.forEach((min) => {
-            if (now.isAfter(min)){
-                dispatch(minuteAdded({minute: dayjs(min).format('h:mm a'), count: 0}))
+            if (now.isAfter(dayjs(min).add(1, 'minute'))){
+                dispatch(minuteAdded({
+                    id: Number(dayjs(min, 'H:mm').format('hhmm')),
+                    minute: dayjs(min).format('h:mm a'),
+                    count: 0}))
                 if ((dayjs(min, 'HH:mm').minute()-1) === dayjs(previous, 'HH:mm').minute()) {
                     previous = min;
                     counter = counter + 1;
+                    updateBar(id, counter, min)
                 } else {
                     id = id + 1;
                     counter = 1;
                     startTime = min;
                     previous = min;
+                    newBar(id, 'bg-danger', min, counter, 0, startTime)
                 }
-
-                //handleBars(id, 'bg-danger', min, counter, 0, startTime)
             }
-            // console.log(min)
-            // console.log(now1)
-            // console.log(min.isAfter(now1))
-            // if (min.isAfter(now1)) {
-            //      addProductionInfo({
-            //         hour: hour,
-            //         minute: dayjs(min).format('HH:mm:ss'),
-            //         item_count: 0,
-            //         line: shift.line,
-            //         shift: shift.id,
-            //     })
-            //     ms = _.reject(ms, min)
-            // }
         })
 
-        console.log(barsProv)
-        //GROUP BARS BY ID
-        let sortedBars = []
-        const byId = _.groupBy(barsProv, 'id')
-        for (const id in byId){
-            sortedBars.push(byId[id].slice(-1))
-        }
-
         //ORDER BARS BY MINUTE
-        sortedBars =  _.flatten(sortedBars)
-        sortedBars =  _.sortBy(sortedBars, 'minute')
+        const sortedBars =  _.sortBy(barsProv, 'minute')
 
         //SET BARS IN STORE
         sortedBars.map(bar => {

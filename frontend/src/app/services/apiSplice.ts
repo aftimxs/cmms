@@ -41,6 +41,7 @@ export const productionApi = createApi({
       getShiftDowntimes: builder.query({
           query: ({shiftId}) =>
               `downtime/?shift=${shiftId}`,
+          providesTags: ['Downtime'],
           transformResponse: (response:comments) => {
               // @ts-ignore
               return response

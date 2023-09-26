@@ -19,7 +19,7 @@ const minutesSlice = createSlice({
   reducers: {
       minuteAdded(state, action: PayloadAction<any>) {
           state.push({
-              id: ++lastId,
+              id: action.payload.id,
               minute: action.payload.minute,
               count: action.payload.count,
           })

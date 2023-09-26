@@ -109,8 +109,8 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
         }
     }, [bar]);
 
-    let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm');
-    let end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm');
+    let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
+    let end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
     let circleColor = color(bar.background);
     let description = comments ? comments.description ? comments.description : '' : '';
     let reason = comments ? comments.reason ? comments.reason : '' : '';

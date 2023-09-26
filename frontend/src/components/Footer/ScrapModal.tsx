@@ -6,11 +6,13 @@ import {
 import Grid from '@mui/material/Unstable_Grid2';
 import Divider from '@mui/material/Divider';
 import {
-    useGetLineState, useGetShiftDowntimesQuery,
+    useGetAllScrapQuery,
+    useGetLineState,
 } from "../../app/services/apiSplice.ts";
 import {useAppSelector} from "../../app/hooks.ts";
-import DowntimeListItem from "./DowntimeListItem.tsx";
 import List from "@mui/material/List";
+import ScrapListItem from "./ScrapListItem.tsx";
+
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -25,7 +27,7 @@ const style = {
     borderRadius: '4px',
 };
 
-const DowntimeModal = ({ open, setOpen, value }:any) => {
+const ScrapModal = ({ open, setOpen, value }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -39,12 +41,12 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
         })
     })
 
-    const {data:allDowntimes} = useGetShiftDowntimesQuery({shiftId: shift?.id});
+    const {data:allScrap} = useGetAllScrapQuery({shift: shift?.id});
 
     return(
         <>
             <Modal
-              open={open && value===2}
+              open={open && value===4}
               onClose={handleClose}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
@@ -59,7 +61,7 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
                     <Grid container spacing={5}>
                         <Grid>
                             <Typography color='black' id="modal-modal-title" align='center' variant="h5">
-                                Downtimes
+                                Scrap
                             </Typography>
                         </Grid>
                     </Grid>
@@ -72,9 +74,10 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
                             maxHeight: 300,
                         }}
                     >
-                        {allDowntimes?.map((period:any, index:number) => <DowntimeListItem
+                        {allScrap?.map((item:any, index:number) =>
+                            <ScrapListItem
                                 key={index}
-                                period={period}
+                                item={item}
                             />
                         )}
                     </List>
@@ -85,4 +88,4 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
     )
 };
 
-export default DowntimeModal;
+export default ScrapModal;

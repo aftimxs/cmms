@@ -9,7 +9,7 @@ import Collapse from "@mui/material/Collapse";
 import {useState} from "react";
 
 
-const DowntimeCard = ({period}:any) => {
+const DowntimeListItem = ({period}:any) => {
 
     const [open, setOpen] = useState(true);
 
@@ -47,4 +47,4 @@ const DowntimeCard = ({period}:any) => {
     )
 }
 
-export default DowntimeCard;
+export default DowntimeListItem;

@@ -28,6 +28,11 @@ export const productionApi = createApi({
   endpoints: (builder) => ({
       getAllLines: builder.query({
           query: () => 'production-line',
+          transformResponse: (response) => {
+              const x = []
+              response.map((line) => x.push({id: line.id, area: line.area, cell: line.cell}))
+              return x
+          }
       }),
       getLine: builder.query({
           query: ({area, cell, date, number}) =>

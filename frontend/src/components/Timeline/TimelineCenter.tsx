@@ -21,17 +21,16 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, productID, production, isSuccess, isFetching} = useGetLineState(lineParams, {
-        selectFromResult: ({currentData:state, isSuccess, isFetching}) => ({
+     const {shift, productID, production, requestId} = useGetLineState(lineParams, {
+        selectFromResult: ({currentData:state, isSuccess, isFetching, requestId}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
-            isSuccess: isSuccess,
-            isFetching: isFetching
+            requestId,
         })
     })
-
+    
     const {data:product} = useGetProductQuery({id:productID})
     const {data:downtimes} = useGetShiftDowntimesQuery({shiftId: shift?.id})
 
@@ -70,40 +69,14 @@ const TimelineCenter = ({ hour }:any) => {
         }
     }
 
-    //REFRESH EVERY 30SECS
-    const [date, setDate] = useState(new Date());
-
     useEffect(() => {
-        const timer = setInterval(() => setDate(new Date()), 30000);
-        return function cleanup(){
-            clearInterval(timer)
+        if (hour === '06:00:00' || hour === '15:00:00'){
+            dispatch(barsReset())
+            dispatch(minutesReset())
         }
-    }, [shift]);
-
-    console.log(date)
-
-    useEffect(() => {
         // @ts-ignore
         setBars(background(now))
-    }, []);
-
-    if (hour === '06:00:00'){
-        console.log(isFetching)
-        console.log(isSuccess)
-        console.log(production)
-    }
-
-    //useEffect(() => {
-    //    if (hour === '06:00:00' || hour === '15:00:00'){
-    //        dispatch(barsReset())
-    //        dispatch(minutesReset())
-    //    }
-    //    setBars([])
-    //    // @ts-ignore
-    //    setBars(background(now))
-    //}, [shift, date]);
-
-
+    }, [shift, requestId]);
 
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
@@ -222,7 +195,7 @@ const TimelineCenter = ({ hour }:any) => {
         }
 
         return sortedBars;
-    }, [shift, date])
+    }, [shift, requestId])
 
 
     return (

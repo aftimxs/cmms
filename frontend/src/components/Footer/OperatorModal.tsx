@@ -7,6 +7,7 @@ import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@mui/material"
 import _ from 'lodash';
 import {useAppSelector} from "../../app/hooks.ts";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
+import Divider from "@mui/material/Divider";
 
 
 const style = {
@@ -99,6 +100,7 @@ const OperatorModal = ({ open, setOpen, value }:any ) => {
                     <Typography color='black' id="modal-modal-title" variant="h6" component="h2" textAlign='center'>
                         Operators
                     </Typography>
+                    <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
 
                         <FormControl id="modal-modal-description" sx={{ mt: 2 }} component="fieldset" variant="standard">
                             <FormGroup>

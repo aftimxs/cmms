@@ -21,8 +21,10 @@ import _ from 'lodash';
 import {produce} from "immer"
 import {
     useDowntimeUpdatedMutation,
-    useLazyGetDowntimeQuery, useLazyGetScrapQuery,
-    useScrapAddedMutation, useScrapDeletedMutation,
+    useLazyGetDowntimeQuery,
+    useLazyGetScrapQuery,
+    useScrapAddedMutation,
+    useScrapDeletedMutation,
     useScrapUpdatedMutation
 } from "../../app/services/apiSplice.ts";
 import CommentButton from "./CommentButton.tsx";

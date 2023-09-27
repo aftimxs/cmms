@@ -6,12 +6,14 @@ import CommentModal from "./CommentModal.tsx";
 import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
-    useGetLineState, useGetProductQuery,
-    useLazyGetDowntimeQuery,
+    useGetLineState,
+    useGetProductQuery,
+    useLazyGetDowntimeQuery, useLazyGetScrapQuery,
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
-import Box, { BoxProps } from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import {Container} from "@mui/material";
+import ScrapIndicator from "./ScrapIndicator.tsx";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -144,11 +146,15 @@ const TimelineBar = ({ barData }:any) => {
             }
     };
 
-    const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery()
+    const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery();
+    const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+
 
     useEffect(() => {
         if (barData.bg === 'bg-danger'){
             getBarDowntime({id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`})
+        } else if (barData.bg !== 'bg-danger') {
+            getScrap({id: `S${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`})
         }
     }, [barData]);
 
@@ -177,7 +183,13 @@ const TimelineBar = ({ barData }:any) => {
             >
 
                 <Container
-                    sx={{width:`${w}%`, height:'75%', backgroundColor: color(barData.bg), marginX:0}}
+                    sx={{
+                        width:`${w}%`,
+                        height:'75%',
+                        backgroundColor: color(barData.bg),
+                        marginX:0,
+                        display:'grid',
+                    }}
                     disableGutters
                     maxWidth={false}
                     onClick={handleOpen}
@@ -193,7 +205,9 @@ const TimelineBar = ({ barData }:any) => {
                         }}
                     >
                         {barData.bg !== 'bg-success' ? barReason : ' '}
+
                     </Box>
+                    {barData.bg !== 'bg-danger' ? <ScrapIndicator scrap={scrap}/> : <></>}
                 </Container>
             </ProductionTooltip>
         </>

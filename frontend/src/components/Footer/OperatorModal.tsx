@@ -3,11 +3,12 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@mui/material";
+import {Checkbox, Container, FormControl, FormControlLabel, FormGroup} from "@mui/material";
 import _ from 'lodash';
 import {useAppSelector} from "../../app/hooks.ts";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
 import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Unstable_Grid2";
 
 
 const style = {
@@ -96,32 +97,41 @@ const OperatorModal = ({ open, setOpen, value }:any ) => {
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
-                    <Typography color='black' id="modal-modal-title" variant="h6" component="h2" textAlign='center'>
-                        Operators
-                    </Typography>
-                    <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
-
-                        <FormControl id="modal-modal-description" sx={{ mt: 2 }} component="fieldset" variant="standard">
-                            <FormGroup>
-                                {operatorData.map((operator:any) => (
-                                    <FormControlLabel
-                                        key={operator.id}
-                                        style={{color:'black'}}
-                                        control={
-                                        <Checkbox
-                                            onChange={handleChange}
-                                            value={operator.id}
-                                            checked={_.includes(selected, operator.id)}
+                <Container sx={style}>
+                    <Grid
+                    container
+                    rowSpacing={2}
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center">
+                        <Grid spacing={5}>
+                            <Typography color='black' id="modal-modal-title" variant="h6" component="h2" textAlign='center'>
+                                Operators
+                            </Typography>
+                        </Grid>
+                        <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
+                        <Grid xs={12} sx={{overflow: 'auto', maxHeight: 300,}}>
+                            <FormControl id="modal-modal-description" sx={{ mt: 2, marginLeft: 5 }} component="fieldset" variant="standard">
+                                <FormGroup>
+                                    {operatorData.map((operator:any) => (
+                                        <FormControlLabel
+                                            key={operator.id}
+                                            style={{color:'black'}}
+                                            control={
+                                            <Checkbox
+                                                onChange={handleChange}
+                                                value={operator.id}
+                                                checked={_.includes(selected, operator.id)}
+                                            />
+                                        }
+                                            label={`#${operator.worker_number} | ${operator.last_name}, ${operator.first_name}`}
                                         />
-                                    }
-                                        label={`#${operator.worker_number} | ${operator.last_name}, ${operator.first_name}`}
-                                    />
-                                ))}
-                            </FormGroup>
-                        </FormControl>
-
-                </Box>
+                                    ))}
+                                </FormGroup>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                </Container>
             </Modal>
         </>
     )

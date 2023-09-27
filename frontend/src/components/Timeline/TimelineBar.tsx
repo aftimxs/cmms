@@ -14,6 +14,7 @@ import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import Box from '@mui/material/Box';
 import {Container} from "@mui/material";
 import ScrapIndicator from "./ScrapIndicator.tsx";
+import _ from 'lodash';
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -97,11 +98,12 @@ const TimelineBar = ({ barData }:any) => {
     const bars = useAppSelector(state => state.bars)
 
     const lineParams = useAppSelector(state => state.line)
-    const {shift, productID} = useGetLineState(lineParams, {
+    const {shift, productID, allScrap} = useGetLineState(lineParams, {
         selectFromResult: ({data: state}) => ({
             shift: state ? state['shift'][0] : undefined,
             productID: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
+            allScrap: state ? state['shift'][0] ? state['shift'][0]['scrap'] ? state['shift'][0]['scrap'] : undefined : undefined : undefined,
         })
     })
 
@@ -149,12 +151,13 @@ const TimelineBar = ({ barData }:any) => {
     const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery();
     const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
 
+    const ID = `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`
 
     useEffect(() => {
         if (barData.bg === 'bg-danger'){
-            getBarDowntime({id: `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`})
-        } else if (barData.bg !== 'bg-danger') {
-            getScrap({id: `S${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`})
+            getBarDowntime({id: ID})
+        } else if (barData.bg !== 'bg-danger' && _.find(allScrap, {id:'S'+ID})) {
+            getScrap({id: `S${ID}`})
         }
     }, [barData]);
 
@@ -189,6 +192,7 @@ const TimelineBar = ({ barData }:any) => {
                         backgroundColor: color(barData.bg),
                         marginX:0,
                         display:'grid',
+                        overflow: 'hidden'
                     }}
                     disableGutters
                     maxWidth={false}
@@ -197,11 +201,13 @@ const TimelineBar = ({ barData }:any) => {
                     <Box
                         sx={{height: '100%',
                             color: 'white',
-                            display: 'flex',
+                            display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: '1rem',
                             fontWeight: '400',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         {barData.bg !== 'bg-success' ? barReason : ' '}

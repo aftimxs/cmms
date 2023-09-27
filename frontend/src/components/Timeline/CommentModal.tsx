@@ -254,7 +254,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                             <List component="div" disablePadding>
                                                 <CommentButton
                                                     comments={comments}
-                                                    updateDowntime={updateDowntime}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     setBarReason={setBarReason}
@@ -262,7 +261,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                                 />
                                                 <CommentButton
                                                     comments={comments}
-                                                    updateDowntime={updateDowntime}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     setBarReason={setBarReason}
@@ -270,7 +268,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                                 />
                                                 <CommentButton
                                                     comments={comments}
-                                                    updateDowntime={updateDowntime}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     setBarReason={setBarReason}
@@ -291,7 +288,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                             <List component="div" disablePadding>
                                                 <CommentButton
                                                       comments={comments}
-                                                      updateDowntime={updateDowntime}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
                                                       setBarReason={setBarReason}
@@ -299,7 +295,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                                   />
                                                 <CommentButton
                                                       comments={comments}
-                                                      updateDowntime={updateDowntime}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
                                                       setBarReason={setBarReason}
@@ -320,7 +315,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                             <List component="div" disablePadding>
                                                 <CommentButton
                                                       comments={comments}
-                                                      updateDowntime={updateDowntime}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
                                                       setBarReason={setBarReason}

@@ -30,7 +30,7 @@ const TimelineCenter = ({ hour }:any) => {
             requestId,
         })
     })
-    
+
     const {data:product} = useGetProductQuery({id:productID})
     const {data:downtimes} = useGetShiftDowntimesQuery({shiftId: shift?.id})
 

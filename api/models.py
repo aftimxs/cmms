@@ -7,7 +7,7 @@ from datetime import timedelta
 # Create your models here.
 class ProductionLine(models.Model):
     area = models.CharField(max_length=15)
-    cell = models.IntegerField()
+    cell = models.IntegerField(null=True)
 
 
 class Product(models.Model):

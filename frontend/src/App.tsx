@@ -9,13 +9,7 @@ function App(){
 
     const lineParams = useAppSelector(state => state.line)
 
-    const {} = useGetLineQuery(
-           {
-               area:lineParams.area,
-               cell:lineParams.cell,
-               date:lineParams.date,
-               number:lineParams.number
-           }, {pollingInterval:30000}
+    const {} = useGetLineQuery(lineParams, {pollingInterval:30000}
     );
 
     return (<div className="container-fluid" >

@@ -147,6 +147,14 @@ export const productionApi = createApi({
           }),
           invalidatesTags: ['Shift']
       }),
+      shiftAdded: builder.mutation({
+          query: (shift) => ({
+              url: 'shift/',
+              method: 'POST',
+              body: shift
+          }),
+          invalidatesTags: ['Shift']
+      }),
   }),
 })
 
@@ -174,5 +182,7 @@ export const {
     useProductUpdatedMutation,
     useQuantityUpdatedMutation,
     useOrderAddedMutation,
+
+    useShiftAddedMutation,
 } = productionApi
 export const useGetLineState = productionApi.endpoints.getLine.useQueryState;

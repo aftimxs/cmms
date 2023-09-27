@@ -1,6 +1,6 @@
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import {Container, InputAdornment, MenuItem, TextField} from "@mui/material";
+import {Button, Container, InputAdornment, MenuItem, TextField} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
 import Divider from '@mui/material/Divider';
 import {
@@ -8,6 +8,7 @@ import {
     useGetLineState, useOrderAddedMutation,
     useProductUpdatedMutation,
     useQuantityUpdatedMutation,
+     useShiftAddedMutation,
 } from "../../app/services/apiSplice.ts";
 import {useAppSelector} from "../../app/hooks.ts";
 import Box from "@mui/material/Box";
@@ -54,6 +55,7 @@ const CommentModal = ({ open, setOpen, value }:any) => {
     const [updateQuantity] = useQuantityUpdatedMutation();
     const [updateProduct] = useProductUpdatedMutation();
     const [addOrder] = useOrderAddedMutation();
+    const [addShift] = useShiftAddedMutation();
 
     const handleProductChange = (event:any) => {
        if (order){
@@ -99,6 +101,20 @@ const CommentModal = ({ open, setOpen, value }:any) => {
                           noValidate
                           autoComplete="off"
                         >
+                             <Box component={'div'} py={2} display={!shift ? 'block' : 'none'}>
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    color={'info'}
+                                    // onClick={() => addShift({
+                                    //     number: lineParams.number,
+                                    //     date: lineParams.date,
+                                    //     line: ,
+                                    // })}
+                                >
+                                    Create Shift
+                                </Button>
+                            </Box>
                             <div>
                                 <TextField
                                     id="product"

@@ -43,8 +43,9 @@ const CommentModal = ({ open, setOpen, value }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, order, product} = useGetLineState(lineParams, {
+     const {shift, order, product, lineID} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
+            lineID: state ? state.id : undefined,
             shift: state? state['shift'][0] : undefined,
             order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
             product: state? state['shift'][0]? state['shift'][0]['order'][0]?
@@ -106,11 +107,11 @@ const CommentModal = ({ open, setOpen, value }:any) => {
                                     variant="contained"
                                     fullWidth
                                     color={'info'}
-                                    // onClick={() => addShift({
-                                    //     number: lineParams.number,
-                                    //     date: lineParams.date,
-                                    //     line: ,
-                                    // })}
+                                    onClick={() => addShift({
+                                        number: lineParams.number,
+                                        date: lineParams.date,
+                                        line: lineID,
+                                    })}
                                 >
                                     Create Shift
                                 </Button>

@@ -77,7 +77,7 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, setBarReason, scrap }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -106,12 +106,12 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
 
     //LAZY QUERIES TRIGGERS DECLARATION
     const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
-    const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+    //const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
 
     //PULL INFO DEPENDING ON BAR TYPE
     useEffect(() => {
         if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
-            getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
+            //getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
         } else if (bar.background === 'bg-danger'){
             getDowntime(bar)
         }

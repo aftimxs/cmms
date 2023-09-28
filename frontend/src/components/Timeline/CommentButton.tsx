@@ -3,7 +3,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import {useDowntimeUpdatedMutation} from "../../app/services/apiSplice.ts";
 import {Snackbar} from "@mui/material";
 import Box from "@mui/material/Box";
-import {useState} from "react";
 
 
 const CommentButton = ({comments, reasonState, setReasonState, title, setBarReason}:any) => {

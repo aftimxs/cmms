@@ -3,10 +3,8 @@ import LineOptionMenu from "./LineOptionMenu.tsx";
 import { useState } from "react";
 import {useAppSelector} from "../../app/hooks.ts";
 import {
-    useGetAllScrapQuery,
     useGetLineState,
     useGetProductQuery,
-    useGetScrapQuery
 } from "../../app/services/apiSplice.ts";
 
 

@@ -149,15 +149,17 @@ const TimelineBar = ({ barData }:any) => {
     };
 
     const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery();
-    const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+    //const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
 
     const ID = `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`
+
+    //let scrap = undefined;
 
     useEffect(() => {
         if (barData.bg === 'bg-danger'){
             getBarDowntime({id: ID})
         } else if (barData.bg !== 'bg-danger' && _.find(allScrap, {id:'S'+ID})) {
-            getScrap({id: `S${ID}`})
+            //scrap = _.find(allScrap, {id:'S'+ID})
         }
     }, [barData]);
 
@@ -213,7 +215,7 @@ const TimelineBar = ({ barData }:any) => {
                         {barData.bg !== 'bg-success' ? barReason : ' '}
 
                     </Box>
-                    {barData.bg !== 'bg-danger' ? <ScrapIndicator scrap={scrap}/> : <></>}
+                    {barData.bg !== 'bg-danger' ? <ScrapIndicator scrap={_.find(allScrap, {id:'S'+ID}) ? _.find(allScrap, {id:'S'+ID}) : undefined}/> : <></>}
                 </Container>
             </ProductionTooltip>
         </>

@@ -1,8 +1,6 @@
 import Box from "@mui/material/Box";
-import dayjs from "dayjs";
-import {useLazyGetScrapQuery} from "../../app/services/apiSplice.ts";
 
-const ScrapIndicator = ({scrap}) => {
+const ScrapIndicator = ({scrap}:any) => {
 
     const color = scrap ? '#ffc107' : '#FFFFFF';
 

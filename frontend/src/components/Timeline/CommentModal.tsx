@@ -14,7 +14,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
-import {NavigateBeforeOutlined, NavigateNextOutlined, Circle, ExpandLess, ExpandMore, EditCalendar, Engineering, AltRoute}
+import {NavigateBeforeOutlined, NavigateNextOutlined, Circle,
+    ExpandLess, ExpandMore, EditCalendar, Engineering, AltRoute}
     from '@mui/icons-material';
 import {useEffect, useState} from "react";
 import _ from 'lodash';

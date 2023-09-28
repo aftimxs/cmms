@@ -43,6 +43,8 @@ export const productionApi = createApi({
               return response[0]
           }
       }),
+
+      //DOWNTIMES
       getShiftDowntimes: builder.query({
           query: ({shiftId}) =>
               `downtime/?shift=${shiftId}`,
@@ -53,9 +55,9 @@ export const productionApi = createApi({
           }
       }),
       getDowntime: builder.query({
-          query: ({id}) =>
-              `downtime/${id}`,
-          providesTags: ['Downtime'],
+          query: (bar) =>
+              `downtime/${bar.id}`,
+          providesTags: (result, error, bar) => [{ type: 'Downtime', id: bar.id }],
           transformResponse: (response:comments) => {
               // @ts-ignore
               return response
@@ -77,15 +79,21 @@ export const productionApi = createApi({
           }),
           invalidatesTags: ['Downtime', 'Shift'],
       }),
+
+
+      //SCRAP
       getAllScrap: builder.query({
           query: ({shift}) =>
               `scrap/?shift=${shift}`,
-          providesTags: ['Scrap'],
+          providesTags: (result = []) => [
+              'Scrap',
+              ...result.map(({ id }) => ({ type: 'Scrap', id }))
+          ]
       }),
       getScrap: builder.query({
-          query: ({id}) =>
-              `scrap/${id}`,
-          providesTags: ['Scrap'],
+          query: (scrap) =>
+              `scrap/${scrap.id}`,
+          providesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
           transformResponse: (response:scrap) => {
               // @ts-ignore
               return response
@@ -105,14 +113,14 @@ export const productionApi = createApi({
               method: 'PATCH',
               body: scrap,
           }),
-          invalidatesTags: ['Scrap', 'Shift'],
+          invalidatesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
       }),
       scrapDeleted: builder.mutation({
           query: (scrap) => ({
               url: `scrap/${scrap.id}/`,
               method: 'DELETE',
           }),
-          invalidatesTags: ['Scrap', 'Shift'],
+          invalidatesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
       }),
       productionInfoAdded: builder.mutation({
           query: (info) => ({

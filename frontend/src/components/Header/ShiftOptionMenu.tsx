@@ -17,7 +17,7 @@ const ShiftOptionMenu = ({ visibility }:any) => {
     ]
 
     const isRadioSelected = (value2:string): boolean => lineParams.number === value2;
-    const handleRadio = (e:React.ChangeEvent<HTMLInputElement>): void => dispatch(numberAdded(e.currentTarget.value))
+    const handleRadio = (e:React.ChangeEvent<HTMLInputElement>) => dispatch(numberAdded(e.currentTarget.value))
 
     return(
          <>

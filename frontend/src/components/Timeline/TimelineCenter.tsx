@@ -22,7 +22,7 @@ const TimelineCenter = ({ hour }:any) => {
     const lineParams = useAppSelector(state => state.line)
 
      const {shift, productID, production, requestId} = useGetLineState(lineParams, {
-        selectFromResult: ({currentData:state, isSuccess, isFetching, requestId}) => ({
+        selectFromResult: ({currentData:state, requestId}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,

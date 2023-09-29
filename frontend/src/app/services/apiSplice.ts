@@ -44,11 +44,18 @@ export const productionApi = createApi({
           }
       }),
 
+
       //DOWNTIMES
       getShiftDowntimes: builder.query({
           query: ({shiftId}) =>
               `downtime/?shift=${shiftId}`,
-          providesTags: ['Downtime'],
+          providesTags: (result) =>
+              result ?
+                  [
+                      ...result.map(({ id }) => ({ type: 'Downtime' as const, id })),
+                      { type: 'Downtime', id: 'LIST' },
+                  ]
+                  : { type: 'Downtime', id: 'LIST' },
           transformResponse: (response:comments) => {
               // @ts-ignore
               return response
@@ -69,7 +76,7 @@ export const productionApi = createApi({
               method: 'POST',
               body: downtime,
           }),
-          invalidatesTags: ['Downtime', 'Shift'],
+          invalidatesTags: [{ type: 'Downtime', id: 'LIST' }],
       }),
       downtimeUpdated: builder.mutation({
           query: (downtime) => ({
@@ -77,7 +84,7 @@ export const productionApi = createApi({
               method: 'PATCH',
               body: downtime,
           }),
-          invalidatesTags: ['Downtime', 'Shift'],
+          invalidatesTags: (result, error, bar) => [{ type: 'Downtime', id: bar.id }],
       }),
 
 
@@ -85,10 +92,13 @@ export const productionApi = createApi({
       getAllScrap: builder.query({
           query: ({shift}) =>
               `scrap/?shift=${shift}`,
-          providesTags: (result = []) => [
-              'Scrap',
-              ...result.map(({ id }) => ({ type: 'Scrap', id }))
-          ]
+          providesTags: (result) =>
+              result ?
+                  [
+                      ...result.map(({ id }) => ({ type: 'Scrap' as const, id })),
+                      { type: 'Scrap', id: 'LIST' },
+                  ]
+                  : { type: 'Scrap', id: 'LIST' },
       }),
       getScrap: builder.query({
           query: (scrap) =>
@@ -105,7 +115,7 @@ export const productionApi = createApi({
               method: 'POST',
               body: scrap,
           }),
-          invalidatesTags: ['Scrap', 'Shift'],
+          invalidatesTags: [{ type: 'Scrap', id: 'LIST' }],
       }),
       scrapUpdated: builder.mutation({
           query: (scrap) => ({
@@ -122,6 +132,8 @@ export const productionApi = createApi({
           }),
           invalidatesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
       }),
+
+
       productionInfoAdded: builder.mutation({
           query: (info) => ({
               url: 'product-info/',
@@ -130,6 +142,8 @@ export const productionApi = createApi({
           }),
           invalidatesTags: ['Shift']
       }),
+
+
       getAllProducts: builder.query({
           query: () => 'product',
       }),
@@ -152,6 +166,8 @@ export const productionApi = createApi({
           }),
           invalidatesTags: ['Shift'],
       }),
+
+
       orderAdded: builder.mutation({
           query: (order) => ({
               url: 'order/',

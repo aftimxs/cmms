@@ -23,7 +23,6 @@ import {produce} from "immer"
 import {
     useDowntimeUpdatedMutation,
     useLazyGetDowntimeQuery,
-    useLazyGetScrapQuery,
     useScrapAddedMutation,
     useScrapDeletedMutation,
     useScrapUpdatedMutation

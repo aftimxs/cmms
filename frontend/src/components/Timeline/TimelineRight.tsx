@@ -1,6 +1,6 @@
 import {useMemo} from "react";
 import {useAppSelector} from "../../app/hooks.ts";
-import {useGetLineState, useGetProductQuery} from "../../app/services/apiSplice.ts";
+import {useGetAllScrapQuery, useGetLineState, useGetProductQuery} from "../../app/services/apiSplice.ts";
 import _ from "lodash";
 import dayjs from "dayjs";
 
@@ -8,17 +8,18 @@ const TimelineRight = ({ hour } : any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const { shift, productID, production, scrap} = useGetLineState(lineParams, {
+     const { shift, productID, production, } = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : {rate:0} : {rate:0} : {rate:0},
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'], 'hour')[hour] : undefined : undefined,
-            scrap: state? state['shift'][0]? state['shift'][0]['scrap'] : undefined : undefined,
         })
     })
 
     const {data:product} = useGetProductQuery({id:productID})
+    const {data:scrap} = useGetAllScrapQuery({shift: shift?.id});
+
 
     const total = () => {
         let counter = 0;
@@ -35,7 +36,7 @@ const TimelineRight = ({ hour } : any) => {
         return [counter, scrapCounter];
     }
 
-    const partsMade = useMemo(() => total(), [shift])
+    const partsMade = useMemo(() => total(), [shift, scrap])
 
     return(
         <div className="col-1 text-center">

@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
     useGetLineState,
-    useGetProductQuery,
+    useGetProductQuery, useGetScrapQuery,
     useLazyGetDowntimeQuery, useLazyGetScrapQuery,
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
@@ -15,6 +15,7 @@ import Box from '@mui/material/Box';
 import {Container} from "@mui/material";
 import ScrapIndicator from "./ScrapIndicator.tsx";
 import _ from 'lodash';
+import {skipToken} from "@reduxjs/toolkit/query";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -149,15 +150,21 @@ const TimelineBar = ({ barData }:any) => {
     };
 
     const [getBarDowntime, {data:nonGreenData}] = useLazyGetDowntimeQuery();
-    const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+    //const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+
 
     const ID = `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`
 
-    useEffect(() => {
+    //const {data:scrap} = useGetScrapQuery((barData.bg !== 'bg-danger' && _.find(allScrap, {id:'S'+ID})) ? {id:'S'+ID} : skipToken);
+
+    const [queryScrap, setQueryScrap] = useState(false)
+
+    useEffect(()  => {
         if (barData.bg === 'bg-danger'){
             getBarDowntime({id: ID})
         } else if (barData.bg !== 'bg-danger' && _.find(allScrap, {id:'S'+ID})) {
-            getScrap({id: `S${ID}`})
+            //getScrap({id: `S${ID}`})
+            setQueryScrap(true)
         }
     }, [barData]);
 
@@ -174,7 +181,6 @@ const TimelineBar = ({ barData }:any) => {
                 setOpen={setOpen}
                 handleClick = {handleClick}
                 setBarReason = {setBarReason}
-                scrap={scrap}
             />
 
             <ProductionTooltip
@@ -214,7 +220,7 @@ const TimelineBar = ({ barData }:any) => {
                         {barData.bg !== 'bg-success' ? barReason : ' '}
 
                     </Box>
-                    {barData.bg !== 'bg-danger' ? <ScrapIndicator scrap={scrap}/> : <></>}
+                    {barData.bg !== 'bg-danger' ? <ScrapIndicator queryScrap={queryScrap} id={ID}/> : <></>}
                 </Container>
             </ProductionTooltip>
         </>

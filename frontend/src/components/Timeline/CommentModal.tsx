@@ -22,7 +22,7 @@ import _ from 'lodash';
 import {produce} from "immer"
 import {
     useDowntimeUpdatedMutation,
-    useLazyGetDowntimeQuery,
+    useLazyGetDowntimeQuery, useLazyGetScrapQuery,
     useScrapAddedMutation,
     useScrapDeletedMutation,
     useScrapUpdatedMutation
@@ -76,7 +76,7 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, setBarReason, scrap }:any) => {
+const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -105,17 +105,18 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason, scrap }:any) =
 
     //LAZY QUERIES TRIGGERS DECLARATION
     const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
-    //const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
+    const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
 
     //PULL INFO DEPENDING ON BAR TYPE
     useEffect(() => {
         if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
-            //getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
+            getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
         } else if (bar.background === 'bg-danger'){
             getDowntime(bar)
         }
     }, [bar]);
 
+    console.log(scrap)
 
     //LOGIC TO CHECK IF THERE IS INFO IN THE QUERIED VARIABLES
     let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
@@ -364,14 +365,18 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason, scrap }:any) =
                                         inputProps={{min:0, max:bar.parts}}
                                         sx={{mt:'10px'}}
                                         defaultValue={`${scrapQuantity}`}
-                                        onClick={() => postScrap({
-                                            id: `S${bar.id}`,
-                                            reason: null,
-                                            pieces: null,
-                                            comments: null,
-                                            minute: dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
-                                            shift: bar.shift,
-                                        })}
+                                        onClick={() => {
+                                            if (scrap === undefined) {
+                                                postScrap({
+                                                    id: `S${bar.id}`,
+                                                    reason: null,
+                                                    pieces: null,
+                                                    comments: null,
+                                                    minute: dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('HH:mm:ss'),
+                                                    shift: bar.shift,
+                                                })
+                                            }
+                                        }}
                                         onChange={(event) => updateScrap({
                                             id: `S${bar.id}`,
                                             reason: null,

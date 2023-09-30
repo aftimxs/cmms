@@ -13,6 +13,7 @@ import {
 import Grid from "@mui/material/Unstable_Grid2";
 import {minuteAdded, minutesReset} from "../../features/minutesSlice.tsx";
 import {produce} from "immer"
+import {Skeleton} from "@mui/material";
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -21,13 +22,14 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, productID, production, requestId} = useGetLineState(lineParams, {
-        selectFromResult: ({currentData:state, requestId}) => ({
+     const {shift, productID, production, requestId, isLoading} = useGetLineState(lineParams, {
+        selectFromResult: ({currentData:state, requestId, isLoading}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
             requestId,
+            isLoading,
         })
     })
 
@@ -197,6 +199,23 @@ const TimelineCenter = ({ hour }:any) => {
         return sortedBars;
     }, [shift, requestId])
 
+    if (isLoading) return (
+        <Grid
+            container
+            display="flex"
+            sx={{bgcolor:'rgb(44,44,44)', paddingX:0}}
+            xs={10}
+            alignItems={'center'}
+            component={'div'}
+        >
+            <Skeleton
+              sx={{ bgcolor: 'grey.800' }}
+              variant="rectangular"
+              width={'100%'}
+              height={'75%'}
+            />
+        </Grid>
+    )
 
     return (
         <Grid
@@ -207,12 +226,14 @@ const TimelineCenter = ({ hour }:any) => {
             alignItems={'center'}
             component={'div'}
         >
-            {bars.map((bar: any, index: number) =>
+            {
+                bars.map((bar: any, index: number) => (
                     <TimelineBar
                         key={index}
                         barData={bar}
                     />
-            )}
+                ))
+            }
         </Grid>
     )
 

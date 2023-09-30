@@ -3,6 +3,7 @@ import LineOptionMenu from "./LineOptionMenu.tsx";
 import { useState } from "react";
 import {useAppSelector} from "../../app/hooks.ts";
 import {
+    useGetAllScrapQuery,
     useGetLineState,
     useGetProductQuery,
 } from "../../app/services/apiSplice.ts";
@@ -13,17 +14,17 @@ const HeaderLeft = () => {
 
     const lineParams = useAppSelector(state => state.line)
 
-    const {shift, order, productID, scrap} = useGetLineState(lineParams, {
+    const {shift, order, productID} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
             order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
-            scrap: state? state['shift'][0]? state['shift'][0]['scrap'] : undefined : undefined,
         })
     })
 
     const {data:product} = useGetProductQuery({id:productID})
+    const {data:scrap} = useGetAllScrapQuery({shift: shift?.id});
 
     // SHOW PRODUCTION LINE MENU
     const [open, setOpen] = useState(false);

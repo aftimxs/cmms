@@ -6,6 +6,7 @@ import CommentModal from "./CommentModal.tsx";
 import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
+    useGetAllScrapQuery,
     useGetLineState,
     useGetProductQuery, useGetScrapQuery,
     useLazyGetDowntimeQuery, useLazyGetScrapQuery,
@@ -99,16 +100,16 @@ const TimelineBar = ({ barData }:any) => {
     const bars = useAppSelector(state => state.bars)
 
     const lineParams = useAppSelector(state => state.line)
-    const {shift, productID, allScrap} = useGetLineState(lineParams, {
+    const {shift, productID} = useGetLineState(lineParams, {
         selectFromResult: ({data: state}) => ({
             shift: state ? state['shift'][0] : undefined,
             productID: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
-            allScrap: state ? state['shift'][0] ? state['shift'][0]['scrap'] ? state['shift'][0]['scrap'] : undefined : undefined : undefined,
         })
     })
 
     const {data:product} = useGetProductQuery({id:productID})
+    const {data:allScrap} = useGetAllScrapQuery({shift: shift?.id});
 
     const w = barData.long * 1.6665
 

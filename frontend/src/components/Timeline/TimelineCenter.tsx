@@ -51,7 +51,7 @@ const TimelineCenter = ({ hour }:any) => {
     const [addDowntime] = useDowntimeAddedMutation()
 
     const postDowntime = async (downtime:any) => {
-        const query:any = _.find(downtimes, {'id':`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
+        const query:any = await _.find(downtimes, {'id':`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
         if (query){
             updateDowntime({
                 id: query.id,

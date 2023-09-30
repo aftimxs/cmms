@@ -12,7 +12,6 @@ function App(){
     const {isLoading} = useGetLineQuery(lineParams, {
         pollingInterval:30000
     });
-    console.log(isLoading)
 
     return (<div className="container-fluid" >
                 <Header/>

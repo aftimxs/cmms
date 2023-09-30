@@ -8,15 +8,14 @@ import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
     useGetAllScrapQuery,
     useGetLineState,
-    useGetProductQuery, useGetScrapQuery,
-    useLazyGetDowntimeQuery, useLazyGetScrapQuery,
+    useGetProductQuery,
+    useLazyGetDowntimeQuery,
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import Box from '@mui/material/Box';
-import {Container} from "@mui/material";
+import {Container, Skeleton} from "@mui/material";
 import ScrapIndicator from "./ScrapIndicator.tsx";
 import _ from 'lodash';
-import {skipToken} from "@reduxjs/toolkit/query";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -100,11 +99,12 @@ const TimelineBar = ({ barData }:any) => {
     const bars = useAppSelector(state => state.bars)
 
     const lineParams = useAppSelector(state => state.line)
-    const {shift, productID} = useGetLineState(lineParams, {
-        selectFromResult: ({data: state}) => ({
+    const {shift, productID, isLoading} = useGetLineState(lineParams, {
+        selectFromResult: ({data: state, isLoading}) => ({
             shift: state ? state['shift'][0] : undefined,
             productID: state ? state['shift'][0] ? state['shift'][0]['order'][0] ?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
+            isLoading,
         })
     })
 
@@ -192,37 +192,47 @@ const TimelineBar = ({ barData }:any) => {
                 leaveDelay={100}
                 arrow
             >
+                {
+                    isLoading ? (
+                        <Skeleton
+                            variant="rectangular"
+                            width={'100%'}
+                            height={'75%'}
+                            sx={{ bgcolor: 'grey.800' }}
+                        />
+                    ) : (
+                        <Container
+                            sx={{
+                                width:`${w}%`,
+                                height:'75%',
+                                backgroundColor: color(barData.bg),
+                                marginX:0,
+                                display:'grid',
+                                overflow: 'hidden'
+                            }}
+                            disableGutters
+                            maxWidth={false}
+                            onClick={handleOpen}
+                        >
+                            <Box
+                                sx={{height: '100%',
+                                    color: 'white',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1rem',
+                                    fontWeight: '400',
+                                    overflow: 'hidden',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {barData.bg !== 'bg-success' ? barReason : ' '}
 
-                <Container
-                    sx={{
-                        width:`${w}%`,
-                        height:'75%',
-                        backgroundColor: color(barData.bg),
-                        marginX:0,
-                        display:'grid',
-                        overflow: 'hidden'
-                    }}
-                    disableGutters
-                    maxWidth={false}
-                    onClick={handleOpen}
-                >
-                    <Box
-                        sx={{height: '100%',
-                            color: 'white',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '1rem',
-                            fontWeight: '400',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        {barData.bg !== 'bg-success' ? barReason : ' '}
-
-                    </Box>
-                    {barData.bg !== 'bg-danger' ? <ScrapIndicator queryScrap={queryScrap} id={ID}/> : <></>}
-                </Container>
+                            </Box>
+                            {barData.bg !== 'bg-danger' ? <ScrapIndicator queryScrap={queryScrap} id={ID}/> : <></>}
+                        </Container>
+                    )
+                }
             </ProductionTooltip>
         </>
     )

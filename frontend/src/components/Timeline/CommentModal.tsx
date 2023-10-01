@@ -1,6 +1,6 @@
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import {Container, InputAdornment, TextField} from "@mui/material";
+import {Alert, Container, InputAdornment, Snackbar, TextField} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -39,6 +39,7 @@ import CommentButton from "./CommentButton.tsx";
 import {useAppSelector} from "../../app/hooks.ts";
 import ScrapButton from "./ScrapButton.tsx";
 import {skipToken} from "@reduxjs/toolkit/query";
+import Slide, {SlideProps} from "@mui/material/Slide";
 
 
 const style = {
@@ -84,7 +85,12 @@ const theme = createTheme({
 });
 
 
-const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
+function SlideTransition(props: SlideProps) {
+    return <Slide {...props} direction="up"/>;
+}
+
+
+const CommentModal = ({ open, setOpen, handleClick }:any) => {
 
     const handleClose = () => {
         setOpen(false)
@@ -168,8 +174,8 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
     };
 
     //MUTATION TRIGGERS
-    const [updateDowntime] = useDowntimeUpdatedMutation()
-    const [updateScrap] = useScrapUpdatedMutation()
+    const [updateDowntime, {isSuccess:updateDowntimeSuccess}] = useDowntimeUpdatedMutation()
+    const [updateScrap, {isSuccess:updateScrapSuccess}] = useScrapUpdatedMutation()
     const [postScrap] = useScrapAddedMutation()
     const [deleteScrap] = useScrapDeletedMutation()
 
@@ -186,8 +192,34 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
       setExpanded(isExpanded ? panel : false);
     };
 
+
+    const [openSnack, setOpenSnack] = useState(false)
+
+    useEffect(() => {
+        if (updateScrapSuccess || updateDowntimeSuccess) {
+        setOpenSnack(true)
+        }
+    }, [updateScrapSuccess, updateDowntimeSuccess]);
+
     return(
         <>
+            <Snackbar
+                anchorOrigin={{ vertical:'bottom', horizontal: 'left' }}
+                open={openSnack}
+                TransitionComponent={SlideTransition}
+                autoHideDuration={4000}
+                onClose={() => setOpenSnack(false)}
+            >
+                <Alert
+                    severity="success"
+                    variant="filled"
+                    elevation={6}
+                    sx={{ width: '100%' }}
+                >
+                    Update Successful
+                </Alert>
+            </Snackbar>
+
             <Modal
               open={open}
               onClose={handleClose}
@@ -256,21 +288,18 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                                     comments={comments}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
-                                                    setBarReason={setBarReason}
                                                     title={'No material'}
                                                 />
                                                 <CommentButton
                                                     comments={comments}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
-                                                    setBarReason={setBarReason}
                                                     title={'No operators'}
                                                 />
                                                 <CommentButton
                                                     comments={comments}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
-                                                    setBarReason={setBarReason}
                                                     title={'Operators in training'}
                                                 />
                                             </List>
@@ -290,14 +319,12 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                                       comments={comments}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
-                                                      setBarReason={setBarReason}
                                                       title={'Planned maintenance'}
                                                   />
                                                 <CommentButton
                                                       comments={comments}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
-                                                      setBarReason={setBarReason}
                                                       title={'Unplanned maintenance'}
                                                   />
                                             </List>
@@ -317,7 +344,6 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                                       comments={comments}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
-                                                      setBarReason={setBarReason}
                                                       title={'Break'}
                                                   />
                                             </List>
@@ -335,7 +361,7 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
                                           shrink: true,
                                         }}
                                         disabled={!reasonState}
-                                        placeholder={description}
+                                        defaultValue={description}
                                         onChange={(event) => updateDowntime({...comments, description: event.target.value})}
                                     />
                                 </AccordionDetails>

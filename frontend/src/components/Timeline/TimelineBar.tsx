@@ -151,12 +151,8 @@ const TimelineBar = ({ barData }:any) => {
     };
 
     const [getBarDowntime, {currentData:nonGreenData}] = useLazyGetDowntimeQuery();
-    //const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
-
 
     const ID = `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`
-
-    //const {data:scrap} = useGetScrapQuery((barData.bg !== 'bg-danger' && _.find(allScrap, {id:'S'+ID})) ? {id:'S'+ID} : skipToken);
 
     const [queryScrap, setQueryScrap] = useState(false)
 
@@ -169,19 +165,12 @@ const TimelineBar = ({ barData }:any) => {
         }
     }, [barData]);
 
-    const [barReason, setBarReason] = useState('');
-
-    useEffect(() => {
-        setBarReason(nonGreenData?.reason)
-    }, [nonGreenData]);
-
     return(
         <>
             <CommentModal
                 open={open}
                 setOpen={setOpen}
                 handleClick = {handleClick}
-                setBarReason = {setBarReason}
             />
 
             <ProductionTooltip
@@ -217,7 +206,7 @@ const TimelineBar = ({ barData }:any) => {
                             whiteSpace: 'nowrap'
                     }}
                     >
-                        {barData.bg !== 'bg-success' ? barReason : ' '}
+                        {barData.bg !== 'bg-success' ? nonGreenData?.reason : ''}
                     </Box>
                     {barData.bg !== 'bg-danger' ? <ScrapIndicator queryScrap={queryScrap} id={ID}/> : <></>}
                 </Container>

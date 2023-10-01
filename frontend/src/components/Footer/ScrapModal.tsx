@@ -12,6 +12,7 @@ import {
 import {useAppSelector} from "../../app/hooks.ts";
 import List from "@mui/material/List";
 import ScrapListItem from "./ScrapListItem.tsx";
+import {skipToken} from "@reduxjs/toolkit/query";
 
 
 const style = {
@@ -41,7 +42,7 @@ const ScrapModal = ({ open, setOpen, value }:any) => {
         })
     })
 
-    const {data:allScrap} = useGetAllScrapQuery({shift: shift?.id});
+    const {data:allScrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
 
     return(
         <>

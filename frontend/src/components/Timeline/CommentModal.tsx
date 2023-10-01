@@ -111,20 +111,7 @@ const CommentModal = ({ open, setOpen, handleClick, setBarReason }:any) => {
     //GET SELECTED BAR INFO
     const bar = useAppSelector(state => state.downtime)
 
-    ////LAZY QUERIES TRIGGERS DECLARATION
-    //const [getDowntime, {data:comments}] = useLazyGetDowntimeQuery()
-    //const [getScrap, {data:scrap}] = useLazyGetScrapQuery()
-//
-    ////PULL INFO DEPENDING ON BAR TYPE
-    //useEffect(() => {
-    //    if (bar.background === 'bg-success' ||  bar.background === 'bg-warning') {
-    //        getScrap({id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`})
-    //    } else if (bar.background === 'bg-danger'){
-    //        getDowntime(bar)
-    //    }
-    //}, [bar]);
-
-    const {data:scrap} = useGetScrapQuery(bar.background !== 'bg-danger' ?
+    const {data:scrap} = useGetScrapQuery(bar.background === 'bg-success' || bar.background === 'bg-warning' ?
         {id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`} : skipToken);
 
     const {data:comments} = useGetDowntimeQuery(bar.background === 'bg-danger' ? bar : skipToken);

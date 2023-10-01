@@ -3,6 +3,7 @@ import {useAppSelector} from "../../app/hooks.ts";
 import {useGetAllScrapQuery, useGetLineState, useGetProductQuery} from "../../app/services/apiSplice.ts";
 import _ from "lodash";
 import dayjs from "dayjs";
+import {skipToken} from "@reduxjs/toolkit/query";
 
 const TimelineRight = ({ hour } : any) => {
 
@@ -12,13 +13,13 @@ const TimelineRight = ({ hour } : any) => {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
-                state['shift'][0]['order'][0]['product'] : {rate:0} : {rate:0} : {rate:0},
+                state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'], 'hour')[hour] : undefined : undefined,
         })
     })
 
-    const {data:product} = useGetProductQuery({id:productID})
-    const {data:scrap} = useGetAllScrapQuery({shift: shift?.id});
+    const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
+    const {data:scrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
 
 
     const total = () => {

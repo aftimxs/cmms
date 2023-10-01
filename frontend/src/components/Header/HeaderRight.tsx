@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Unstable_Grid2";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
 import CheckIcon from '@mui/icons-material/Check';
-import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
 
 
 // @ts-ignore
@@ -60,16 +60,22 @@ const HeaderRight = () => {
                         disableElevation
                         fullWidth
                     >
-                        <IconButton onClick={handleBackShift}> <ChevronLeftIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
-                        <IconButton onClick={handleForwardShift}> <ChevronRightIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
-                        <IconButton onClick={handleTodayShift}> <LastPageIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                         <Tooltip title={'Previous Shift'}>
+                             <IconButton onClick={handleBackShift}> <ChevronLeftIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                         </Tooltip>
+                         <Tooltip title={'Next Shift'}>
+                             <IconButton onClick={handleForwardShift}> <ChevronRightIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                         </Tooltip>
+                         <Tooltip title={'Today'}>
+                             <IconButton onClick={handleTodayShift}> <LastPageIcon sx={{color:'#e3f2fd'}} fontSize="large"/> </IconButton>
+                         </Tooltip>
                     </ButtonGroup>
                 </Grid>
                <Grid display="flex" justifyContent="center" alignItems="center">
                    {isFetching ? (
-                       <CircularProgress size={'1.5rem'} color={'inherit'}/>
+                       <Tooltip title={'Fetching'}><CircularProgress size={'1.5rem'} color={'inherit'}/></Tooltip>
                        ) : (
-                           <CheckIcon sx={{fontSize:'1.5rem', color:'#4caf50'}}/>
+                       <Tooltip title={'Up to date'}><CheckIcon sx={{fontSize:'1.5rem', color:'#4caf50'}}/></Tooltip>
                        )
                    }
                </Grid>

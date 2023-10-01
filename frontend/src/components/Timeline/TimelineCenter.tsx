@@ -14,6 +14,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import {minuteAdded, minutesReset} from "../../features/minutesSlice.tsx";
 import {produce} from "immer"
 import {Skeleton} from "@mui/material";
+import {skipToken} from "@reduxjs/toolkit/query";
 
 
 const TimelineCenter = ({ hour }:any) => {
@@ -23,7 +24,7 @@ const TimelineCenter = ({ hour }:any) => {
     const lineParams = useAppSelector(state => state.line)
 
      const {shift, productID, production, requestId, isLoading} = useGetLineState(lineParams, {
-        selectFromResult: ({currentData:state, requestId, isLoading}) => ({
+        selectFromResult: ({currentData:state, requestId, isFetching, isLoading}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
@@ -33,8 +34,8 @@ const TimelineCenter = ({ hour }:any) => {
         })
     })
 
-    const {data:product} = useGetProductQuery({id:productID})
-    const {data:downtimes} = useGetShiftDowntimesQuery({shiftId: shift?.id})
+    const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
+    const {currentData:downtimes} = useGetShiftDowntimesQuery(shift ? {shiftId: shift?.id} : skipToken)
 
     const now = dayjs();
 
@@ -54,20 +55,22 @@ const TimelineCenter = ({ hour }:any) => {
 
     const postDowntime = async (downtime:any) => {
         const query:any = await _.find(downtimes, {'id':`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
-        if (query){
-            updateDowntime({
-                id: query.id,
-                start: query.start,
-                end:dayjs(downtime.minute).format('HH:mm:ss'),
-                shift: query.shift,
-            })
-        } else {
-            addDowntime({
-                id: `${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`,
-                start: dayjs(downtime.startTime).format('HH:mm:ss'),
-                end: dayjs(downtime.minute).format('HH:mm:ss'),
-                shift: shift?.id,
-            })
+        if (downtimes) {
+            if (query){
+                updateDowntime({
+                    id: query.id,
+                    start: query.start,
+                    end:dayjs(downtime.minute).format('HH:mm:ss'),
+                    shift: query.shift,
+                })
+            } else {
+                addDowntime({
+                    id: `${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`,
+                    start: dayjs(downtime.startTime).format('HH:mm:ss'),
+                    end: dayjs(downtime.minute).format('HH:mm:ss'),
+                    shift: shift?.id,
+                })
+            }
         }
     }
 

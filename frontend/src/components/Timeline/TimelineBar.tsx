@@ -13,9 +13,10 @@ import {
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import Box from '@mui/material/Box';
-import {Container, Skeleton} from "@mui/material";
+import {Container} from "@mui/material";
 import ScrapIndicator from "./ScrapIndicator.tsx";
 import _ from 'lodash';
+import {skipToken} from "@reduxjs/toolkit/query";
 
 
 const ProductionTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -107,8 +108,8 @@ const TimelineBar = ({ barData }:any) => {
         })
     })
 
-    const {data:product} = useGetProductQuery({id:productID})
-    const {data:allScrap} = useGetAllScrapQuery({shift: shift?.id});
+    const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
+    const {data:allScrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
 
     const w = barData.long * 1.6665
 

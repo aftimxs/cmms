@@ -7,6 +7,8 @@ import {
     useGetLineState,
     useGetProductQuery,
 } from "../../app/services/apiSplice.ts";
+import Tooltip from "@mui/material/Tooltip";
+import {skipToken} from "@reduxjs/toolkit/query";
 
 
 // @ts-ignore
@@ -23,8 +25,8 @@ const HeaderLeft = () => {
         })
     })
 
-    const {data:product} = useGetProductQuery({id:productID})
-    const {data:scrap} = useGetAllScrapQuery({shift: shift?.id});
+    const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
+    const {data:scrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
 
     // SHOW PRODUCTION LINE MENU
     const [open, setOpen] = useState(false);
@@ -58,21 +60,23 @@ const HeaderLeft = () => {
                         <i className="bi bi-list" style={{fontSize: "1.5rem"}}></i>
                     </div>
 
-                    <button type="button" className="btn col-7" onClick={handleOpen}>
-                    <div className="row">
-                        <div className="col-2">
-                            <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
-                        </div>
-                        <div className=" col-10">
-                            <div className=" row">
-                                <span className=" titles">PRODUCTION LINE</span>
+                    <Tooltip title={'Select production line'}>
+                        <button type="button" className="btn col-7" onClick={handleOpen}>
+                        <div className="row">
+                            <div className="col-2">
+                                <i className="bi bi-person-workspace" style={{fontSize: "1.5rem"}}></i>
                             </div>
-                            <div className=" row">
-                                <span>{`${lineParams.area} ${lineParams.cell}`}</span>
+                            <div className=" col-10">
+                                <div className=" row">
+                                    <span className=" titles">PRODUCTION LINE</span>
+                                </div>
+                                <div className=" row">
+                                    <span>{`${lineParams.area} ${lineParams.cell}`}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    </button>
+                        </button>
+                    </Tooltip>
 
                     <div className=" col-1">
                     </div>
@@ -114,9 +118,11 @@ const HeaderLeft = () => {
                     <div className=" col-8 pt-1">
                         <ProgressBar progress={progress}/>
                     </div>
-                    <div className=" col-4 text-end">
-                        <span>{total} <span style={{color:'#ffc107'}}>({totalScrap})</span> / {order? order.quantity : 0} pcs</span>
-                    </div>
+                    <Tooltip title={'Made (Scrap) / Total'}>
+                        <div className=" col-4 text-end">
+                            <span>{total} <span style={{color:'#ffc107'}}>({totalScrap})</span> / {order? order.quantity : 0} pcs</span>
+                        </div>
+                    </Tooltip>
                 </div>
             </div>
 

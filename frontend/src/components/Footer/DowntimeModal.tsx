@@ -1,16 +1,13 @@
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import {
-    Container,
-} from "@mui/material";
+import {Container,} from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
 import Divider from '@mui/material/Divider';
-import {
-    useGetLineState, useGetShiftDowntimesQuery,
-} from "../../app/services/apiSplice.ts";
+import {useGetLineState, useGetShiftDowntimesQuery,} from "../../app/services/apiSplice.ts";
 import {useAppSelector} from "../../app/hooks.ts";
 import DowntimeListItem from "./DowntimeListItem.tsx";
 import List from "@mui/material/List";
+import {skipToken} from "@reduxjs/toolkit/query";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -39,7 +36,7 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
         })
     })
 
-    const {data:allDowntimes} = useGetShiftDowntimesQuery({shiftId: shift?.id});
+    const {data:allDowntimes} = useGetShiftDowntimesQuery(shift ? {shiftId: shift?.id} : skipToken);
 
     return(
         <>

@@ -24,7 +24,7 @@ export const productionApi = createApi({
     baseQuery: fetchBaseQuery({
     baseUrl: 'http://127.0.0.1:8000/api/',
   }),
-  tagTypes: ['Shift', 'Downtime', 'Scrap'],
+  tagTypes: ['Shift', 'Downtime', 'Scrap', 'Product'],
   endpoints: (builder) => ({
       getAllLines: builder.query({
           query: () => 'production-line',
@@ -144,11 +144,13 @@ export const productionApi = createApi({
       }),
 
 
+      //PRODUCTS
       getAllProducts: builder.query({
           query: () => 'product',
       }),
       getProduct: builder.query({
-          query: ({id}) => `product/${id}/`,
+          query: (product) => `product/${product.id}/`,
+          providesTags: ['Shift'],
       }),
       productUpdated: builder.mutation({
           query: (order) => ({

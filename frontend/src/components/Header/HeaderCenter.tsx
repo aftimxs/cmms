@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
+import {CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import CustomTooltip from "./CustomTooltip.tsx";
 import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
 import * as dayjs from 'dayjs'
@@ -6,6 +6,9 @@ import {useAppSelector} from "../../app/hooks.ts";
 import {useState} from "react";
 import {useGetLineState, useGetProductQuery} from "../../app/services/apiSplice.ts";
 import _ from 'lodash';
+import {Tooltip as Tool} from "@mui/material";
+import {skipToken} from "@reduxjs/toolkit/query";
+
 
 const HeaderCenter = () => {
 
@@ -21,7 +24,7 @@ const HeaderCenter = () => {
         })
     })
 
-    const {data:product} = useGetProductQuery({id:productID})
+    const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
 
     // SHOW SHIFT SELECTOR MENU
     const [show, setShow] = useState(false);
@@ -38,24 +41,26 @@ const HeaderCenter = () => {
             />
 
             <div className="col-5">
-                <div className="container py-0">
-                    <button type="button" className="btn w-100" onClick={handleShow}>
-                        <div className="row">
-                            <div className="col-2 text-center">
-                                <i className="bi bi-calendar" style={{fontSize: "1.5rem"}}></i>
-                            </div>
-                            <div className="col-10">
-                                <div className="row">
-                                    <span className="titles">SHIFT</span>
+                <Tool title={'Select date and shift'}>
+                    <div className="container py-0">
+                        <button type="button" className="btn w-100" onClick={handleShow}>
+                            <div className="row">
+                                <div className="col-2 text-center">
+                                    <i className="bi bi-calendar" style={{fontSize: "1.5rem"}}></i>
                                 </div>
-                                <div className="row">
-                                    <span>{`${dayjs(lineParams.date).
-                                    format('dddd DD/MM/YYYY')} - Shift ${lineParams.number}`}</span>
+                                <div className="col-10">
+                                    <div className="row">
+                                        <span className="titles">SHIFT</span>
+                                    </div>
+                                    <div className="row">
+                                        <span>{`${dayjs(lineParams.date).
+                                        format('dddd DD/MM/YYYY')} - Shift ${lineParams.number}`}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </button>
-                </div>
+                        </button>
+                    </div>
+                </Tool>
 
                 <div className="container py-0">
                     <div className="row">

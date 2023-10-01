@@ -18,13 +18,13 @@ const HeaderCenter = () => {
     const orderedMinutes = _.orderBy(minutes, ['id'], ['asc']);
 
     const {productID} = useGetLineState(lineParams, {
-        selectFromResult: ({data:state}) => ({
+        selectFromResult: ({currentData:state}) => ({
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
         })
     })
 
-    const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
+    const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
 
     // SHOW SHIFT SELECTOR MENU
     const [show, setShow] = useState(false);

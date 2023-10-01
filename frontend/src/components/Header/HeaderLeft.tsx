@@ -17,7 +17,7 @@ const HeaderLeft = () => {
     const lineParams = useAppSelector(state => state.line)
 
     const {shift, order, productID} = useGetLineState(lineParams, {
-        selectFromResult: ({data:state}) => ({
+        selectFromResult: ({currentData:state}) => ({
             shift: state? state['shift'][0] : undefined,
             order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
@@ -25,8 +25,8 @@ const HeaderLeft = () => {
         })
     })
 
-    const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
-    const {data:scrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
+    const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
+    const {currentData:scrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
 
     // SHOW PRODUCTION LINE MENU
     const [open, setOpen] = useState(false);

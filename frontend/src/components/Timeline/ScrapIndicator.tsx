@@ -2,9 +2,9 @@ import Box from "@mui/material/Box";
 import {useGetScrapQuery} from "../../app/services/apiSplice.ts";
 import {skipToken} from "@reduxjs/toolkit/query";
 
-const ScrapIndicator = ({queryScrap, id}) => {
+const ScrapIndicator = ({queryScrap, id}:any) => {
 
-    const {data:scrap} = useGetScrapQuery(queryScrap ? {id:'S'+id} : skipToken);
+    const {currentData:scrap} = useGetScrapQuery(queryScrap ? {id:'S'+id} : skipToken);
 
     const color = scrap ? scrap.pieces ?  '#ffc107' : '#FFFFFF' : '#FFFFFF';
 

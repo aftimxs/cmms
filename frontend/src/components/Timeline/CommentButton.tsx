@@ -1,12 +1,9 @@
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
-import {useDowntimeUpdatedMutation} from "../../app/services/apiSplice.ts";
 import Box from "@mui/material/Box";
 
 
-const CommentButton = ({comments, reasonState, setReasonState, title}:any) => {
-
-    const [updateDowntime] = useDowntimeUpdatedMutation()
+const CommentButton = ({comments, reasonState, setReasonState, title, updateDowntime}:any) => {
 
     return(
         <Box>

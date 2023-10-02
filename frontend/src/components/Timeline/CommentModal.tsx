@@ -174,8 +174,8 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
     };
 
     //MUTATION TRIGGERS
-    const [updateDowntime, {isSuccess:updateDowntimeSuccess}] = useDowntimeUpdatedMutation()
-    const [updateScrap, {isSuccess:updateScrapSuccess}] = useScrapUpdatedMutation()
+    const [updateDowntime, {isSuccess:updateDowntimeSuccess, isError:updateDowntimeError}] = useDowntimeUpdatedMutation()
+    const [updateScrap, {isSuccess:updateScrapSuccess, isError:updateScrapError}] = useScrapUpdatedMutation()
     const [postScrap] = useScrapAddedMutation()
     const [deleteScrap] = useScrapDeletedMutation()
 
@@ -194,12 +194,17 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
 
 
     const [openSnack, setOpenSnack] = useState(false)
+    const [severity, setSeverity] = useState('success')
 
     useEffect(() => {
         if (updateScrapSuccess || updateDowntimeSuccess) {
-        setOpenSnack(true)
+            setOpenSnack(true)
+            setSeverity('success')
+        } else if (updateScrapError || updateDowntimeError) {
+            setOpenSnack(true)
+            setSeverity('error')
         }
-    }, [updateScrapSuccess, updateDowntimeSuccess]);
+    }, [updateScrapSuccess, updateDowntimeSuccess, updateScrapError, updateDowntimeError]);
 
     return(
         <>
@@ -211,12 +216,12 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                 onClose={() => setOpenSnack(false)}
             >
                 <Alert
-                    severity="success"
+                    severity={severity}
                     variant="filled"
                     elevation={6}
                     sx={{ width: '100%' }}
                 >
-                    Update Successful
+                    {severity==='success' ? 'Update Successful' : 'Something went wrong! Try again'}
                 </Alert>
             </Snackbar>
 
@@ -289,18 +294,21 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     title={'No material'}
+                                                    updateDowntime={updateDowntime}
                                                 />
                                                 <CommentButton
                                                     comments={comments}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     title={'No operators'}
+                                                    updateDowntime={updateDowntime}
                                                 />
                                                 <CommentButton
                                                     comments={comments}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     title={'Operators in training'}
+                                                    updateDowntime={updateDowntime}
                                                 />
                                             </List>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
@@ -320,12 +328,14 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
                                                       title={'Planned maintenance'}
+                                                      updateDowntime={updateDowntime}
                                                   />
                                                 <CommentButton
                                                       comments={comments}
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
                                                       title={'Unplanned maintenance'}
+                                                      updateDowntime={updateDowntime}
                                                   />
                                             </List>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
@@ -345,6 +355,14 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                                                       reasonState={reasonState}
                                                       setReasonState={setReasonState}
                                                       title={'Break'}
+                                                      updateDowntime={updateDowntime}
+                                                  />
+                                                <CommentButton
+                                                      comments={comments}
+                                                      reasonState={reasonState}
+                                                      setReasonState={setReasonState}
+                                                      title={'Other'}
+                                                      updateDowntime={updateDowntime}
                                                   />
                                             </List>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>

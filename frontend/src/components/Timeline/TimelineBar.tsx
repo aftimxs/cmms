@@ -1,5 +1,5 @@
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-import { styled } from '@mui/material/styles';
+import Tooltip, {tooltipClasses, TooltipProps} from '@mui/material/Tooltip';
+import {styled} from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import CommentModal from "./CommentModal.tsx";
@@ -7,8 +7,9 @@ import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
     useGetAllScrapQuery,
+    useGetDowntimeQuery,
     useGetLineState,
-    useGetProductQuery,
+    useGetProductQuery, useGetSpeedLossQuery,
     useLazyGetDowntimeQuery,
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
@@ -150,15 +151,18 @@ const TimelineBar = ({ barData }:any) => {
             }
     };
 
-    const [getBarDowntime, {currentData:nonGreenData}] = useLazyGetDowntimeQuery();
+    const ID = `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`;
 
-    const ID = `${dayjs(barData.startTime, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${shift?.id}`
+    //const [getBarDowntime, {currentData:redBarData}] = useLazyGetDowntimeQuery();
+    const {data:redBarData} = useGetDowntimeQuery(barData.bg === 'bg-danger' ? {id: ID} : skipToken);
+    const {data:yellowBarData} = useGetSpeedLossQuery(barData.bg === 'bg-warning' ? {id: ID} : skipToken);
+
 
     const [queryScrap, setQueryScrap] = useState(false)
 
     useEffect(()  => {
         if (barData.bg === 'bg-danger'){
-            getBarDowntime({id: ID})
+            //getBarDowntime({id: ID})
         } else if (barData.bg !== 'bg-danger' && _.find(allScrap, {id:'S'+ID})) {
             //getScrap({id: `S${ID}`})
             setQueryScrap(true)
@@ -206,7 +210,8 @@ const TimelineBar = ({ barData }:any) => {
                             whiteSpace: 'nowrap'
                     }}
                     >
-                        {barData.bg !== 'bg-success' ? nonGreenData?.reason : ''}
+                        {barData.bg === 'bg-danger' ? redBarData?.reason :
+                            barData.bg === 'bg-warning' ? yellowBarData?.reason : ''}
                     </Box>
                     {barData.bg !== 'bg-danger' ? <ScrapIndicator queryScrap={queryScrap} id={ID}/> : <></>}
                 </Container>

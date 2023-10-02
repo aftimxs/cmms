@@ -30,10 +30,10 @@ import {produce} from "immer"
 import {
     useDowntimeUpdatedMutation,
     useGetDowntimeQuery,
-    useGetScrapQuery,
+    useGetScrapQuery, useGetSpeedLossQuery,
     useScrapAddedMutation,
     useScrapDeletedMutation,
-    useScrapUpdatedMutation
+    useScrapUpdatedMutation, useSpeedlossUpdatedMutation
 } from "../../app/services/apiSplice.ts";
 import CommentButton from "./CommentButton.tsx";
 import {useAppSelector} from "../../app/hooks.ts";
@@ -121,6 +121,7 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
         {id: `S${dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('DDMMYYHHmm')}${bar.shift}`} : skipToken);
 
     const {data:comments} = useGetDowntimeQuery(bar.background === 'bg-danger' ? bar : skipToken);
+    const {data:warning} = useGetSpeedLossQuery(bar.background === 'bg-warning' ? bar : skipToken);
 
 
     //LOGIC TO CHECK IF THERE IS INFO IN THE QUERIED VARIABLES
@@ -174,10 +175,11 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
     };
 
     //MUTATION TRIGGERS
-    const [updateDowntime, {isSuccess:updateDowntimeSuccess, isError:updateDowntimeError}] = useDowntimeUpdatedMutation()
-    const [updateScrap, {isSuccess:updateScrapSuccess, isError:updateScrapError}] = useScrapUpdatedMutation()
-    const [postScrap] = useScrapAddedMutation()
-    const [deleteScrap] = useScrapDeletedMutation()
+    const [updateDowntime, {isSuccess:updateDowntimeSuccess, isError:updateDowntimeError}] = useDowntimeUpdatedMutation();
+    const [updateSpeedLoss, {isSuccess:updateSpeedLossSuccess, isError:updateSpeedLossError}] = useSpeedlossUpdatedMutation();
+    const [updateScrap, {isSuccess:updateScrapSuccess, isError:updateScrapError}] = useScrapUpdatedMutation();
+    const [postScrap] = useScrapAddedMutation();
+    const [deleteScrap] = useScrapDeletedMutation();
 
     //CHECK IF SCRAP PIECES ARE 0
     const checkScrapPieces = () => {
@@ -290,26 +292,26 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                             <List component="div" disablePadding>
                                                 <CommentButton
-                                                    comments={comments}
+                                                    info={circleColor === 'red' ? comments : warning}
                                                     reasonState={reasonState}
                                                     setReasonState={setReasonState}
                                                     title={'No material'}
-                                                    updateDowntime={updateDowntime}
+                                                    update={circleColor === 'red' ? updateDowntime : updateSpeedLoss}
                                                 />
-                                                <CommentButton
-                                                    comments={comments}
-                                                    reasonState={reasonState}
-                                                    setReasonState={setReasonState}
-                                                    title={'No operators'}
-                                                    updateDowntime={updateDowntime}
-                                                />
-                                                <CommentButton
-                                                    comments={comments}
-                                                    reasonState={reasonState}
-                                                    setReasonState={setReasonState}
-                                                    title={'Operators in training'}
-                                                    updateDowntime={updateDowntime}
-                                                />
+                                                {/*<CommentButton*/}
+                                                {/*    comments={comments}*/}
+                                                {/*    reasonState={reasonState}*/}
+                                                {/*    setReasonState={setReasonState}*/}
+                                                {/*    title={'No operators'}*/}
+                                                {/*    updateDowntime={updateDowntime}*/}
+                                                {/*>*/}
+                                                {/*<CommentButton*/}
+                                                {/*    comments={comments}*/}
+                                                {/*    reasonState={reasonState}*/}
+                                                {/*    setReasonState={setReasonState}*/}
+                                                {/*    title={'Operators in training'}*/}
+                                                {/*    updateDowntime={updateDowntime}*/}
+                                                {/*>*/}
                                             </List>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                         </Collapse>
@@ -323,20 +325,20 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                                         <Collapse in={openList[1].active} timeout="auto" unmountOnExit>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                             <List component="div" disablePadding>
-                                                <CommentButton
-                                                      comments={comments}
-                                                      reasonState={reasonState}
-                                                      setReasonState={setReasonState}
-                                                      title={'Planned maintenance'}
-                                                      updateDowntime={updateDowntime}
-                                                  />
-                                                <CommentButton
-                                                      comments={comments}
-                                                      reasonState={reasonState}
-                                                      setReasonState={setReasonState}
-                                                      title={'Unplanned maintenance'}
-                                                      updateDowntime={updateDowntime}
-                                                  />
+                                                {/*<CommentButton*/}
+                                                {/*      comments={comments}*/}
+                                                {/*      reasonState={reasonState}*/}
+                                                {/*      setReasonState={setReasonState}*/}
+                                                {/*      title={'Planned maintenance'}*/}
+                                                {/*      updateDowntime={updateDowntime}*/}
+                                                {/*  />*/}
+                                                {/*<CommentButton*/}
+                                                {/*      comments={comments}*/}
+                                                {/*      reasonState={reasonState}*/}
+                                                {/*      setReasonState={setReasonState}*/}
+                                                {/*      title={'Unplanned maintenance'}*/}
+                                                {/*      updateDowntime={updateDowntime}*/}
+                                                {/*  />*/}
                                             </List>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                         </Collapse>
@@ -350,20 +352,20 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
                                         <Collapse in={openList[2].active} timeout="auto" unmountOnExit>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                             <List component="div" disablePadding>
-                                                <CommentButton
-                                                      comments={comments}
-                                                      reasonState={reasonState}
-                                                      setReasonState={setReasonState}
-                                                      title={'Break'}
-                                                      updateDowntime={updateDowntime}
-                                                  />
-                                                <CommentButton
-                                                      comments={comments}
-                                                      reasonState={reasonState}
-                                                      setReasonState={setReasonState}
-                                                      title={'Other'}
-                                                      updateDowntime={updateDowntime}
-                                                  />
+                                                {/*<CommentButton*/}
+                                                {/*      comments={comments}*/}
+                                                {/*      reasonState={reasonState}*/}
+                                                {/*      setReasonState={setReasonState}*/}
+                                                {/*      title={'Break'}*/}
+                                                {/*      updateDowntime={updateDowntime}*/}
+                                                {/*  />*/}
+                                                {/*<CommentButton*/}
+                                                {/*      comments={comments}*/}
+                                                {/*      reasonState={reasonState}*/}
+                                                {/*      setReasonState={setReasonState}*/}
+                                                {/*      title={'Other'}*/}
+                                                {/*      updateDowntime={updateDowntime}*/}
+                                                {/*  />*/}
                                             </List>
                                             <Divider variant="fullWidth" orientation={'horizontal'} flexItem={true} sx={{bgcolor:'black'}}/>
                                         </Collapse>

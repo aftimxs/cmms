@@ -8,7 +8,11 @@ import {
     useDowntimeAddedMutation,
     useDowntimeUpdatedMutation,
     useGetLineState,
-    useGetProductQuery, useGetShiftDowntimesQuery,
+    useGetProductQuery,
+    useGetShiftDowntimesQuery, useGetShiftSpeedLossQuery,
+    useScrapUpdatedMutation,
+    useSpeedlossAddedMutation,
+    useSpeedlossUpdatedMutation,
 } from "../../app/services/apiSplice.ts";
 import Grid from "@mui/material/Unstable_Grid2";
 import {minuteAdded, minutesReset} from "../../features/minutesSlice.tsx";
@@ -23,7 +27,7 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, productID, production, requestId, isLoading} = useGetLineState(lineParams, {
+     const {shift, productID, production, requestId, isLoading, isFetching} = useGetLineState(lineParams, {
         selectFromResult: ({currentData:state, requestId, isFetching, isLoading}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
@@ -31,11 +35,13 @@ const TimelineCenter = ({ hour }:any) => {
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
             requestId,
             isLoading,
+            isFetching
         })
     })
 
     const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
     const {currentData:downtimes} = useGetShiftDowntimesQuery(shift ? {shiftId: shift?.id} : skipToken)
+    const {currentData:speedlosses} = useGetShiftSpeedLossQuery(shift ? {shiftId: shift?.id} : skipToken)
 
     const now = dayjs();
 
@@ -50,8 +56,11 @@ const TimelineCenter = ({ hour }:any) => {
     }
 
     //POST OR PUT BARS TO DB
-    const [updateDowntime] = useDowntimeUpdatedMutation()
-    const [addDowntime] = useDowntimeAddedMutation()
+    const [updateDowntime] = useDowntimeUpdatedMutation();
+    const [addDowntime] = useDowntimeAddedMutation();
+
+    const [updateSpeedLoss] = useSpeedlossUpdatedMutation();
+    const [addSpeedLoss] = useSpeedlossAddedMutation();
 
     const postDowntime = async (downtime:any) => {
         const query:any = await _.find(downtimes, {'id':`${dayjs(downtime.startTime).format('DDMMYYHHmm')}${shift?.id}`})
@@ -74,14 +83,31 @@ const TimelineCenter = ({ hour }:any) => {
         }
     }
 
-    useEffect(() => {
-        if (hour === '06:00:00' || hour === '15:00:00'){
-            dispatch(barsReset())
-            dispatch(minutesReset())
+    const postSpeedLoss = async (speedLoss:any) => {
+        const query:any = await _.find(speedlosses, {'id':`${dayjs(speedLoss.startTime).format('DDMMYYHHmm')}${shift?.id}`})
+        if (speedlosses) {
+            if (query){
+                updateSpeedLoss({
+                    id: query.id,
+                    start: query.start,
+                    end:dayjs(speedLoss.minute).format('HH:mm:ss'),
+                    shift: query.shift,
+                })
+            } else {
+                addSpeedLoss({
+                    id: `${dayjs(speedLoss.startTime).format('DDMMYYHHmm')}${shift?.id}`,
+                    start: dayjs(speedLoss.startTime).format('HH:mm:ss'),
+                    end: dayjs(speedLoss.minute).format('HH:mm:ss'),
+                    shift: shift?.id,
+                })
+            }
         }
+    }
+
+    useEffect(() => {
         // @ts-ignore
         setBars(background(now))
-    }, [shift, requestId]);
+    }, [shift, requestId, product]);
 
 
     //MAKE ARRAY OF ALL THE BARS IN THAT HOUR
@@ -94,6 +120,11 @@ const TimelineCenter = ({ hour }:any) => {
         let ms = [...minutes];
         let barsProv:any = [];
         let previous = now;
+
+        if (hour === '06:00:00' || hour === '15:00:00'){
+            dispatch(barsReset())
+            dispatch(minutesReset())
+        }
 
         //CHECK IF THIS MINUTES COLOR MATCHES PREVIOUS MINUTE COLOR
         const checkColor = (c:string, min:dayjs.Dayjs, unused:boolean, items:number) => {
@@ -136,13 +167,13 @@ const TimelineCenter = ({ hour }:any) => {
 
         //GET BGCOLOR FOR EACH MINUTE WITH DATA
         production?.forEach((info:any) => {
-            dispatch(minuteAdded({
-                id: Number(dayjs(info.minute, 'H:mm').format('Hmm')),
-                minute: dayjs(info.minute, 'H:mm').format('h:mm a'),
-                count: info.item_count
-            }))
             for (let i = 0; i < minutes.length; i++) {
                 if (dayjs(info.minute, 'H:mm').minute() === minutes[i].minute()) {
+                    dispatch(minuteAdded({
+                        id: Number(dayjs(info.minute, 'H:mm').format('Hmm')),
+                        minute: dayjs(info.minute, 'H:mm').format('h:mm a'),
+                        count: info.item_count
+                    }))
                     if (info.item_count >= (product?.rate / 60)) {
                         checkColor('bg-success', minutes[i], false, info.item_count)
                     } else if (info.item_count < (product?.rate / 60) && info.item_count > 0) {
@@ -189,18 +220,23 @@ const TimelineCenter = ({ hour }:any) => {
                parts: bar.parts,
            }))
         })
-
+        console.log(sortedBars)
         //GROUP RED BARS INTO ARRAY AND POST TO DATABASE
-        let danger = _.groupBy(sortedBars, 'bg')
+        const bgGrouped = _.groupBy(sortedBars, 'bg')
         // @ts-ignore
-        danger = _.flatten(danger['bg-danger'])
-        // @ts-ignore
+        const danger = _.flatten(bgGrouped['bg-danger'])
+        const warning = _.flatten(bgGrouped['bg-warning'])
+
         for (let j = 0; j < danger.length; j++){
             postDowntime(danger[j])
         }
 
+        for (let q = 0; q < warning.length; q++){
+            postSpeedLoss(warning[q])
+        }
+
         return sortedBars;
-    }, [shift, requestId])
+    }, [shift, requestId, product])
 
     if (isLoading) return (
         <Grid

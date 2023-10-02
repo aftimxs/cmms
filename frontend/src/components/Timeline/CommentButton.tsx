@@ -3,14 +3,14 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Box from "@mui/material/Box";
 
 
-const CommentButton = ({comments, reasonState, setReasonState, title, updateDowntime}:any) => {
+const CommentButton = ({info, reasonState, setReasonState, title, update}:any) => {
 
     return(
         <Box>
             <ListItemButton
                 sx={{ pl: 9 }}
                 onClick={() => {
-                    updateDowntime({...comments, reason: title})
+                    update({...info, reason: title})
                     setReasonState(title)
                 }}
                 selected={reasonState === title}

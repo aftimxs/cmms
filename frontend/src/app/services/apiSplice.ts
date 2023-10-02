@@ -24,7 +24,7 @@ export const productionApi = createApi({
     baseQuery: fetchBaseQuery({
     baseUrl: 'http://127.0.0.1:8000/api/',
   }),
-  tagTypes: ['Shift', 'Downtime', 'Scrap', 'Product'],
+  tagTypes: ['Shift', 'Downtime', 'Speedloss', 'Scrap', 'Product'],
   endpoints: (builder) => ({
       getAllLines: builder.query({
           query: () => 'production-line',
@@ -85,6 +85,41 @@ export const productionApi = createApi({
               body: downtime,
           }),
           invalidatesTags: (result, error, bar) => [{ type: 'Downtime', id: bar.id }],
+      }),
+
+
+      //SPEED LOSS
+      getShiftSpeedLoss: builder.query({
+          query: ({shiftId}) =>
+              `speedloss/?shift=${shiftId}`,
+          providesTags: (result) =>
+              result ?
+                  [
+                      ...result.map(({ id }) => ({ type: 'Speedloss' as const, id })),
+                      { type: 'Speedloss', id: 'LIST' },
+                  ]
+                  : { type: 'Speedloss', id: 'LIST' },
+      }),
+      getSpeedLoss: builder.query({
+          query: (bar) =>
+              `speedloss/${bar.id}`,
+          providesTags: (result, error, bar) => [{ type: 'Speedloss', id: bar.id }],
+      }),
+      speedlossAdded: builder.mutation({
+          query: (speedloss) => ({
+              url: `speedloss/`,
+              method: 'POST',
+              body: speedloss,
+          }),
+          invalidatesTags: [{ type: 'Speedloss', id: 'LIST' }],
+      }),
+      speedlossUpdated: builder.mutation({
+          query: (speedloss) => ({
+              url: `speedloss/${speedloss.id}/`,
+              method: 'PATCH',
+              body: speedloss,
+          }),
+          invalidatesTags: (result, error, bar) => [{ type: 'Speedloss', id: bar.id }],
       }),
 
 
@@ -198,6 +233,11 @@ export const {
     useDowntimeAddedMutation,
     useDowntimeUpdatedMutation,
     useLazyGetDowntimeQuery,
+
+    useGetShiftSpeedLossQuery,
+    useGetSpeedLossQuery,
+    useSpeedlossAddedMutation,
+    useSpeedlossUpdatedMutation,
 
     useGetAllScrapQuery,
     useGetScrapQuery,

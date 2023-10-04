@@ -97,7 +97,7 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
     };
 
     //CONVERT BOOTSTRAP COLORS TO MUI
-    const color = (background:string) => {
+    const color = (background:string|undefined) => {
          switch (background){
             case 'bg-success': {
                 return 'green';
@@ -125,15 +125,15 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
 
 
     //LOGIC TO CHECK IF THERE IS INFO IN THE QUERIED VARIABLES
-    let start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
-    let end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
-    let circleColor = color(bar.background);
-    let description = comments ? comments.description ? comments.description : '' : '';
-    let reason = comments ? comments.reason ? comments.reason : '' : '';
+    const start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
+    const end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
+    const circleColor:string = color(bar.background);
+    const description = comments ? comments.description ? comments.description : '' : '';
+    const reason = comments ? comments.reason ? comments.reason : '' : '';
 
-    let scrapReason = scrap ? scrap.reason ? scrap.reason : '' : '';
-    let scrapComments = scrap ? scrap.comments ? scrap.comments : '' : '';
-    let scrapQuantity = scrap ? scrap.id.slice(1) === bar.id ? scrap.pieces ? scrap.pieces : 0 : 0 : 0;
+    const scrapReason = scrap ? scrap.reason ? scrap.reason : '' : '';
+    const scrapComments = scrap ? scrap.comments ? scrap.comments : '' : '';
+    const scrapQuantity = scrap ? scrap.id.slice(1) === bar.id ? scrap.pieces ? scrap.pieces : 0 : 0 : 0;
 
 
     //UPDATE REASON

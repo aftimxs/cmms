@@ -26,7 +26,7 @@ const HeaderLeft = () => {
     })
 
     const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
-    const {currentData:scrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
+    const {currentData:scrap} = useGetAllScrapQuery(shift ? shift?.id : skipToken);
 
     // SHOW PRODUCTION LINE MENU
     const [open, setOpen] = useState(false);

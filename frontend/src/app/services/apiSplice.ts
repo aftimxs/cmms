@@ -1,5 +1,4 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import {BaseQueryArg} from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 
 interface comments {
     id: string,
@@ -19,6 +18,12 @@ interface scrap {
     shift:number,
 }
 
+interface product {
+    id: number,
+    part_num: string,
+    rate: number,
+}
+
 export const productionApi = createApi({
     reducerPath: 'productionApi',
     baseQuery: fetchBaseQuery({
@@ -28,18 +33,17 @@ export const productionApi = createApi({
   endpoints: (builder) => ({
       getAllLines: builder.query({
           query: () => 'production-line',
-          transformResponse: (response) => {
-              const x = []
-              response.map((line) => x.push({id: line.id, area: line.area, cell: line.cell}))
-              return x
-          }
+          // transformResponse: (response:never) => {
+          //     const x:any[] = []
+          //     response.map((line) => x.push({id: line.id, area: line.area, cell: line.cell}))
+          //     return x
+          // }
       }),
       getLine: builder.query({
           query: ({area, cell, date, number}) =>
               `production-line?area=${area}&cell=${cell}&date=${date}&number=${number}`,
           providesTags: ['Shift'],
           transformResponse: (response) => {
-              // @ts-ignore
               return response[0]
           }
       }),
@@ -56,17 +60,15 @@ export const productionApi = createApi({
                       { type: 'Downtime', id: 'LIST' },
                   ]
                   : { type: 'Downtime', id: 'LIST' },
-          transformResponse: (response:comments) => {
-              // @ts-ignore
+          transformResponse: (response:comments[]) => {
               return response
           }
       }),
       getDowntime: builder.query({
           query: (bar) =>
               `downtime/${bar.id}`,
-          providesTags: (result, error, bar) => [{ type: 'Downtime', id: bar.id }],
+          providesTags: (_result, _error, bar) => [{ type: 'Downtime', id: bar.id }],
           transformResponse: (response:comments) => {
-              // @ts-ignore
               return response
           },
       }),
@@ -84,7 +86,7 @@ export const productionApi = createApi({
               method: 'PATCH',
               body: downtime,
           }),
-          invalidatesTags: (result, error, bar) => [{ type: 'Downtime', id: bar.id }],
+          invalidatesTags: (_result, _error, bar) => [{ type: 'Downtime', id: bar.id }],
       }),
 
 
@@ -103,7 +105,7 @@ export const productionApi = createApi({
       getSpeedLoss: builder.query({
           query: (bar) =>
               `speedloss/${bar.id}`,
-          providesTags: (result, error, bar) => [{ type: 'Speedloss', id: bar.id }],
+          providesTags: (_result, _error, bar) => [{ type: 'Speedloss', id: bar.id }],
       }),
       speedlossAdded: builder.mutation({
           query: (speedloss) => ({
@@ -119,18 +121,18 @@ export const productionApi = createApi({
               method: 'PATCH',
               body: speedloss,
           }),
-          invalidatesTags: (result, error, bar) => [{ type: 'Speedloss', id: bar.id }],
+          invalidatesTags: (_result, _error, bar) => [{ type: 'Speedloss', id: bar.id }],
       }),
 
 
       //SCRAP
-      getAllScrap: builder.query({
-          query: ({shift}) =>
+      getAllScrap: builder.query<scrap[], number>({
+          query: (shift) =>
               `scrap/?shift=${shift}`,
           providesTags: (result) =>
               result ?
                   [
-                      ...result.map(({ id }) => ({ type: 'Scrap' as const, id })),
+                      ...result.map(({ id }):{id:string, type:string} => ({ type: 'Scrap' as const, id })),
                       { type: 'Scrap', id: 'LIST' },
                   ]
                   : { type: 'Scrap', id: 'LIST' },
@@ -138,9 +140,8 @@ export const productionApi = createApi({
       getScrap: builder.query({
           query: (scrap) =>
               `scrap/${scrap.id}`,
-          providesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
+          providesTags: (_result, _error, scrap) => [{ type: 'Scrap', id: scrap.id}],
           transformResponse: (response:scrap) => {
-              // @ts-ignore
               return response
           },
       }),
@@ -158,14 +159,14 @@ export const productionApi = createApi({
               method: 'PATCH',
               body: scrap,
           }),
-          invalidatesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
+          invalidatesTags: (_result, _error, scrap) => [{ type: 'Scrap', id: scrap.id}],
       }),
       scrapDeleted: builder.mutation({
           query: (scrap) => ({
               url: `scrap/${scrap.id}/`,
               method: 'DELETE',
           }),
-          invalidatesTags: (result, error, scrap) => [{ type: 'Scrap', id: scrap.id}],
+          invalidatesTags: (_result, _error, scrap) => [{ type: 'Scrap', id: scrap.id}],
       }),
 
 
@@ -180,7 +181,7 @@ export const productionApi = createApi({
 
 
       //PRODUCTS
-      getAllProducts: builder.query({
+      getAllProducts: builder.query<product[], void>({
           query: () => 'product',
       }),
       getProduct: builder.query({
@@ -224,7 +225,6 @@ export const productionApi = createApi({
   }),
 })
 
-// @ts-ignore
 export const {
     useGetLineQuery,
 

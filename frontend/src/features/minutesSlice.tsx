@@ -11,8 +11,6 @@ export interface minutesState {
 // Define the initial state using that type
 const initialState: minutesState[] = []
 
-let lastId = 0;
-
 const minutesSlice = createSlice({
   name: 'minutes',
   initialState,
@@ -30,7 +28,6 @@ const minutesSlice = createSlice({
       //},
 
       minutesReset() {
-          lastId = 0;
           return initialState
       },
     }

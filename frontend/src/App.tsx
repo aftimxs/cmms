@@ -9,9 +9,7 @@ function App(){
 
     const lineParams = useAppSelector(state => state.line)
 
-    const {isLoading} = useGetLineQuery(lineParams, {
-        pollingInterval:30000
-    });
+    useGetLineQuery(lineParams, {pollingInterval:30000});
 
     return (<div className="container-fluid" >
                 <Header/>

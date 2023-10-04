@@ -42,7 +42,7 @@ const ScrapModal = ({ open, setOpen, value }:any) => {
         })
     })
 
-    const {data:allScrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
+    const {data:allScrap} = useGetAllScrapQuery(shift ? shift?.id : skipToken);
 
     return(
         <>

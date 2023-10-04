@@ -10,7 +10,6 @@ import {
     useGetLineState,
     useGetProductQuery,
     useGetShiftDowntimesQuery, useGetShiftSpeedLossQuery,
-    useScrapUpdatedMutation,
     useSpeedlossAddedMutation,
     useSpeedlossUpdatedMutation,
 } from "../../app/services/apiSplice.ts";
@@ -20,6 +19,15 @@ import {produce} from "immer"
 import {Skeleton} from "@mui/material";
 import {skipToken} from "@reduxjs/toolkit/query";
 
+interface sortedBars {
+    id: string,
+    startTime: dayjs.Dayjs,
+    minute: dayjs.Dayjs,
+    bg: string,
+    long: number,
+    parts: number,
+}
+
 
 const TimelineCenter = ({ hour }:any) => {
 
@@ -27,15 +35,14 @@ const TimelineCenter = ({ hour }:any) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift, productID, production, requestId, isLoading, isFetching} = useGetLineState(lineParams, {
-        selectFromResult: ({currentData:state, requestId, isFetching, isLoading}) => ({
+     const {shift, productID, production, requestId, isLoading} = useGetLineState(lineParams, {
+        selectFromResult: ({currentData:state, requestId, isLoading}) => ({
             shift: state? state['shift'][0] : undefined,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
             production: state? state['shift'][0]? _.groupBy(state['shift'][0]['info'],'hour')[hour] : undefined : undefined,
             requestId,
             isLoading,
-            isFetching
         })
     })
 
@@ -45,7 +52,8 @@ const TimelineCenter = ({ hour }:any) => {
 
     const now = dayjs();
 
-    const [bars, setBars] = useState([])
+    const initialBars:sortedBars[] = []
+    const [bars, setBars] = useState(initialBars)
 
     //CREATE MINUTES ARRAY
     const minutes:any = [];
@@ -105,7 +113,6 @@ const TimelineCenter = ({ hour }:any) => {
     }
 
     useEffect(() => {
-        // @ts-ignore
         setBars(background(now))
     }, [shift, requestId, product]);
 
@@ -146,7 +153,7 @@ const TimelineCenter = ({ hour }:any) => {
         }
 
         const newBar = (id:number, color:string, minute:dayjs.Dayjs, counter:number, partsCounter:number, startTime:dayjs.Dayjs) => {
-            barsProv = produce(barsProv, draftState => {
+            barsProv = produce(barsProv, (draftState: { id: number; long: number; minute: dayjs.Dayjs; bg: string; parts: number; startTime: dayjs.Dayjs; }[]) => {
                 draftState.push({
                     id: id,
                     long: counter,
@@ -159,7 +166,7 @@ const TimelineCenter = ({ hour }:any) => {
         }
 
         const updateBar = (id:number, counter:number, minute:dayjs.Dayjs) => {
-            barsProv = produce(barsProv, draftState => {
+            barsProv = produce(barsProv, (draftState: { minute:dayjs.Dayjs, long: number; }[]) => {
                 draftState[id].minute = minute
                 draftState[id].long = counter
             })
@@ -207,7 +214,7 @@ const TimelineCenter = ({ hour }:any) => {
         })
 
         //ORDER BARS BY MINUTE
-        const sortedBars =  _.sortBy(barsProv, 'minute')
+        const sortedBars:sortedBars[] =  _.sortBy(barsProv, 'minute')
 
         //SET BARS IN STORE
         sortedBars.map(bar => {
@@ -220,10 +227,9 @@ const TimelineCenter = ({ hour }:any) => {
                parts: bar.parts,
            }))
         })
-        console.log(sortedBars)
+
         //GROUP RED BARS INTO ARRAY AND POST TO DATABASE
         const bgGrouped = _.groupBy(sortedBars, 'bg')
-        // @ts-ignore
         const danger = _.flatten(bgGrouped['bg-danger'])
         const warning = _.flatten(bgGrouped['bg-warning'])
 

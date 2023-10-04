@@ -19,7 +19,7 @@ const TimelineRight = ({ hour } : any) => {
     })
 
     const {data:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
-    const {data:scrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
+    const {data:scrap} = useGetAllScrapQuery(shift ? shift?.id : skipToken);
 
 
     const total = () => {

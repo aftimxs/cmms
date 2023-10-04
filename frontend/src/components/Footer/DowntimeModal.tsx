@@ -69,10 +69,12 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
                             maxHeight: 300,
                         }}
                     >
-                        {allDowntimes?.map((period:any, index:number) => <DowntimeListItem
+                        {allDowntimes?.map((period, index:number) => (
+                            <DowntimeListItem
                                 key={index}
                                 period={period}
                             />
+                            )
                         )}
                     </List>
                 </Grid>

@@ -28,11 +28,6 @@ const style = {
     borderRadius: '4px',
 };
 
-export interface product {
-    id: number,
-    part_num: string,
-    rate: number
-}
 
 const CommentModal = ({ open, setOpen, value }:any) => {
 
@@ -128,7 +123,7 @@ const CommentModal = ({ open, setOpen, value }:any) => {
                                     sx={{mt:'20px'}}
                                     onChange={(event) => handleProductChange(event)}
                                 >
-                                    {products?.map((option:product) => (
+                                    {products?.map((option) => (
                                         <MenuItem key={option.id} value={option.id}>
                                             {option.part_num}
                                         </MenuItem>

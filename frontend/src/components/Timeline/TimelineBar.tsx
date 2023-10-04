@@ -10,7 +10,6 @@ import {
     useGetDowntimeQuery,
     useGetLineState,
     useGetProductQuery, useGetSpeedLossQuery,
-    useLazyGetDowntimeQuery,
 } from "../../app/services/apiSplice.ts";
 import {downtimeSelected} from "../../features/downtimeSlice.ts";
 import Box from '@mui/material/Box';
@@ -110,7 +109,7 @@ const TimelineBar = ({ barData }:any) => {
     })
 
     const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
-    const {currentData:allScrap} = useGetAllScrapQuery(shift ? {shift: shift?.id} : skipToken);
+    const {currentData:allScrap} = useGetAllScrapQuery(shift ? shift?.id : skipToken);
 
     const w = barData.long * 1.6665
 

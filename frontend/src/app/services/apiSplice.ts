@@ -24,6 +24,14 @@ interface product {
     rate: number,
 }
 
+interface line {
+    area: string,
+    cell: number,
+    id: number,
+    machine: {},
+    shift: [],
+}
+
 export const productionApi = createApi({
     reducerPath: 'productionApi',
     baseQuery: fetchBaseQuery({
@@ -50,19 +58,16 @@ export const productionApi = createApi({
 
 
       //DOWNTIMES
-      getShiftDowntimes: builder.query({
-          query: ({shiftId}) =>
+      getShiftDowntimes: builder.query<comments[], number>({
+          query: (shiftId) =>
               `downtime/?shift=${shiftId}`,
           providesTags: (result) =>
               result ?
                   [
-                      ...result.map(({ id }) => ({ type: 'Downtime' as const, id })),
+                      ...result.map(({ id })=> ({ type: 'Downtime' as const, id})),
                       { type: 'Downtime', id: 'LIST' },
                   ]
                   : { type: 'Downtime', id: 'LIST' },
-          transformResponse: (response:comments[]) => {
-              return response
-          }
       }),
       getDowntime: builder.query({
           query: (bar) =>

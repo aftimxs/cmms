@@ -47,7 +47,7 @@ const TimelineCenter = ({ hour }:any) => {
     })
 
     const {currentData:product} = useGetProductQuery(productID ? {id:productID} : skipToken);
-    const {currentData:downtimes} = useGetShiftDowntimesQuery(shift ? {shiftId: shift?.id} : skipToken)
+    const {currentData:downtimes} = useGetShiftDowntimesQuery(shift ? shift?.id : skipToken)
     const {currentData:speedlosses} = useGetShiftSpeedLossQuery(shift ? {shiftId: shift?.id} : skipToken)
 
     const now = dayjs();

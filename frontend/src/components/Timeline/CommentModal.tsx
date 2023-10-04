@@ -41,6 +41,7 @@ import ScrapButton from "./ScrapButton.tsx";
 import {skipToken} from "@reduxjs/toolkit/query";
 import Slide, {SlideProps} from "@mui/material/Slide";
 
+export type AlertColor = 'success' | 'info' | 'warning' | 'error';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -196,13 +197,13 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
 
 
     const [openSnack, setOpenSnack] = useState(false)
-    const [severity, setSeverity] = useState('success')
+    const [severity, setSeverity] = useState<AlertColor|undefined>('success')
 
     useEffect(() => {
-        if (updateScrapSuccess || updateDowntimeSuccess) {
+        if (updateScrapSuccess || updateDowntimeSuccess || updateSpeedLossSuccess) {
             setOpenSnack(true)
             setSeverity('success')
-        } else if (updateScrapError || updateDowntimeError) {
+        } else if (updateScrapError || updateDowntimeError || updateSpeedLossError) {
             setOpenSnack(true)
             setSeverity('error')
         }

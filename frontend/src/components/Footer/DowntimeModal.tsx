@@ -36,7 +36,7 @@ const DowntimeModal = ({ open, setOpen, value }:any) => {
         })
     })
 
-    const {data:allDowntimes} = useGetShiftDowntimesQuery(shift ? {shiftId: shift?.id} : skipToken);
+    const {data:allDowntimes} = useGetShiftDowntimesQuery(shift ? shift?.id : skipToken);
 
     return(
         <>

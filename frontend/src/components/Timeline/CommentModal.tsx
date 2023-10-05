@@ -124,14 +124,25 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
     const {data:comments} = useGetDowntimeQuery(bar.background === 'bg-danger' ? bar : skipToken);
     const {data:warning} = useGetSpeedLossQuery(bar.background === 'bg-warning' ? bar : skipToken);
 
+    let reason = '';
+    let description = '';
+
+
 
     //LOGIC TO CHECK IF THERE IS INFO IN THE QUERIED VARIABLES
     const start = dayjs(bar.start, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
     const end = dayjs(bar.end, 'DD-MM-YYYY HH:mm:ss Z').format('h:mm a');
     const circleColor:string = color(bar.background);
-    const description = comments ? comments.description ? comments.description : '' : '';
-    const reason = comments ? comments.reason ? comments.reason : '' : '';
 
+    //DOWNTIMES
+    //const description = comments ? comments.description ? comments.description : '' : '';
+    //const reason = comments ? comments.reason ? comments.reason : '' : '';
+//
+    ////SPEED LOSS
+    //const descriptionSL = warning ? warning.description ? warning.description : '' : '';
+    //const reasonSL = warning ? warning.reason ? warning.reason : '' : '';
+
+    //SCRAP
     const scrapReason = scrap ? scrap.reason ? scrap.reason : '' : '';
     const scrapComments = scrap ? scrap.comments ? scrap.comments : '' : '';
     const scrapQuantity = scrap ? scrap.id.slice(1) === bar.id ? scrap.pieces ? scrap.pieces : 0 : 0 : 0;
@@ -141,15 +152,33 @@ const CommentModal = ({ open, setOpen, handleClick }:any) => {
     const [reasonState, setReasonState] = useState('')
     const [scrapReasonState, setScrapReasonState] = useState('')
     useEffect(() => {
-        if (bar.background === 'bg-success') {
-            setScrapReasonState(scrapReason)
-        } else if (bar.background === 'bg-warning') {
-            setScrapReasonState(scrapReason)
-            setReasonState(reason)
-        } else if (bar.background === 'bg-danger') {
-            setReasonState(reason)
+        // if (bar.background === 'bg-success') {
+        //     setScrapReasonState(scrapReason)
+        // } else if (bar.background === 'bg-warning') {
+        //     setScrapReasonState(scrapReason)
+        //     setReasonState(reason)
+        // } else if (bar.background === 'bg-danger') {
+        //     setReasonState(reason)
+        // }
+        switch (bar.background){
+            case 'bg-success':
+                setScrapReasonState(scrapReason);
+                break;
+            case 'bg-warning':
+                reason = warning ? warning.reason ? warning.reason : '' : '';
+                description = warning ? warning.description ? warning.description : '' : '';
+                setScrapReasonState(scrapReason)
+                setReasonState(reason)
+                break;
+            case 'bg-danger':
+                reason = comments ? comments.reason ? comments.reason : '' : '';
+                description = comments ? comments.description ? comments.description : '' : '';
+                setReasonState(reason)
+                break;
         }
     }, [bar, reason, open, handleClick]);
+
+    console.log(reason, description)
 
 
     //OPEN REASON LIST SUBCATEGORIES

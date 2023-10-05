@@ -11,6 +11,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import {useGetLineState} from "../../app/services/apiSplice.ts";
 import CheckIcon from '@mui/icons-material/Check';
 import Tooltip from "@mui/material/Tooltip";
+import agLogo from '../../assets/ag.png'
 
 
 // @ts-ignore
@@ -86,7 +87,7 @@ const HeaderRight = () => {
             </Grid>
 
             <Grid pt={2}>
-                <img src="./src/assets/ag.png" alt="AG" className="img-fluid" style={{maxWidth: "100px"}}/>
+                <img src={agLogo} alt="AG" className="img-fluid" style={{maxWidth: "100px"}}/>
             </Grid>
 
         </Grid>

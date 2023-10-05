@@ -1,7 +1,7 @@
 import {CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import CustomTooltip from "./CustomTooltip.tsx";
 import ShiftOptionMenu from "./ShiftOptionMenu.tsx";
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import {useAppSelector} from "../../app/hooks.ts";
 import {useState} from "react";
 import {useGetLineState, useGetProductQuery} from "../../app/services/apiSplice.ts";
@@ -53,8 +53,7 @@ const HeaderCenter = () => {
                                         <span className="titles">SHIFT</span>
                                     </div>
                                     <div className="row">
-                                        <span>{`${dayjs(lineParams.date).
-                                        format('dddd DD/MM/YYYY')} - Shift ${lineParams.number}`}</span>
+                                        <span>{dayjs(lineParams.date).format('dddd DD/MM/YYYY')} - Shift {lineParams.number}</span>
                                     </div>
                                 </div>
                             </div>

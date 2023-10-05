@@ -16,10 +16,11 @@ const HeaderLeft = () => {
 
     const lineParams = useAppSelector(state => state.line)
 
-    const {shift, order, productID} = useGetLineState(lineParams, {
+    const {shift, quantity, productID} = useGetLineState(lineParams, {
         selectFromResult: ({currentData:state}) => ({
             shift: state? state['shift'][0] : undefined,
-            order: state? state['shift'][0]? state['shift'][0]['order'][0] : undefined : undefined,
+            quantity: state? state['shift'][0]? state['shift'][0]['order'][0]? state['shift'][0]['order'][0]['quantity']
+                : 0 : 0 : 0,
             productID: state? state['shift'][0]? state['shift'][0]['order'][0]?
                 state['shift'][0]['order'][0]['product'] : undefined : undefined : undefined,
         })
@@ -44,8 +45,8 @@ const HeaderLeft = () => {
         totalScrap = totalScrap + scr.pieces;
     })
 
-    let progress = [Number((((total-totalScrap)/order?.quantity)*100).toPrecision(4)),
-        Number(((totalScrap/order?.quantity)*100).toFixed(2))]
+    let progress = [Number((((total-totalScrap)/quantity)*100).toPrecision(4)),
+        Number(((totalScrap/quantity)*100).toFixed(2))]
 
     return (
         <>
@@ -120,7 +121,7 @@ const HeaderLeft = () => {
                     </div>
                     <Tooltip title={'Made (Scrap) / Total'}>
                         <div className=" col-4 text-end">
-                            <span>{total} <span style={{color:'#ffc107'}}>({totalScrap})</span> / {order? order.quantity : 0} pcs</span>
+                            <span>{total} <span style={{color:'#ffc107'}}>({totalScrap})</span> / {quantity} pcs</span>
                         </div>
                     </Tooltip>
                 </div>

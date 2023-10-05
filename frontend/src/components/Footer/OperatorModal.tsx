@@ -27,20 +27,23 @@ const OperatorModal = ({ open, setOpen, value }:any ) => {
 
     const lineParams = useAppSelector(state => state.line)
 
-     const {shift} = useGetLineState(lineParams, {
+     const {shift, operators} = useGetLineState(lineParams, {
         selectFromResult: ({data:state}) => ({
             shift: state? state['shift'][0] : undefined,
+            operators: state ? state['shift'][0] ? state['shift'][0]['operators'] : undefined : undefined,
         })
     })
 
     const handleClose = () => setOpen(false);
     const [operatorData, setOperatorData] = useState([])
-    const [selected, setSelected] = useState([0]);
+    const [selected, setSelected] = useState<number[]>([0]);
 
     // GET OPERATORS
     useEffect(() => {
         getOperators()
-        setSelected(shift?.operators)
+        if (operators !== undefined) {
+            setSelected(operators)
+        }
     }, [shift])
 
     const instance = axios.create({

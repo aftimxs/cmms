@@ -29,7 +29,26 @@ interface line {
     cell: number,
     id: number,
     machine: {},
-    shift: [],
+    shift: [
+        {
+            id: number,
+            line: number,
+            date: string,
+            number: number,
+            downtime: [],
+            info: [],
+            order: [{
+                id: number,
+                line: number,
+                product: number,
+                quantity: number,
+                shift: number,
+            }],
+            scrap: [],
+            speedloss: [],
+            operators: [],
+        }
+    ],
 }
 
 export const productionApi = createApi({
@@ -51,7 +70,7 @@ export const productionApi = createApi({
           query: ({area, cell, date, number}) =>
               `production-line?area=${area}&cell=${cell}&date=${date}&number=${number}`,
           providesTags: ['Shift'],
-          transformResponse: (response) => {
+          transformResponse: (response:[line]) => {
               return response[0]
           }
       }),
@@ -67,7 +86,7 @@ export const productionApi = createApi({
                       ...result.map(({ id })=> ({ type: 'Downtime' as const, id})),
                       { type: 'Downtime', id: 'LIST' },
                   ]
-                  : { type: 'Downtime', id: 'LIST' },
+                  : [{ type: 'Downtime', id: 'LIST' }],
       }),
       getDowntime: builder.query({
           query: (bar) =>
@@ -96,8 +115,8 @@ export const productionApi = createApi({
 
 
       //SPEED LOSS
-      getShiftSpeedLoss: builder.query({
-          query: ({shiftId}) =>
+      getShiftSpeedLoss: builder.query<comments[], number>({
+          query: (shiftId) =>
               `speedloss/?shift=${shiftId}`,
           providesTags: (result) =>
               result ?
@@ -105,7 +124,7 @@ export const productionApi = createApi({
                       ...result.map(({ id }) => ({ type: 'Speedloss' as const, id })),
                       { type: 'Speedloss', id: 'LIST' },
                   ]
-                  : { type: 'Speedloss', id: 'LIST' },
+                  : [{ type: 'Speedloss', id: 'LIST' }],
       }),
       getSpeedLoss: builder.query({
           query: (bar) =>
@@ -137,10 +156,10 @@ export const productionApi = createApi({
           providesTags: (result) =>
               result ?
                   [
-                      ...result.map(({ id }):{id:string, type:string} => ({ type: 'Scrap' as const, id })),
+                      ...result.map(({ id }) => ({ type: 'Scrap' as const, id })),
                       { type: 'Scrap', id: 'LIST' },
                   ]
-                  : { type: 'Scrap', id: 'LIST' },
+                  : [{ type: 'Scrap', id: 'LIST' }],
       }),
       getScrap: builder.query({
           query: (scrap) =>
